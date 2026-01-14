@@ -3,7 +3,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Dashboard/dashboard_page.dart';
 import 'package:mobile_assignment/Pages/Event/event_page.dart';
 import 'package:mobile_assignment/Pages/Home/home_page.dart';
-import 'package:mobile_assignment/Pages/My%20Tickets/ticket_page.dart';
+import 'package:mobile_assignment/Pages/My Tickets/ticket_page.dart';
 import 'package:mobile_assignment/Pages/Profile/profile_page.dart';
 
 class Changepage extends StatefulWidget {
