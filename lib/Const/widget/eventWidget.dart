@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Const/widget/bookmark_button.dart';
+import 'package:mobile_assignment/Const/widget/like_dislike_row.dart';
 import 'package:mobile_assignment/Pages/Other/eventdetailed_page.dart';
 
 class eventWidget extends StatelessWidget {
@@ -47,43 +49,86 @@ class eventWidget extends StatelessWidget {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: AdvertiseColor.backgroundColor.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.white.withOpacity(0.35),
+                          AdvertiseColor.backgroundColor.withOpacity(0.7),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(18),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          '12',
-                          style: TextStyle(
-                            fontFamily: 'KantumruyPro',
-                            color: AdvertiseColor.textColor,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 25,
-                          ),
+                        Stack(
+                          children: [
+                            Text(
+                              '12',
+                              style: TextStyle(
+                                fontFamily: 'KantumruyPro',
+                                foreground: Paint()
+                                  ..style = PaintingStyle.stroke
+                                  ..strokeWidth = 2.2
+                                  ..color = AdvertiseColor.primaryColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 24,
+                              ),
+                            ),
+                            Text(
+                              '12',
+                              style: TextStyle(
+                                fontFamily: 'KantumruyPro',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 24,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'DEC',
-                          style: TextStyle(
-                            fontFamily: 'KantumruyPro',
-                            color: AdvertiseColor.primaryColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        SizedBox(height: 2),
+                        Stack(
+                          children: [
+                            Text(
+                              'DEC',
+                              style: TextStyle(
+                                fontFamily: 'KantumruyPro',
+                                foreground: Paint()
+                                  ..style = PaintingStyle.stroke
+                                  ..strokeWidth = 1.5
+                                  ..color = AdvertiseColor.primaryColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              'DEC',
+                              style: TextStyle(
+                                fontFamily: 'KantumruyPro',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                   Spacer(),
                   Container(
-                    width: 30,
-                    height: 35,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
-                      color: AdvertiseColor.backgroundColor.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(10),
+                      color: AdvertiseColor.backgroundColor.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Icon(Icons.bookmark_outline),
+                    alignment: Alignment.center,
+                    child: const BookmarkButton(
+                      size: 22,
+                    ),
                   ),
                 ],
               ),
@@ -104,19 +149,10 @@ class eventWidget extends StatelessWidget {
                   SizedBox(height: 5),
                   Row(
                     children: [
-                      Icon(
-                        Icons.thumb_up_outlined,
-                        color: AdvertiseColor.primaryColor,
+                      const LikeDislikeRow(
+                        likes: 809000,
+                        dislikes: 0,
                       ),
-                      SizedBox(width: 5),
-                      Text('809 k'),
-                      SizedBox(width: 5),
-                      Icon(
-                        Icons.thumb_down_outlined,
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                      SizedBox(width: 5),
-                      Text('0'),
                       Spacer(),
                       Icon(
                         Icons.share_rounded,

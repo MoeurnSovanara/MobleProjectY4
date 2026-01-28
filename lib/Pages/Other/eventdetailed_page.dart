@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Const/widget/bookmark_button.dart';
+import 'package:mobile_assignment/Const/widget/like_dislike_row.dart';
 import 'package:mobile_assignment/Pages/Other/bookticket_page.dart';
 
 class EventdetailedPage extends StatelessWidget {
@@ -9,67 +11,70 @@ class EventdetailedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(5),
-              height: 180,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(15),
-                  bottomRight: Radius.circular(15),
-                ),
-                image: DecorationImage(
-                  image: AssetImage('assets/img/sample/event.png'),
-                  fit: BoxFit.fill,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: AdvertiseColor.backgroundColor,
-                    ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Sticky event image at the top
+          Builder(
+            builder: (context) {
+              final paddingTop = MediaQuery.of(context).padding.top;
+
+              return Container(
+                height: 220,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
                   ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                  image: DecorationImage(
+                    image: AssetImage('assets/img/sample/event.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(12, paddingTop + 8, 12, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.35),
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(6),
+                          child: Image.asset(
+                            'assets/img/Icon/arrowback.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          // Scrollable content below
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.thumb_up_outlined,
-                        color: AdvertiseColor.primaryColor,
+                      const LikeDislikeRow(
+                        likes: 1500,
+                        dislikes: 1000,
                       ),
-                      Text(
-                        '1.5k',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'KantumruyPro',
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      Icon(
-                        Icons.thumb_down_outlined,
-                        color: AdvertiseColor.dangerColor,
-                      ),
-                      Text(
-                        '1k',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'KantumruyPro',
-                        ),
-                      ),
-                      Spacer(),
+                      const Spacer(),
                       Text(
                         '100',
                         style: TextStyle(
@@ -77,9 +82,9 @@ class EventdetailedPage extends StatelessWidget {
                           fontFamily: 'KantumruyPro',
                         ),
                       ),
-                      Icon(
-                        Icons.bookmark_outline,
-                        color: AdvertiseColor.warningColor,
+                      const SizedBox(width: 6),
+                      const BookmarkButton(
+                        size: 20,
                       ),
                     ],
                   ),
@@ -321,26 +326,37 @@ class EventdetailedPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BookticketPage(),
-                          ),
-                        ),
-                        style: AppComponent.elevatedButtonStyle,
-                        child: Text(
-                          'Booking Ticket',
-                          style: AppComponent.elevatedButtonTextStyle,
-                        ),
-                      ),
+                      SizedBox(height: 24),
                     ],
                   ),
                 ],
               ),
+              ),
             ),
-          ],
+          ),
+        ],
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookticketPage(),
+                ),
+              ),
+              style: AppComponent.elevatedButtonStyle,
+              child: Text(
+                'Booking Ticket',
+                style: AppComponent.elevatedButtonTextStyle,
+              ),
+            ),
+          ),
         ),
       ),
     );
