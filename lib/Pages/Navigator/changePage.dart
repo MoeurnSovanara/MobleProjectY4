@@ -43,6 +43,10 @@ class _ChangepageState extends State<Changepage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final double iconSize = size.width * 0.06; // ~6% of screen width
+    final double topPadding = size.height * 0.006; // small responsive top padding
+
     return Scaffold(
       backgroundColor: AdvertiseColor.backgroundColor,
       body: pages[currentTabIndex],
@@ -53,25 +57,100 @@ class _ChangepageState extends State<Changepage> {
         selectedItemColor: AdvertiseColor.primaryColor,
         unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
+            icon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/homeTabar.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/homeTabarActive.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event_outlined),
+            icon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/eventTabar.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/eventTabarActive.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
             label: 'Events',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
+            icon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/dashboadTabar.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/dashboardTabarActive.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.confirmation_number_outlined),
+            icon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/myTicketTabar.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/myTicketTabarActive.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
             label: 'Tickets',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
+            icon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/profileTabar.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.only(top: topPadding),
+              child: Image.asset(
+                'assets/img/Icon/profileTabarActive.png',
+                width: iconSize,
+                height: iconSize,
+              ),
+            ),
             label: 'Profile',
           ),
         ],
