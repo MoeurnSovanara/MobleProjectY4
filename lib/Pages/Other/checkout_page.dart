@@ -163,19 +163,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
               Row(
                 children: [
                   _buildDateInfo(
-                    Icons.calendar_month_outlined,
+                    Image.asset('assets/img/Icon/calendar.png', width: 24, height: 24),
                     'Start Date',
                     '16-Dec-2025',
                   ),
                   Spacer(),
                   _buildDateInfo(
-                    Icons.calendar_month_outlined,
+                    Image.asset('assets/img/Icon/calendar.png', width: 24, height: 24),
                     'End Date',
                     '23-Mar-2025',
                   ),
                   Spacer(),
                   _buildDateInfo(
-                    Icons.timer_outlined,
+                    Image.asset('assets/img/Icon/clock.png', width: 24, height: 24),
                     'Time',
                     '11:00 AM - 2:50 PM',
                   ),
@@ -285,10 +285,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  Widget _buildDateInfo(IconData icon, String title, String value) {
+  Widget _buildDateInfo(Widget icon, String title, String value) {
     return Row(
       children: [
-        Icon(icon),
+        icon,
         SizedBox(width: 5),
 
         Column(

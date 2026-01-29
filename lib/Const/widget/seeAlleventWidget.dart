@@ -155,9 +155,10 @@ class Seealleventwidget extends StatelessWidget {
                 SizedBox(height: 10),
                 Row(
                   children: [
-                    Icon(
-                      Icons.location_on,
-                      color: AdvertiseColor.textColor.withOpacity(0.5),
+                    Image.asset(
+                      'assets/img/Icon/location.png',
+                      width: 22,
+                      height: 22,
                     ),
                     SizedBox(width: 5),
                     Text(

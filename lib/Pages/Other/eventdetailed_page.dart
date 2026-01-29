@@ -68,27 +68,8 @@ class EventdetailedPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  Row(
-                    children: [
-                      const LikeDislikeRow(
-                        likes: 1500,
-                        dislikes: 1000,
-                      ),
-                      const Spacer(),
-                      Text(
-                        '100',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'KantumruyPro',
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      const BookmarkButton(
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
+                  const _EventDetailInteractionRow(),
+                  const SizedBox(height: 5),
                   Row(
                     children: [
                       Text('Symphony', style: AppComponent.boldTextStyle),
@@ -116,7 +97,7 @@ class EventdetailedPage extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.calendar_month_outlined),
+                              Image.asset('assets/img/Icon/calendar.png', width: 24, height: 24),
                               Container(
                                 padding: EdgeInsets.all(5),
                                 child: Column(
@@ -138,7 +119,7 @@ class EventdetailedPage extends StatelessWidget {
                           Spacer(),
                           Row(
                             children: [
-                              Icon(Icons.calendar_month_outlined),
+                              Image.asset('assets/img/Icon/calendar.png', width: 24, height: 24),
                               Container(
                                 padding: EdgeInsets.all(5),
                                 child: Column(
@@ -163,7 +144,7 @@ class EventdetailedPage extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.timer_outlined),
+                              Image.asset('assets/img/Icon/clock.png', width: 24, height: 24),
                               Container(
                                 padding: EdgeInsets.all(5),
                                 child: Column(
@@ -185,144 +166,225 @@ class EventdetailedPage extends StatelessWidget {
                         ],
                       ),
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.location_on_outlined),
-                          SizedBox(width: 5),
-                          Text(
-                            'Location: Phnom Penh',
-                            style: AppComponent.hintTextStyle.copyWith(
-                              color: AdvertiseColor.textColor,
-                            ),
-                          ),
+                          Image.asset('assets/img/Icon/location.png', width: 22, height: 22),
                           SizedBox(width: 10),
-                          Image.asset('assets/img/other/googlemap.png'),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Column(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: AdvertiseColor.primaryColor,
-                              ),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Stage',
-                                  style: AppComponent.boldTextStyle,
+                                  'Location: Phnom Penh',
+                                  style: TextStyle(
+                                    fontFamily: 'KantumruyPro',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: AdvertiseColor.textColor,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Image.asset('assets/img/other/googlemap.png', height: 20),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Google Map',
+                                      style: TextStyle(
+                                        fontFamily: 'KantumruyPro',
+                                        fontSize: 13,
+                                        color: AdvertiseColor.textColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: AdvertiseColor.primaryColor,
-                                    ),
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Zone A',
-                                        style: AppComponent.boldTextStyle,
-                                      ),
-                                      Text(
-                                        'VIP',
-                                        style: AppComponent.sublabelStyle,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Container(
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: AdvertiseColor.primaryColor,
-                                    ),
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Zone B',
-                                        style: AppComponent.boldTextStyle,
-                                      ),
-                                      Text(
-                                        'Premium',
-                                        style: AppComponent.sublabelStyle,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                      SizedBox(height: 24),
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFE8ECF5),
+                          border: Border.all(
+                            color: AdvertiseColor.primaryColor.withOpacity(0.4),
+                            width: 1,
                           ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: AdvertiseColor.primaryColor,
-                                    ),
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Zone C',
-                                        style: AppComponent.boldTextStyle,
-                                      ),
-                                      Text(
-                                        'Standard',
-                                        style: AppComponent.sublabelStyle,
-                                      ),
-                                    ],
-                                  ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Stage',
+                            style: TextStyle(
+                              fontFamily: 'KantumruyPro',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AdvertiseColor.textColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: AdvertiseColor.primaryColor.withOpacity(0.12),
+                                border: Border.all(
+                                  color: AdvertiseColor.primaryColor.withOpacity(0.4),
+                                  width: 1,
                                 ),
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Container(
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: AdvertiseColor.primaryColor,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Zone A',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AdvertiseColor.textColor,
                                     ),
-                                    borderRadius: BorderRadius.circular(15),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Zone D',
-                                        style: AppComponent.boldTextStyle,
-                                      ),
-                                      Text(
-                                        'General',
-                                        style: AppComponent.sublabelStyle,
-                                      ),
-                                    ],
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'VIP',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: AdvertiseColor.textColor.withOpacity(0.7),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFFFF9E6),
+                                border: Border.all(
+                                  color: AdvertiseColor.primaryColor.withOpacity(0.4),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Zone B',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Premium',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: AdvertiseColor.textColor.withOpacity(0.7),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFFFF9E6),
+                                border: Border.all(
+                                  color: AdvertiseColor.primaryColor.withOpacity(0.4),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Zone C',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Standart',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: AdvertiseColor.textColor.withOpacity(0.7),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: AdvertiseColor.primaryColor.withOpacity(0.12),
+                                border: Border.all(
+                                  color: AdvertiseColor.primaryColor.withOpacity(0.4),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Zone D',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'General',
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: AdvertiseColor.textColor.withOpacity(0.7),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -359,6 +421,49 @@ class EventdetailedPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _EventDetailInteractionRow extends StatefulWidget {
+  const _EventDetailInteractionRow();
+
+  @override
+  State<_EventDetailInteractionRow> createState() =>
+      _EventDetailInteractionRowState();
+}
+
+class _EventDetailInteractionRowState extends State<_EventDetailInteractionRow> {
+  static const int _initialBookmarkCount = 100;
+  int _bookmarkCount = _initialBookmarkCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const LikeDislikeRow(
+          likes: 1500,
+          dislikes: 1000,
+        ),
+        const Spacer(),
+        Text(
+          '$_bookmarkCount',
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'KantumruyPro',
+          ),
+        ),
+        const SizedBox(width: 6),
+        BookmarkButton(
+          size: 20,
+          onChanged: (isBookmarked) {
+            setState(() {
+              _bookmarkCount =
+                  _initialBookmarkCount + (isBookmarked ? 1 : 0);
+            });
+          },
+        ),
+      ],
     );
   }
 }

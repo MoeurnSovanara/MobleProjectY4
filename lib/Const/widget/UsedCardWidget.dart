@@ -37,7 +37,7 @@ class Usedcardwidget extends StatelessWidget {
                   Spacer(),
                   Row(
                     children: [
-                      Icon(Icons.location_on_outlined),
+                      Image.asset('assets/img/Icon/location.png', width: 24, height: 24),
                       Expanded(
                         child: Text(
                           'Phnom Penh, Cambodia',

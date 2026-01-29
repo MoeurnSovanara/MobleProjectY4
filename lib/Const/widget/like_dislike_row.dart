@@ -22,7 +22,8 @@ class _LikeDislikeRowState extends State<LikeDislikeRow> {
 
   String _formatCount(int value) {
     if (value >= 1000000) return '${(value / 1000000).toStringAsFixed(1)} M';
-    if (value >= 1000) return '${(value / 1000).toStringAsFixed(0)} k';
+    if (value >= 10000) return '${(value / 1000).toStringAsFixed(0)} k';
+    if (value >= 1000) return value.toString(); // show full number so +1 is visible (e.g. 1500 → 1501)
     return value.toString();
   }
 
@@ -87,24 +88,34 @@ class _LikeDislikeRowState extends State<LikeDislikeRow> {
           ),
         ),
         const SizedBox(width: 5),
-        Text(_formatCount(widget.likes)),
+        Text(_formatCount(widget.likes + (_isLiked ? 1 : 0))),
         const SizedBox(width: 8),
         GestureDetector(
           onTap: _toggleDislike,
           child: AnimatedScale(
             scale: _dislikeScale,
             duration: const Duration(milliseconds: 120),
-            child: Image.asset(
-              _isDisliked
-                  ? 'assets/img/Icon/disliked.png'
-                  : 'assets/img/Icon/dislike.png',
-              width: 22,
-              height: 22,
-            ),
+            child: _isDisliked
+                ? Image.asset(
+                    'assets/img/Icon/dislike.png',
+                    width: 22,
+                    height: 22,
+                  )
+                : ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      Colors.grey,
+                      BlendMode.srcIn,
+                    ),
+                    child: Image.asset(
+                      'assets/img/Icon/disliked.png',
+                      width: 22,
+                      height: 22,
+                    ),
+                  ),
           ),
         ),
         const SizedBox(width: 5),
-        Text(_formatCount(widget.dislikes)),
+        Text(_formatCount(widget.dislikes + (_isDisliked ? 1 : 0))),
       ],
     );
   }

@@ -1234,11 +1234,10 @@ class _CreateeventpageState extends State<Createeventpage> {
                                     .withOpacity(0.5),
                                 suffixIcon: Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
-                                  child: Icon(
-                                    Icons.calendar_month,
-                                    color: AdvertiseColor.textColor.withOpacity(
-                                      0.5,
-                                    ),
+                                  child: Image.asset(
+                                    'assets/img/Icon/calendar.png',
+                                    width: 24,
+                                    height: 24,
                                   ),
                                 ),
                                 border: OutlineInputBorder(
@@ -1288,11 +1287,10 @@ class _CreateeventpageState extends State<Createeventpage> {
                                     .withOpacity(0.5),
                                 suffixIcon: Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
-                                  child: Icon(
-                                    Icons.calendar_month,
-                                    color: AdvertiseColor.textColor.withOpacity(
-                                      0.5,
-                                    ),
+                                  child: Image.asset(
+                                    'assets/img/Icon/calendar.png',
+                                    width: 24,
+                                    height: 24,
                                   ),
                                 ),
                                 border: OutlineInputBorder(
@@ -1348,11 +1346,10 @@ class _CreateeventpageState extends State<Createeventpage> {
                                     .withOpacity(0.5),
                                 suffixIcon: Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
-                                  child: Icon(
-                                    Icons.timer_outlined,
-                                    color: AdvertiseColor.textColor.withOpacity(
-                                      0.5,
-                                    ),
+                                  child: Image.asset(
+                                    'assets/img/Icon/clock.png',
+                                    width: 24,
+                                    height: 24,
                                   ),
                                 ),
                                 border: OutlineInputBorder(
@@ -1400,11 +1397,10 @@ class _CreateeventpageState extends State<Createeventpage> {
                                     .withOpacity(0.5),
                                 suffixIcon: Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
-                                  child: Icon(
-                                    Icons.timer_outlined,
-                                    color: AdvertiseColor.textColor.withOpacity(
-                                      0.5,
-                                    ),
+                                  child: Image.asset(
+                                    'assets/img/Icon/clock.png',
+                                    width: 24,
+                                    height: 24,
                                   ),
                                 ),
                                 border: OutlineInputBorder(
