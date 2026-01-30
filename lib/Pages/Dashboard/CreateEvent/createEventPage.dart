@@ -608,6 +608,7 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   Widget _buildStep4() {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Form(
       key: _formKey,
       child: Column(
@@ -706,7 +707,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                           filled: true,
                           fillColor: AdvertiseColor.backgroundColor,
                           contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
+                            horizontal: screenWidth <= 375 ? 2.5 : 10,
                             vertical: 5,
                           ),
                         ),

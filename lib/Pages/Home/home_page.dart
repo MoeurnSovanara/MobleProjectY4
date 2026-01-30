@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage> {
                           itemCount: 3,
                           scrollDirection: Axis.horizontal,
                           shrinkWrap: false,
+                          
                           itemBuilder: (BuildContext context, int index) {
                             return eventWidget();
                           },

@@ -13,6 +13,7 @@ class TicketInfo_widget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       height: 80,
@@ -20,7 +21,10 @@ class TicketInfo_widget extends StatelessWidget {
         border: Border.all(color: AdvertiseColor.textColor),
         borderRadius: BorderRadius.circular(15),
       ),
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+      padding: EdgeInsets.symmetric(
+        vertical: 5,
+        horizontal: screenWidth <= 375 ? 18 : 20,
+      ),
       margin: EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
@@ -60,6 +64,7 @@ class TicketInfo_widget extends StatelessWidget {
           Text(
             '\$ 120',
             style: AppComponent.boldTextStyle.copyWith(
+              fontSize: screenWidth <= 375 ? 18 : 24,
               color: AdvertiseColor.textColor.withOpacity(0.5),
             ),
           ),

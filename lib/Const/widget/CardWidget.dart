@@ -7,6 +7,7 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Container(
       height: 160,
       decoration: BoxDecoration(
@@ -21,17 +22,29 @@ class CardWidget extends StatelessWidget {
             Image.asset('assets/img/sample/ticket.png', height: 140),
             SizedBox(width: 5),
             SizedBox(
-              width: 180,
+              width: screenWidth <= 393 ? 135 : 180,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Cambodian Tranditional Dance',
                     maxLines: 2,
-                    style: AppComponent.labelStyle,
+                    style: AppComponent.labelStyle.copyWith(
+                      fontSize: screenWidth <= 393 ? 14 : 16,
+                    ),
                   ),
-                  Text('Mon Nov at 1:45 PM'),
-                  Text('Phnom Penh, Cambodia'),
+                  Text(
+                    'Mon Nov at 1:45 PM',
+                    style: AppComponent.detailTextStyle.copyWith(
+                      fontSize: screenWidth <= 393 ? 12 : 14,
+                    ),
+                  ),
+                  Text(
+                    'Phnom Penh, Cambodia',
+                    style: AppComponent.detailTextStyle.copyWith(
+                      fontSize: screenWidth <= 393 ? 12 : 14,
+                    ),
+                  ),
                   Container(
                     margin: EdgeInsets.only(top: 10),
                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -49,6 +62,7 @@ class CardWidget extends StatelessWidget {
                 ],
               ),
             ),
+            Spacer(),
             Column(
               children: [
                 IconButton.outlined(
