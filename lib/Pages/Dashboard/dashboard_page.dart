@@ -23,6 +23,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    var screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: Image.asset('assets/img/other/logo2.png'),
@@ -63,7 +65,10 @@ class _DashboardPageState extends State<DashboardPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Moth Tola', style: AppComponent.labelStyle),
+                        Text(
+                          '${screenHeight.toStringAsFixed(0)}+${screenWidth.toStringAsFixed(0)}',
+                          style: AppComponent.labelStyle,
+                        ),
                         SizedBox(height: 5),
                         Text(
                           'mothTola@gmail.com',

@@ -14,7 +14,7 @@ class CardWidget extends StatelessWidget {
         border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.5)),
         borderRadius: BorderRadius.circular(15),
       ),
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(5),
       child: SizedBox(
         width: double.infinity,
         child: Row(
@@ -46,7 +46,7 @@ class CardWidget extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 10),
+                    margin: EdgeInsets.only(top: 5),
                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                     decoration: BoxDecoration(
                       color: AdvertiseColor.primaryColor,
@@ -88,6 +88,7 @@ class CardWidget extends StatelessWidget {
                                 style: AppComponent.labelStyle.copyWith(
                                   color: Colors.white,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),

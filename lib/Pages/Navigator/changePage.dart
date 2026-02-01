@@ -43,38 +43,40 @@ class _ChangepageState extends State<Changepage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AdvertiseColor.backgroundColor,
-      body: pages[currentTabIndex],
-      bottomNavigationBar: BottomNavigationBar(
+    return SafeArea(
+      child: Scaffold(
         backgroundColor: AdvertiseColor.backgroundColor,
-        currentIndex: currentTabIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: AdvertiseColor.primaryColor,
-        unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_outlined),
-            label: 'Events',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.confirmation_number_outlined),
-            label: 'Tickets',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
-        ],
+        body: pages[currentTabIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: AdvertiseColor.backgroundColor,
+          currentIndex: currentTabIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: AdvertiseColor.primaryColor,
+          unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.event_outlined),
+              label: 'Events',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.confirmation_number_outlined),
+              label: 'Tickets',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

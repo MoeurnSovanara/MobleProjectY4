@@ -707,7 +707,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                           filled: true,
                           fillColor: AdvertiseColor.backgroundColor,
                           contentPadding: EdgeInsets.symmetric(
-                            horizontal: screenWidth <= 375 ? 2.5 : 10,
+                            horizontal: screenWidth <= 375 ? 2.5 : 8,
                             vertical: 5,
                           ),
                         ),
@@ -820,7 +820,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                 borderRadius: BorderRadius.circular(8),
                 color: AdvertiseColor.primaryColor,
               ),
-              width: 130,
+              width: 135,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -1015,7 +1015,7 @@ class _CreateeventpageState extends State<Createeventpage> {
             onTap: _addTicket,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              width: 140,
+              width: 150,
               decoration: BoxDecoration(
                 border: Border.all(color: AdvertiseColor.primaryColor),
                 borderRadius: BorderRadius.circular(10),

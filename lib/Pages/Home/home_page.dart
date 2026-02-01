@@ -72,12 +72,12 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SizedBox(height: 10),
                       Container(
-                        height: 250,
+                        height: 270,
                         child: ListView.builder(
                           itemCount: 3,
                           scrollDirection: Axis.horizontal,
                           shrinkWrap: false,
-                          
+
                           itemBuilder: (BuildContext context, int index) {
                             return eventWidget();
                           },

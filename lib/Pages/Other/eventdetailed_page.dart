@@ -198,7 +198,7 @@ class EventdetailedPage extends StatelessWidget {
                         children: [
                           Container(
                             width: double.infinity,
-                            height: 60,
+                            height: 65,
                             decoration: BoxDecoration(
                               border: Border.all(
                                 color: AdvertiseColor.primaryColor,
@@ -220,7 +220,7 @@ class EventdetailedPage extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Container(
-                                  height: 60,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                       color: AdvertiseColor.primaryColor,
@@ -244,7 +244,7 @@ class EventdetailedPage extends StatelessWidget {
                               SizedBox(width: 10),
                               Expanded(
                                 child: Container(
-                                  height: 60,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                       color: AdvertiseColor.primaryColor,
@@ -272,7 +272,7 @@ class EventdetailedPage extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Container(
-                                  height: 60,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                       color: AdvertiseColor.primaryColor,
@@ -296,7 +296,7 @@ class EventdetailedPage extends StatelessWidget {
                               SizedBox(width: 10),
                               Expanded(
                                 child: Container(
-                                  height: 60,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                       color: AdvertiseColor.primaryColor,
