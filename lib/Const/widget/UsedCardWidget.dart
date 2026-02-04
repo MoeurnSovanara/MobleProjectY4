@@ -7,8 +7,9 @@ class Usedcardwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      height: 160,
+      height: screenWidth <= 402 ? 140 : 160,
       decoration: BoxDecoration(
         border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.5)),
         borderRadius: BorderRadius.circular(15),
@@ -51,88 +52,85 @@ class Usedcardwidget extends StatelessWidget {
             ),
             Spacer(),
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
 
-                          builder: (context) => Dialog(
-                            backgroundColor: Colors.transparent,
-                            insetPadding: EdgeInsets.all(20),
+                      builder: (context) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: EdgeInsets.all(20),
 
-                            child: SizedBox(
-                              height: 300,
-                              width: 300,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Image.asset('assets/img/sample/qr.png'),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    'Scan this QR code at the entrance',
-                                    style: AppComponent.labelStyle.copyWith(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                        child: SizedBox(
+                          height: 300,
+                          width: 300,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.asset('assets/img/sample/qr.png'),
+                              SizedBox(height: 10),
+                              Text(
+                                'Scan this QR code at the entrance',
+                                style: AppComponent.labelStyle.copyWith(
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        );
-                      },
-                      child: SizedBox(
-                        height: 30,
-                        width: 30,
-                        child: Icon(
-                          Icons.qr_code,
-                          color: AdvertiseColor.primaryColor,
                         ),
                       ),
+                    );
+                  },
+                  child: SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: Icon(
+                      Icons.qr_code,
+                      color: AdvertiseColor.primaryColor,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
 
-                          builder: (context) => Dialog(
-                            backgroundColor: Colors.transparent,
-                            insetPadding: EdgeInsets.all(20),
+                      builder: (context) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: EdgeInsets.all(20),
 
-                            child: SizedBox(
-                              height: 300,
-                              width: 300,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Image.asset('assets/img/sample/qr.png'),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    'Scan this QR code at the entrance',
-                                    style: AppComponent.labelStyle.copyWith(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                        child: SizedBox(
+                          height: 300,
+                          width: 300,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.asset('assets/img/sample/qr.png'),
+                              SizedBox(height: 10),
+                              Text(
+                                'Scan this QR code at the entrance',
+                                style: AppComponent.labelStyle.copyWith(
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        );
-                      },
-                      child: SizedBox(
-                        height: 30,
-                        width: 30,
-                        child: Icon(
-                          Icons.delete_outline,
-                          color: AdvertiseColor.dangerColor,
                         ),
                       ),
+                    );
+                  },
+                  child: SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: Icon(
+                      Icons.delete_outline,
+                      color: AdvertiseColor.dangerColor,
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
