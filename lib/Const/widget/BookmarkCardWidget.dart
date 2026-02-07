@@ -7,8 +7,9 @@ class Bookmarkcardwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      height: 160,
+      height: screenWidth <= 402 ? 140 : 160,
       decoration: BoxDecoration(
         border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.5)),
         borderRadius: BorderRadius.circular(15),
