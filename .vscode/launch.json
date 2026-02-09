@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "Run Desktop with Custom Window Size",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "windows",
+      "args": [
+        "--dart-define=WINDOW_WIDTH=1024",
+        "--dart-define=WINDOW_HEIGHT=768",
+        "--window-size=1024,768"
+      ]
+    },
+    {
+      "name": "Run Desktop with FPS Counter",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "windows",
+      "args": [
+        "--show-fps-counter",
+        "--trace-skia"
+      ]
+    }
+  ]
+}
