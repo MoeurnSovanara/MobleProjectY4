@@ -73,7 +73,7 @@ class _EventPageState extends State<EventPage> {
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                        return eventWidget();
+                                        return EventWidget();
                                       },
                                 ),
                               ),

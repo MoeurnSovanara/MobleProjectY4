@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
                           shrinkWrap: false,
 
                           itemBuilder: (BuildContext context, int index) {
-                            return eventWidget();
+                            return EventWidget();
                           },
                         ),
                       ),

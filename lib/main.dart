@@ -16,8 +16,8 @@ void main() {
       statusBarBrightness: Brightness.light,
     ),
   );
-  // runApp(DevicePreview(builder: (context) => MyApp()));
-  runApp(MyApp());
+  runApp(DevicePreview(builder: (context) => MyApp()));
+  // runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
