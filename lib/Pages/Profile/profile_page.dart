@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Pages/My%20Tickets/ticket_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/bookmark_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/editProfile_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/newdevice_page.dart';
@@ -242,78 +244,166 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 width: double.infinity,
-                height: 120,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                height: isOrganizer == true ? 300 : 130,
+                child: Column(
                   children: [
-                    Stack(
-                      alignment: Alignment.bottomRight,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: AdvertiseColor.textColor,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(40),
-                            child: _pickedImage != null
-                                ? Image.file(
-                                    _pickedImage!,
-                                    fit: BoxFit.cover,
-                                    height: 95,
-                                    width: 95,
-                                  )
-                                : Image.asset(
-                                    'assets/img/other/avatar.png',
-                                    fit: BoxFit.cover,
-                                    height: 95,
-                                    width: 95,
-                                  ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _pickImage,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
+                        Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: AdvertiseColor.textColor,
+                                  width: 2,
                                 ),
-                              ],
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(40),
+                                child: _pickedImage != null
+                                    ? Image.file(
+                                        _pickedImage!,
+                                        fit: BoxFit.cover,
+                                        height: 95,
+                                        width: 95,
+                                      )
+                                    : Image.asset(
+                                        'assets/img/other/avatar.png',
+                                        fit: BoxFit.cover,
+                                        height: 95,
+                                        width: 95,
+                                      ),
+                              ),
                             ),
-                            child: Icon(
-                              Icons.camera_alt,
-                              size: 16,
-                              color: Colors.black,
+                            GestureDetector(
+                              onTap: _pickImage,
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  size: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
+                        ),
+                        SizedBox(width: 10),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Yang Jungwon',
+                              style: AppComponent.labelStyle,
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'jungwon@gmail.com',
+                              style: AppComponent.sublabelStyle.copyWith(
+                                color: AdvertiseColor.textColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    SizedBox(width: 10),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Yang Jungwon', style: AppComponent.labelStyle),
-                        SizedBox(height: 10),
-                        Text(
-                          'jungwon@gmail.com',
-                          style: AppComponent.sublabelStyle.copyWith(
-                            color: AdvertiseColor.textColor,
+                    if (isOrganizer)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Icon(Icons.phone_outlined, size: 26),
+                              SizedBox(width: 5),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Phone",
+                                    style: AppComponent.sublabelStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    '+855 123 456 789',
+                                    style: AppComponent.sublabelStyle.copyWith(
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Icon(Icons.pin_drop_outlined, size: 26),
+                              SizedBox(width: 5),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Location",
+                                    style: AppComponent.sublabelStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Cambodia, Phnom Penh',
+                                    style: AppComponent.sublabelStyle.copyWith(
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Icon(Icons.calendar_month, size: 26),
+                              SizedBox(width: 5),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Jointed",
+                                    style: AppComponent.sublabelStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    '18-June-2023',
+                                    style: AppComponent.sublabelStyle.copyWith(
+                                      color: AdvertiseColor.textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),
@@ -660,41 +750,42 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               // Bookmark
               SizedBox(height: 10),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => BookmarkPage()),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AdvertiseColor.textColor.withOpacity(0.5),
-                    ),
-                  ),
-                  height: 70,
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.bookmark_outline,
-                        color: AdvertiseColor.primaryColor,
-                      ),
-                      SizedBox(width: 5),
-                      Text('Bookmark', style: AppComponent.labelTextStyle),
-                      Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios,
+              if (isOrganizer == false)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => BookmarkPage()),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
                         color: AdvertiseColor.textColor.withOpacity(0.5),
                       ),
-                    ],
+                    ),
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.bookmark_outline,
+                          color: AdvertiseColor.primaryColor,
+                        ),
+                        SizedBox(width: 5),
+                        Text('Bookmark', style: AppComponent.labelTextStyle),
+                        Spacer(),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: AdvertiseColor.textColor.withOpacity(0.5),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

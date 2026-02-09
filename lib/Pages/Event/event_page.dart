@@ -39,7 +39,7 @@ class _EventPageState extends State<EventPage> {
                         'Entertainment',
                       ])
                         Container(
-                          height: 300,
+                          height: 330,
                           child: Column(
                             children: [
                               SizedBox(height: 10),
@@ -66,14 +66,14 @@ class _EventPageState extends State<EventPage> {
                               ),
                               SizedBox(height: 10),
                               Container(
-                                height: 250,
+                                height: 270,
                                 child: ListView.builder(
                                   itemCount: 3,
                                   shrinkWrap: false,
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                        return eventWidget();
+                                        return EventWidget();
                                       },
                                 ),
                               ),

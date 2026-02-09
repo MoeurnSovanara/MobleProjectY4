@@ -71,7 +71,7 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
                       "Welcome! Let's get to know you",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -81,16 +81,16 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
                     child: Text(
                       "This short form helps us understand you better. It only takes a minute!",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 32),
+              SizedBox(height: 30),
 
               // Full Name Section
               Text("Full name", style: AppComponent.labelTextStyle),
-              SizedBox(height: 10),
+              SizedBox(height: 5),
               Container(
                 height: 50,
                 child: TextFormField(
@@ -114,11 +114,11 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
                 ),
               ),
 
-              SizedBox(height: 16),
+              SizedBox(height: 10),
 
               // Date of Birth Section
               Text("Date of birth", style: AppComponent.labelTextStyle),
-              SizedBox(height: 10),
+              SizedBox(height: 5),
               Container(
                 height: 50,
                 child: GestureDetector(
@@ -160,7 +160,7 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
                 ),
               ),
 
-              SizedBox(height: 16),
+              SizedBox(height: 10),
 
               // Gender Section
               Text("Select your gender", style: AppComponent.labelTextStyle),

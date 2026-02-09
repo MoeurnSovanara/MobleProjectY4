@@ -28,7 +28,7 @@ class _TicketPageState extends State<TicketPage> {
               child: Column(
                 children: [
                   SizedBox(
-                    height: 170 * 5,
+                    height: 180 * 5,
                     child: ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: 5,

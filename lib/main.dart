@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
-import 'package:mobile_assignment/Pages/landingpage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,8 +12,8 @@ void main() {
   ]);
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarBrightness: Brightness.dark,
+      statusBarColor: Colors.white,
+      statusBarBrightness: Brightness.light,
     ),
   );
   runApp(DevicePreview(builder: (context) => MyApp()));

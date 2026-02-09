@@ -286,6 +286,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildDateInfo(IconData icon, String title, String value) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Row(
       children: [
         Icon(icon),
@@ -296,11 +297,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
           children: [
             Text(
               title,
-              style: AppComponent.labelTextStyle.copyWith(fontSize: 12),
+              style: AppComponent.labelTextStyle.copyWith(
+                fontSize: screenWidth <= 375 ? 10 : 12,
+              ),
             ),
             Text(
               value,
-              style: AppComponent.labelTextStyle.copyWith(fontSize: 12),
+              style: AppComponent.labelTextStyle.copyWith(
+                fontSize: screenWidth <= 375 ? 10 : 12,
+              ),
             ),
           ],
         ),
