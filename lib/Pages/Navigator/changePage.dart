@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Dashboard/dashboard_page.dart';
 import 'package:mobile_assignment/Pages/Event/event_page.dart';
 import 'package:mobile_assignment/Pages/Home/home_page.dart';
+import 'package:mobile_assignment/Pages/My%20Events/MyEvents.dart';
 import 'package:mobile_assignment/Pages/My%20Tickets/ticket_page.dart';
 import 'package:mobile_assignment/Pages/Profile/profile_page.dart';
 
@@ -21,6 +23,7 @@ class _ChangepageState extends State<Changepage> {
   late DashboardPage dashboardPage;
   late TicketPage ticketPage;
   late ProfilePage profilePage;
+  late Myevents myevents;
 
   int currentTabIndex = 0;
 
@@ -31,7 +34,13 @@ class _ChangepageState extends State<Changepage> {
     dashboardPage = DashboardPage();
     ticketPage = TicketPage();
     profilePage = ProfilePage();
-    pages = [homePage, eventPage, dashboardPage, ticketPage, profilePage];
+    myevents = Myevents();
+    if (isOrganizer) {
+      pages = [homePage, eventPage, dashboardPage, myevents, profilePage];
+    } else {
+      pages = [homePage, eventPage, dashboardPage, ticketPage, profilePage];
+    }
+
     super.initState();
   }
 
@@ -54,24 +63,29 @@ class _ChangepageState extends State<Changepage> {
           selectedItemColor: AdvertiseColor.primaryColor,
           unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
           type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(
+          items: [
+            const BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
               label: 'Home',
             ),
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.event_outlined),
               label: 'Events',
             ),
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_outlined),
               label: 'Dashboard',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.confirmation_number_outlined),
-              label: 'Tickets',
-            ),
-            BottomNavigationBarItem(
+            isOrganizer == false
+                ? const BottomNavigationBarItem(
+                    icon: Icon(Icons.confirmation_number_outlined),
+                    label: 'Tickets',
+                  )
+                : const BottomNavigationBarItem(
+                    icon: Icon(Icons.wallet),
+                    label: 'My Events',
+                  ),
+            const BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               label: 'Profile',
             ),

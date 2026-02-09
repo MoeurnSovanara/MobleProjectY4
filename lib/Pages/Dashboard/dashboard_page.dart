@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/createEventPage.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -227,69 +228,70 @@ class _DashboardPageState extends State<DashboardPage> {
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 20),
-                  Text(
-                    'History Post booking',
-                    style: AppComponent.labelTextStyle,
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
+              if (isOrganizer)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    Text(
+                      'History Post booking',
+                      style: AppComponent.labelTextStyle,
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AdvertiseColor.textColor.withOpacity(0.5),
+                        ),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    height: 250,
-                    width: double.infinity,
-                    child: Wrap(
-                      spacing: 30,
-                      runSpacing: 20,
-                      children: bookingData.map((item) {
-                        double percent = item['count'] / maxCount;
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularPercentIndicator(
-                              radius: 50.0,
-                              lineWidth: 10.0,
-                              percent: percent.clamp(0.0, 1.0),
-                              center: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${item['count']}',
-                                    style: TextStyle(
-                                      fontFamily: 'KantumruyPro',
-                                      fontWeight: FontWeight.bold,
-                                      color: item['color'],
+                      height: 250,
+                      width: double.infinity,
+                      child: Wrap(
+                        spacing: 30,
+                        runSpacing: 20,
+                        children: bookingData.map((item) {
+                          double percent = item['count'] / maxCount;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularPercentIndicator(
+                                radius: 50.0,
+                                lineWidth: 10.0,
+                                percent: percent.clamp(0.0, 1.0),
+                                center: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '${item['count']}',
+                                      style: TextStyle(
+                                        fontFamily: 'KantumruyPro',
+                                        fontWeight: FontWeight.bold,
+                                        color: item['color'],
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    item['label'],
-                                    style: TextStyle(
-                                      fontFamily: 'KantumruyPro',
-                                      color: item['color'],
+                                    Text(
+                                      item['label'],
+                                      style: TextStyle(
+                                        fontFamily: 'KantumruyPro',
+                                        color: item['color'],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                                progressColor: item['color'],
+                                backgroundColor: item['color'].withOpacity(0.2),
+                                circularStrokeCap: CircularStrokeCap.round,
                               ),
-                              progressColor: item['color'],
-                              backgroundColor: item['color'].withOpacity(0.2),
-                              circularStrokeCap: CircularStrokeCap.round,
-                            ),
-                            SizedBox(height: 8),
-                          ],
-                        );
-                      }).toList(),
+                              SizedBox(height: 8),
+                            ],
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -350,142 +352,153 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ],
               ),
-              Column(
-                children: [
-                  SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
+              if (isOrganizer)
+                Column(
+                  children: [
+                    SizedBox(height: 20),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AdvertiseColor.textColor.withOpacity(0.5),
+                        ),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      borderRadius: BorderRadius.circular(15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Top3 Events By Revenues",
+                            style: AppComponent.boldTextStyle.copyWith(
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: LinearProgressIndicator(
+                              value: 0.7,
+                              minHeight: 20,
+                              backgroundColor: AdvertiseColor.textColor
+                                  .withOpacity(0.1),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AdvertiseColor.primaryColor,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Siem Reap Marathon",
+                                style: AppComponent.sublabelStyle,
+                              ),
+                              Spacer(),
+                              Text(
+                                "1,000\$",
+                                style: AppComponent.sublabelStyle,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: LinearProgressIndicator(
+                              value: 0.6,
+                              minHeight: 20,
+                              backgroundColor: AdvertiseColor.textColor
+                                  .withOpacity(0.1),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AdvertiseColor.dangerColor,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Esport Tournament",
+                                style: AppComponent.sublabelStyle,
+                              ),
+                              Spacer(),
+                              Text(
+                                "3,000\$",
+                                style: AppComponent.sublabelStyle,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: LinearProgressIndicator(
+                              value: 0.3,
+                              minHeight: 20,
+                              backgroundColor: AdvertiseColor.textColor
+                                  .withOpacity(0.1),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AdvertiseColor.warningColor,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Art Performance",
+                                style: AppComponent.sublabelStyle,
+                              ),
+                              Spacer(),
+                              Text(
+                                "20,000\$",
+                                style: AppComponent.sublabelStyle,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Top3 Events By Revenues",
-                          style: AppComponent.boldTextStyle.copyWith(
-                            fontSize: 16,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: LinearProgressIndicator(
-                            value: 0.7,
-                            minHeight: 20,
-                            backgroundColor: AdvertiseColor.textColor
-                                .withOpacity(0.1),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AdvertiseColor.primaryColor,
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              "Siem Reap Marathon",
-                              style: AppComponent.sublabelStyle,
-                            ),
-                            Spacer(),
-                            Text("1,000\$", style: AppComponent.sublabelStyle),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: LinearProgressIndicator(
-                            value: 0.6,
-                            minHeight: 20,
-                            backgroundColor: AdvertiseColor.textColor
-                                .withOpacity(0.1),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AdvertiseColor.dangerColor,
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              "Esport Tournament",
-                              style: AppComponent.sublabelStyle,
-                            ),
-                            Spacer(),
-                            Text("3,000\$", style: AppComponent.sublabelStyle),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: LinearProgressIndicator(
-                            value: 0.3,
-                            minHeight: 20,
-                            backgroundColor: AdvertiseColor.textColor
-                                .withOpacity(0.1),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AdvertiseColor.warningColor,
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              "Art Performance",
-                              style: AppComponent.sublabelStyle,
-                            ),
-                            Spacer(),
-                            Text("20,000\$", style: AppComponent.sublabelStyle),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
 
               //pieChart
-              Column(
-                children: [
-                  SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Most Sold Ticket Type",
-                          style: AppComponent.boldTextStyle.copyWith(
-                            fontSize: 16,
-                          ),
+              if (isOrganizer)
+                Column(
+                  children: [
+                    SizedBox(height: 20),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AdvertiseColor.textColor.withOpacity(0.5),
                         ),
-                        SizedBox(height: 20),
-                        Container(
-                          height: 250, // Set a fixed height
-                          child: PieChart(
-                            PieChartData(
-                              sectionsSpace: 2,
-                              centerSpaceRadius: 40,
-                              sections: _createPieChartSections(),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Most Sold Ticket Type",
+                            style: AppComponent.boldTextStyle.copyWith(
+                              fontSize: 16,
                             ),
                           ),
-                        ),
-                        SizedBox(height: 20),
-                        // Add Legend
-                        _buildLegend(),
-                      ],
+                          SizedBox(height: 20),
+                          Container(
+                            height: 250, // Set a fixed height
+                            child: PieChart(
+                              PieChartData(
+                                sectionsSpace: 2,
+                                centerSpaceRadius: 40,
+                                sections: _createPieChartSections(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          // Add Legend
+                          _buildLegend(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ),
