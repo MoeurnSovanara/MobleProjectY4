@@ -81,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: Row(
                   children: [
-                    Image.asset('assets/img/other/english.png'),
+                    Image.asset('assets/img/other/english.png', width: 20),
                     SizedBox(width: 20),
                     Text('English', style: AppComponent.labelTextStyle),
                   ],
@@ -178,6 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    var screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -428,7 +429,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Text(
                           'Devices',
                           style: AppComponent.detailTextStyle.copyWith(
-                            fontSize: 16,
+                            fontSize: screenwidth <= 402 ? 12 : 16,
                           ),
                         ),
                         Spacer(),
@@ -443,7 +444,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             'ADD NEW DEVICES',
                             style: TextStyle(
                               fontFamily: 'KantumruyPro',
-                              fontSize: 16,
+                              fontSize: screenwidth <= 402 ? 12 : 16,
                               color: AdvertiseColor.blueColor,
                               decoration: TextDecoration.underline,
                               decorationColor: AdvertiseColor.blueColor,
@@ -463,129 +464,108 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: 70,
                         ),
                         SizedBox(width: 5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Added on 13/June/2025',
-                              style: AppComponent.labelStyle.copyWith(
-                                fontSize: 12,
+                        // Use Expanded to constrain the middle column to half the available width
+                        Expanded(
+                          flex: 1, // Takes 1 part of available space
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Added on 13/June/2025',
+                                style: AppComponent.labelStyle.copyWith(
+                                  fontSize: 12,
+                                ),
+                                overflow: TextOverflow
+                                    .ellipsis, // Add ellipsis for overflow
+                                maxLines: 1, // Limit to 1 line
                               ),
-                            ),
-                            Text(
-                              'RUPP',
-                              style: AppComponent.detailTextStyle.copyWith(
-                                fontSize: 10,
+                              Text(
+                                'RUPP',
+                                style: AppComponent.detailTextStyle.copyWith(
+                                  fontSize: 10,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
-                            ),
-                            Text(
-                              'C5E9',
-                              style: AppComponent.detailTextStyle.copyWith(
-                                fontSize: 10,
+                              Text(
+                                'C5E9',
+                                style: AppComponent.detailTextStyle.copyWith(
+                                  fontSize: 10,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        Spacer(),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AdvertiseColor.textColor.withOpacity(
-                                      0.5,
-                                    ),
-                                    width: 1.5,
+                        // Use another Expanded for the button section to control spacing
+                        Expanded(
+                          flex: 1, // Takes 1 part (equal to the text section)
+                          child: Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.end, // Align buttons to end
+                            children: [
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenwidth <= 402 ? 6 : 10,
+                                    vertical: 2,
                                   ),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Text(
-                                  'Block',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'KantumruyPro',
-                                    color: AdvertiseColor.textColor.withOpacity(
-                                      0.5,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: AdvertiseColor.textColor
+                                          .withOpacity(0.5),
+                                      width: 1.5,
                                     ),
-                                    fontWeight: FontWeight.w500,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Text(
+                                    'Block',
+                                    style: TextStyle(
+                                      fontSize: screenwidth <= 402 ? 12 : 14,
+                                      fontFamily: 'KantumruyPro',
+                                      color: AdvertiseColor.textColor
+                                          .withOpacity(0.5),
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 5),
-                            GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AdvertiseColor.blueColor,
-                                    width: 1.5,
+                              SizedBox(width: 5),
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenwidth <= 402 ? 6 : 10,
+                                    vertical: 2,
                                   ),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Text(
-                                  'Remove',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'KantumruyPro',
-                                    color: AdvertiseColor.blueColor,
-                                    fontWeight: FontWeight.w500,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: AdvertiseColor.blueColor,
+                                      width: 1.5,
+                                    ),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Text(
+                                    'Remove',
+                                    style: TextStyle(
+                                      fontSize: screenwidth <= 402 ? 12 : 14,
+                                      fontFamily: 'KantumruyPro',
+                                      color: AdvertiseColor.blueColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-              Column(
-                children: [
-                  SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AdvertiseColor.textColor.withOpacity(0.5),
-                        ),
-                      ),
-                      height: 70,
-                      width: double.infinity,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.confirmation_number_outlined,
-                            color: AdvertiseColor.primaryColor,
-                          ),
-                          SizedBox(width: 5),
-                          Text('My Ticket', style: AppComponent.labelTextStyle),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: AdvertiseColor.textColor.withOpacity(0.5),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
               ),
               //Used Ticket
               SizedBox(height: 10),
