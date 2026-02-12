@@ -52,45 +52,43 @@ class _ChangepageState extends State<Changepage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: AdvertiseColor.backgroundColor,
+      body: pages[currentTabIndex],
+      bottomNavigationBar: BottomNavigationBar(
         backgroundColor: AdvertiseColor.backgroundColor,
-        body: pages[currentTabIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: AdvertiseColor.backgroundColor,
-          currentIndex: currentTabIndex,
-          onTap: _onItemTapped,
-          selectedItemColor: AdvertiseColor.primaryColor,
-          unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
-          type: BottomNavigationBarType.fixed,
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: 'Home',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.event_outlined),
-              label: 'Events',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_outlined),
-              label: 'Dashboard',
-            ),
-            isOrganizer == false
-                ? const BottomNavigationBarItem(
-                    icon: Icon(Icons.confirmation_number_outlined),
-                    label: 'Tickets',
-                  )
-                : const BottomNavigationBarItem(
-                    icon: Icon(Icons.wallet),
-                    label: 'My Events',
-                  ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              label: 'Profile',
-            ),
-          ],
-        ),
+        currentIndex: currentTabIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: AdvertiseColor.primaryColor,
+        unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
+        type: BottomNavigationBarType.fixed,
+        items: [
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.event_outlined),
+            label: 'Events',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_outlined),
+            label: 'Dashboard',
+          ),
+          isOrganizer == false
+              ? const BottomNavigationBarItem(
+                  icon: Icon(Icons.confirmation_number_outlined),
+                  label: 'Tickets',
+                )
+              : const BottomNavigationBarItem(
+                  icon: Icon(Icons.wallet),
+                  label: 'My Events',
+                ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }

@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Auth/signup_page.dart';
 import 'package:mobile_assignment/Pages/Auth/verifyOTP_page.dart';
+import 'package:mobile_assignment/services/UserApi.dart';
+import 'package:mobile_assignment/services/sentEmailServices.dart';
 
 class ForgetpassPage extends StatefulWidget {
   const ForgetpassPage({super.key});
@@ -15,6 +19,48 @@ class _ForgetpassPageState extends State<ForgetpassPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
+  Userapi userapi = Userapi();
+  Sentemailservices sentemailservices = Sentemailservices();
+
+  void sentEmail() async {
+    var existEmail = await userapi.getUserByEmail(email: _emailController.text);
+    if (existEmail != null) {
+      setState(() {
+        _isLoading = true;
+      });
+      Random random = Random();
+      String verifyCode = (random.nextInt(900000) + 100000).toString();
+      await sentemailservices.sendEmail(
+        email: _emailController.text,
+        subject: "Reset Password OTP",
+        code: verifyCode,
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VerifyotpPage(
+            email: _emailController.text,
+            otp: verifyCode,
+            password: "",
+            statusCase: "reset",
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AdvertiseColor.dangerColor,
+          content: Text(
+            "Email not found",
+            style: TextStyle(color: AdvertiseColor.backgroundColor),
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,13 +140,7 @@ class _ForgetpassPageState extends State<ForgetpassPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                VerifyotpPage(email: _emailController.text),
-                          ),
-                        ),
+                        onPressed: () => _isLoading ? null : sentEmail(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AdvertiseColor.primaryColor,
                           shape: RoundedRectangleBorder(

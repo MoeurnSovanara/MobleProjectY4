@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
+import 'package:mobile_assignment/Pages/landingpage.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,19 +13,38 @@ void main() {
     DeviceOrientation.portraitDown,
   ]);
   SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarBrightness: Brightness.light,
-    ),
+    SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
-  runApp(DevicePreview(builder: (context) => MyApp()));
-  // runApp(MyApp());
+  // runApp(DevicePreview(builder: (context) => MyApp()));
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  String userEmail = "";
+  bool _isLoading = true; // Add loading state
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEmail();
+  }
+
+  void _loadUserEmail() async {
+    String? email = await usersharedpreferences.getUserEmail();
+    setState(() {
+      userEmail = email ?? "";
+      _isLoading = false; // Set loading to false when done
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -34,7 +55,13 @@ class MyApp extends StatelessWidget {
           seedColor: AdvertiseColor.backgroundColor,
         ),
       ),
-      home: Changepage(),
+      home: _isLoading
+          ? const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ) // Show loading indicator while checking
+          : userEmail.isEmpty
+          ? const Landingpage() // Show landing page if not logged in
+          : const Changepage(), // Show homepage if already logged in
     );
   }
 }

@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
-import 'package:mobile_assignment/Pages/Auth/createprofile_page.dart';
 import 'package:mobile_assignment/Pages/Auth/forgetpass_page.dart';
 import 'package:mobile_assignment/Pages/Auth/signup_page.dart';
+import 'package:mobile_assignment/Pages/Auth/verifyOTP_page.dart';
+import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
+import 'package:mobile_assignment/services/UserApi.dart';
+import 'package:mobile_assignment/services/sentEmailServices.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,6 +23,55 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  Userapi userapi = Userapi();
+  Sentemailservices sentemailservices = Sentemailservices();
+
+  void logIn() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      var user = await userapi.loginUser(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      if (user != null) {
+        Random random = Random();
+        String otpCode = (random.nextInt(900000) + 100000)
+            .toString(); // Generate a 6-digit OTP
+        await sentemailservices.sendEmail(
+          subject: "Verify Login OTP",
+          email: user.email,
+          code: otpCode,
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerifyotpPage(
+              email: user.email,
+              otp: otpCode,
+              password: _passwordController.text,
+              statusCase: "login",
+            ),
+          ),
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed. Please check your credentials.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _createProfile,
+                        onPressed: _isLoading ? null : logIn,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AdvertiseColor.primaryColor,
                           shape: RoundedRectangleBorder(
@@ -203,6 +257,7 @@ class _LoginPageState extends State<LoginPage> {
                         Expanded(
                           child: Divider(
                             thickness: 1,
+                            // ignore: deprecated_member_use
                             color: AdvertiseColor.textColor.withOpacity(0.3),
                           ),
                         ),
@@ -289,15 +344,6 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  void _createProfile() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => CreateprofilePage()),
-      );
-    }
   }
 
   void _loginWithGoogle() async {

@@ -1,11 +1,25 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Pages/Auth/createprofile_page.dart';
 import 'package:mobile_assignment/Pages/Auth/newpass_page.dart';
+import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class VerifyotpPage extends StatefulWidget {
   final String email;
-  const VerifyotpPage({super.key, required this.email});
+  final String otp;
+  final String password;
+  final String statusCase;
+  const VerifyotpPage({
+    super.key,
+    required this.email,
+    required this.otp,
+    required this.password,
+    required this.statusCase,
+  });
 
   @override
   State<VerifyotpPage> createState() => _VerifyotpPageState();
@@ -18,6 +32,7 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
     (index) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
 
   @override
   void initState() {
@@ -66,21 +81,59 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
     });
 
     try {
-      // TODO: Implement your OTP verification logic here
-      // For example:
-      // bool isVerified = await AuthService.verifyOtp(widget.email, otpCode);
-
-      // Simulate API call delay
-      await Future.delayed(Duration(seconds: 2));
-
-      // For demo purposes, assume verification is successful
-      bool isVerified = true;
-
-      if (isVerified) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => NewpassPage()),
-        );
+      switch (widget.statusCase) {
+        case "signup":
+          // For example:
+          // bool isVerified = await AuthService.verifyOtp(widget.email, otpCode);
+          if (otpCode != widget.otp) {
+            await Future.delayed(Duration(seconds: 2));
+            _showErrorDialog("Invalid OTP. Please try again.");
+            return;
+          } else {
+            // Simulate successful verification for demo purposes
+            await Future.delayed(Duration(seconds: 2));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CreateprofilePage(
+                  email: widget.email,
+                  password: widget.password,
+                ),
+              ),
+            );
+          }
+        case "reset":
+          if (otpCode != widget.otp) {
+            await Future.delayed(Duration(seconds: 2));
+            _showErrorDialog("Invalid OTP. Please try again.");
+            return;
+          } else {
+            // Simulate successful verification for demo purposes
+            await Future.delayed(Duration(seconds: 2));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NewpassPage(email: widget.email),
+              ),
+            );
+          }
+        case "login":
+          if (otpCode != widget.otp) {
+            await Future.delayed(Duration(seconds: 2));
+            _showErrorDialog("Invalid OTP. Please try again.");
+            return;
+          } else {
+            // Simulate successful verification for demo purposes
+            await Future.delayed(Duration(seconds: 2));
+            await usersharedpreferences.saveUserEmail(widget.email);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => Changepage()),
+            );
+            // Navigate to home page or dashboard after successful login
+            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+          }
+          break;
       }
     } catch (e) {
       _showErrorDialog("An error occurred. Please try again.");

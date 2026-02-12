@@ -10,7 +10,7 @@ class Editeventwidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 220,
-      height: 300,
+      height: 320,
 
       padding: EdgeInsets.all(5),
       decoration: BoxDecoration(

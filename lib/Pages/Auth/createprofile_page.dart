@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/UserDto.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
+import 'package:mobile_assignment/services/UserApi.dart';
 
 class CreateprofilePage extends StatefulWidget {
-  @override
+  final String email;
+  final String password;
+  const CreateprofilePage({
+    super.key,
+    required this.email,
+    required this.password,
+  });
   _CreateprofilePageState createState() => _CreateprofilePageState();
 }
 
@@ -13,6 +21,37 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDate;
   String? _selectedGender;
+  Userapi userapi = Userapi();
+
+  void CreateProfile() async {
+    if (_formKey.currentState!.validate()) {
+      final newUser = Userdto(
+        fullname: _fullNameController.text,
+        email: widget.email,
+        gender: _selectedGender.toString(),
+        password: widget.password,
+        phoneNumber: "",
+        dateOfBirth: _selectedDate!,
+        createdAt: DateTime.now(),
+        google: false,
+        organizer: false,
+        verified: true,
+      );
+      var createdUser = await userapi.createUser(user: newUser);
+      if (createdUser.statusCode >= 200 && createdUser.statusCode < 300) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Changepage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create profile. Please try again.'),
+          ),
+        );
+      }
+    }
+  }
 
   void _pickDate() async {
     final DateTime? picked = await showDatePicker(
@@ -184,7 +223,7 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _checkForm,
+                  onPressed: CreateProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AdvertiseColor.primaryColor,
                     shape: RoundedRectangleBorder(
@@ -203,14 +242,5 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
         ),
       ),
     );
-  }
-
-  void _checkForm() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Changepage()),
-      );
-    }
   }
 }

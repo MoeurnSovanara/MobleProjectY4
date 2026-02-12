@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
-import 'package:mobile_assignment/Pages/Auth/createprofile_page.dart';
 import 'package:mobile_assignment/Pages/Auth/login_page.dart';
+import 'package:mobile_assignment/Pages/Auth/verifyOTP_page.dart';
+import 'package:mobile_assignment/services/UserApi.dart';
+import 'package:mobile_assignment/services/sentEmailServices.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -18,6 +22,71 @@ class _SignupPageState extends State<SignupPage> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false; // Add loading state variable
+  Sentemailservices sentemailservices = Sentemailservices();
+  Userapi userapi = Userapi();
+
+  void singUp() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true; // Start loading
+      });
+
+      try {
+        var data = await userapi.getUserByEmail(email: _emailController.text);
+        if (data != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Email already exists. Please use a different email.',
+              ),
+              backgroundColor: AdvertiseColor.dangerColor,
+            ),
+          );
+          return; // Stop further execution
+        }
+        Random random = Random();
+        int otp = random.nextInt(900000) + 100000; // Generate a 6-digit OTP
+        var response = await sentemailservices.sendEmail(
+          email: _emailController.text,
+          subject: "Verify Account",
+          code: otp.toString(),
+        );
+
+        if (response.statusCode == 200) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VerifyotpPage(
+                email: _emailController.text,
+                otp: otp.toString(),
+                password: _passwordController.text,
+                statusCase: "signup",
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to send OTP. Please try again.'),
+              backgroundColor: AdvertiseColor.dangerColor,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An error occurred. Please try again.'),
+            backgroundColor: AdvertiseColor.dangerColor,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false; // Stop loading
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +141,6 @@ class _SignupPageState extends State<SignupPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Full Name Field
-                    Text("Full Name", style: AppComponent.labelTextStyle),
-                    SizedBox(height: 10),
-
                     // Email Field
                     Text("Email", style: AppComponent.labelTextStyle),
                     SizedBox(height: 10),
@@ -205,11 +270,11 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     SizedBox(height: 30),
 
-                    // Sign Up Button
+                    // Sign Up Button with Loading State
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _signup,
+                        onPressed: _isLoading ? null : () => singUp(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AdvertiseColor.primaryColor,
                           shape: RoundedRectangleBorder(
@@ -220,14 +285,37 @@ class _SignupPageState extends State<SignupPage> {
                             vertical: 15,
                           ),
                         ),
-                        child: Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            fontFamily: 'KantumruyPro',
-                            fontSize: 18,
-                            color: AdvertiseColor.backgroundColor,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: AdvertiseColor.backgroundColor,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Processing...",
+                                    style: TextStyle(
+                                      fontFamily: 'KantumruyPro',
+                                      fontSize: 18,
+                                      color: AdvertiseColor.backgroundColor,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                  fontFamily: 'KantumruyPro',
+                                  fontSize: 18,
+                                  color: AdvertiseColor.backgroundColor,
+                                ),
+                              ),
                       ),
                     ),
                     SizedBox(height: 20),
@@ -265,7 +353,7 @@ class _SignupPageState extends State<SignupPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _signUpWithGoogle,
+                        onPressed: _isLoading ? null : _signUpWithGoogle,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AdvertiseColor.backgroundColor,
                           shape: RoundedRectangleBorder(
@@ -308,15 +396,23 @@ class _SignupPageState extends State<SignupPage> {
                           style: AppComponent.labelTextStyle,
                         ),
                         GestureDetector(
-                          onTap: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginPage(),
-                            ),
-                          ),
+                          onTap: _isLoading
+                              ? null
+                              : () => Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginPage(),
+                                  ),
+                                ),
                           child: Text(
                             "Log In",
-                            style: AppComponent.primaryThemeTextStyle,
+                            style: _isLoading
+                                ? AppComponent.labelTextStyle.copyWith(
+                                    color: AdvertiseColor.textColor.withOpacity(
+                                      0.5,
+                                    ),
+                                  )
+                                : AppComponent.primaryThemeTextStyle,
                           ),
                         ),
                       ],
@@ -329,26 +425,6 @@ class _SignupPageState extends State<SignupPage> {
         ),
       ),
     );
-  }
-
-  void _signup() {
-    if (_formKey.currentState!.validate()) {
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Account created successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => CreateprofilePage()),
-      );
-
-      // Example: Navigate to home page after successful signup
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
-    }
   }
 
   void _signUpWithGoogle() {

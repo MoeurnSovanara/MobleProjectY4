@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
-import 'package:mobile_assignment/Pages/My%20Tickets/ticket_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/bookmark_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/editProfile_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/newdevice_page.dart';
@@ -244,7 +243,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 width: double.infinity,
-                height: isOrganizer == true ? 300 : 130,
+                height: isOrganizer == true ? 310 : 130,
                 child: Column(
                   children: [
                     Row(
@@ -420,7 +419,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 width: double.infinity,
-                height: 120,
+                height: 125,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -510,7 +509,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 onTap: () {},
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: screenwidth <= 402 ? 6 : 10,
+                                    horizontal: screenwidth <= 402 ? 6 : 8,
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
@@ -538,7 +537,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 onTap: () {},
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: screenwidth <= 402 ? 6 : 10,
+                                    horizontal: screenwidth <= 402 ? 6 : 8,
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
