@@ -11,6 +11,7 @@ import 'package:mobile_assignment/Pages/Profile/other/newdevice_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/password_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/usedTicket_page.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -21,8 +22,51 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _notificationsEnabled = true;
-
   File? _pickedImage;
+
+  // Initialize variables
+  bool? isOrganizer = false;
+  bool _isLoading = true;
+  String userName = "Yang Jungwon";
+  String userEmail = "jungwon@gmail.com";
+  String userPhone = "+855 123 456 789";
+  String userLocation = "Cambodia, Phnom Penh";
+  String userJoinedDate = "18-June-2023";
+
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  // Add this method to load user data
+  void _loadUserData() async {
+    try {
+      // Load organizer status
+      var organizerResult = await usersharedpreferences.getUserOrganizer();
+
+      // Load user email and name
+      String? email = await usersharedpreferences.getUserEmail();
+      String? name = await usersharedpreferences.getUserName();
+
+      if (mounted) {
+        setState(() {
+          isOrganizer = organizerResult ?? false;
+          userEmail = email ?? "jungwon@gmail.com";
+          userName = name ?? "Yang Jungwon";
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(
@@ -88,7 +132,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: 40),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 style: AppComponent.elevatedButtonStyle,
                 child: Text(
                   'Select',
@@ -161,7 +207,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: 40),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 style: AppComponent.elevatedButtonStyle,
                 child: Text(
                   'Select',
@@ -175,8 +223,32 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> _logout() async {
+    await usersharedpreferences.clearUserData();
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const Landingpage()),
+        (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Show loading indicator
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Profile Page",
+            style: AppComponent.labelStyle.copyWith(fontSize: 25),
+          ),
+          backgroundColor: AdvertiseColor.backgroundColor,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     var screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -184,22 +256,25 @@ class _ProfilePageState extends State<ProfilePage> {
           "Profile Page",
           style: AppComponent.labelStyle.copyWith(fontSize: 25),
         ),
+        backgroundColor: AdvertiseColor.backgroundColor,
         actions: [
           PopupMenuButton<String>(
-            icon: Icon(Icons.settings_outlined),
+            icon: Icon(
+              Icons.settings_outlined,
+              color: AdvertiseColor.textColor,
+            ),
             onSelected: (value) {
               if (value == 'edit') {
-                // Navigate to Edit Profile
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditprofilePage()),
+                );
               } else if (value == 'logout') {
-                // Handle logout
+                _logout();
               }
             },
             itemBuilder: (BuildContext context) => [
-              PopupMenuItem(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EditprofilePage()),
-                ),
+              const PopupMenuItem(
                 value: 'edit',
                 child: Row(
                   children: [
@@ -209,12 +284,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'logout',
-                onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => Landingpage()),
-                ),
                 child: Row(
                   children: [
                     Icon(Icons.logout, color: AdvertiseColor.dangerColor),
@@ -229,12 +300,13 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Profile Header
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -289,11 +361,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.2),
                                       blurRadius: 4,
-                                      offset: Offset(0, 2),
+                                      offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.camera_alt,
                                   size: 16,
                                   color: Colors.black,
@@ -302,18 +374,15 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ],
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(userName, style: AppComponent.labelStyle),
+                            const SizedBox(height: 10),
                             Text(
-                              'Yang Jungwon',
-                              style: AppComponent.labelStyle,
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'jungwon@gmail.com',
+                              userEmail,
                               style: AppComponent.sublabelStyle.copyWith(
                                 color: AdvertiseColor.textColor,
                               ),
@@ -322,15 +391,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                     ),
-                    if (isOrganizer)
+                    if (isOrganizer == true)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
-                              Icon(Icons.phone_outlined, size: 26),
-                              SizedBox(width: 5),
+                              const Icon(Icons.phone_outlined, size: 26),
+                              const SizedBox(width: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -342,7 +411,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                   Text(
-                                    '+855 123 456 789',
+                                    userPhone,
                                     style: AppComponent.sublabelStyle.copyWith(
                                       color: AdvertiseColor.textColor,
                                     ),
@@ -351,11 +420,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
-                              Icon(Icons.pin_drop_outlined, size: 26),
-                              SizedBox(width: 5),
+                              const Icon(Icons.pin_drop_outlined, size: 26),
+                              const SizedBox(width: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -367,7 +436,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                   Text(
-                                    'Cambodia, Phnom Penh',
+                                    userLocation,
                                     style: AppComponent.sublabelStyle.copyWith(
                                       color: AdvertiseColor.textColor,
                                     ),
@@ -376,23 +445,23 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
-                              Icon(Icons.calendar_month, size: 26),
-                              SizedBox(width: 5),
+                              const Icon(Icons.calendar_month, size: 26),
+                              const SizedBox(width: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Jointed",
+                                    "Joined",
                                     style: AppComponent.sublabelStyle.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: AdvertiseColor.textColor,
                                     ),
                                   ),
                                   Text(
-                                    '18-June-2023',
+                                    userJoinedDate,
                                     style: AppComponent.sublabelStyle.copyWith(
                                       color: AdvertiseColor.textColor,
                                     ),
@@ -406,11 +475,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-              //Device
+              // Device Section
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -431,7 +500,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontSize: screenwidth <= 402 ? 12 : 16,
                           ),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         GestureDetector(
                           onTap: () => Navigator.push(
                             context,
@@ -452,7 +521,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -462,10 +531,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           height: 70,
                           width: 70,
                         ),
-                        SizedBox(width: 5),
-                        // Use Expanded to constrain the middle column to half the available width
+                        const SizedBox(width: 5),
                         Expanded(
-                          flex: 1, // Takes 1 part of available space
+                          flex: 1,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -475,9 +543,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 style: AppComponent.labelStyle.copyWith(
                                   fontSize: 12,
                                 ),
-                                overflow: TextOverflow
-                                    .ellipsis, // Add ellipsis for overflow
-                                maxLines: 1, // Limit to 1 line
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                               Text(
                                 'RUPP',
@@ -498,12 +565,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                           ),
                         ),
-                        // Use another Expanded for the button section to control spacing
                         Expanded(
-                          flex: 1, // Takes 1 part (equal to the text section)
+                          flex: 1,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.end, // Align buttons to end
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               GestureDetector(
                                 onTap: () {},
@@ -532,7 +597,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 5),
+                              const SizedBox(width: 5),
                               GestureDetector(
                                 onTap: () {},
                                 child: Container(
@@ -566,15 +631,16 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
               ),
-              //Used Ticket
-              SizedBox(height: 10),
+
+              // Used Ticket
+              const SizedBox(height: 10),
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UsedticketPage()),
                 ),
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -590,9 +656,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.file_copy_outlined,
                         color: AdvertiseColor.primaryColor,
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Text('Used Ticket', style: AppComponent.labelTextStyle),
-                      Spacer(),
+                      const Spacer(),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -602,10 +668,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              //Notifications
-              SizedBox(height: 10),
+              // Notifications
+              const SizedBox(height: 10),
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -621,16 +687,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       Icons.notifications_outlined,
                       color: AdvertiseColor.primaryColor,
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Text('Notification', style: AppComponent.labelTextStyle),
-                    Spacer(),
+                    const Spacer(),
                     Switch(
                       value: _notificationsEnabled,
                       onChanged: (bool value) {
                         setState(() {
                           _notificationsEnabled = value;
                         });
-                        // Save notification preference
                       },
                       activeColor: AdvertiseColor.primaryColor,
                       activeTrackColor: AdvertiseColor.primaryColor.withOpacity(
@@ -645,14 +710,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              //Languages
-              SizedBox(height: 10),
+              // Languages
+              const SizedBox(height: 10),
               GestureDetector(
                 onTap: () {
                   _showLanguageBottomSheet(context);
                 },
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -665,9 +730,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Row(
                     children: [
                       Icon(Icons.language, color: AdvertiseColor.primaryColor),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Text('Language', style: AppComponent.labelTextStyle),
-                      Spacer(),
+                      const Spacer(),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -677,15 +742,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              //Password
-              SizedBox(height: 10),
+              // Password
+              const SizedBox(height: 10),
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PasswordPage()),
                 ),
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -701,9 +766,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.lock_outline,
                         color: AdvertiseColor.primaryColor,
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Text('Password', style: AppComponent.labelTextStyle),
-                      Spacer(),
+                      const Spacer(),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -713,14 +778,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              //appearance
-              SizedBox(height: 10),
+              // Appearance
+              const SizedBox(height: 10),
               GestureDetector(
                 onTap: () {
                   _showAppearanceBottomSheet(context);
                 },
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -736,9 +801,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.dark_mode_outlined,
                         color: AdvertiseColor.primaryColor,
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Text('Appearance', style: AppComponent.labelTextStyle),
-                      Spacer(),
+                      const Spacer(),
                       Icon(
                         Icons.arrow_forward_ios,
                         color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -747,8 +812,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              // Bookmark
-              SizedBox(height: 10),
+
+              // Bookmark (Only for non-organizers)
+              const SizedBox(height: 10),
               if (isOrganizer == false)
                 GestureDetector(
                   onTap: () {
@@ -758,7 +824,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     );
                   },
                   child: Container(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
@@ -774,9 +840,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           Icons.bookmark_outline,
                           color: AdvertiseColor.primaryColor,
                         ),
-                        SizedBox(width: 5),
+                        const SizedBox(width: 5),
                         Text('Bookmark', style: AppComponent.labelTextStyle),
-                        Spacer(),
+                        const Spacer(),
                         Icon(
                           Icons.arrow_forward_ios,
                           color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -785,6 +851,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

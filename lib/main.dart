@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
@@ -39,9 +40,11 @@ class _MyAppState extends State<MyApp> {
 
   void _loadUserEmail() async {
     String? email = await usersharedpreferences.getUserEmail();
+    bool? isOrganizer = await usersharedpreferences.getUserOrganizer();
     setState(() {
       userEmail = email ?? "";
       _isLoading = false; // Set loading to false when done
+      isOrganizer = isOrganizer ?? false; // Default to false if not set
     });
   }
 
@@ -56,12 +59,12 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
       home: _isLoading
-          ? const Scaffold(
+          ? Scaffold(
               body: Center(child: CircularProgressIndicator()),
             ) // Show loading indicator while checking
           : userEmail.isEmpty
-          ? const Landingpage() // Show landing page if not logged in
-          : const Changepage(), // Show homepage if already logged in
+          ? Landingpage() // Show landing page if not logged in
+          : Changepage(), // Show homepage if already logged in
     );
   }
 }

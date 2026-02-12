@@ -6,6 +6,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Auth/createprofile_page.dart';
 import 'package:mobile_assignment/Pages/Auth/newpass_page.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
+import 'package:mobile_assignment/services/UserApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class VerifyotpPage extends StatefulWidget {
@@ -32,6 +33,7 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
     (index) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
+  Userapi userapi = Userapi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
 
   @override
@@ -125,7 +127,10 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
           } else {
             // Simulate successful verification for demo purposes
             await Future.delayed(Duration(seconds: 2));
+            var userData = await userapi.getUserByEmail(email: widget.email);
             await usersharedpreferences.saveUserEmail(widget.email);
+            await usersharedpreferences.saveUserOrganizer(userData!.organizer);
+            await usersharedpreferences.saveUserName(userData.fullname);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => Changepage()),

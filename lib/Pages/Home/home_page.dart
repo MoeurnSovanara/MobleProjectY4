@@ -6,6 +6,7 @@ import 'package:mobile_assignment/Const/widget/eventWidget.dart';
 import 'package:mobile_assignment/Const/widget/videoCardWidget.dart';
 import 'package:mobile_assignment/Pages/Home/other/notification_page.dart';
 import 'package:mobile_assignment/Pages/Other/seeall_page.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var _searchFieldContorller = TextEditingController();
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
 
   final items = [
     {
