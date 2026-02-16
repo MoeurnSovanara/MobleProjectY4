@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
@@ -7,14 +9,15 @@ import 'package:mobile_assignment/Pages/Auth/createprofile_page.dart';
 import 'package:mobile_assignment/Pages/Auth/newpass_page.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
 import 'package:mobile_assignment/services/UserApi.dart';
+import 'package:mobile_assignment/services/sentEmailServices.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class VerifyotpPage extends StatefulWidget {
   final String email;
-  final String otp;
+  String otp;
   final String password;
   final String statusCase;
-  const VerifyotpPage({
+  VerifyotpPage({
     super.key,
     required this.email,
     required this.otp,
@@ -35,6 +38,12 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
   Userapi userapi = Userapi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  Sentemailservices sentemailservices = Sentemailservices();
+
+  // Add timer variables
+  int _resendCooldown = 60;
+  bool _canResend = true;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -49,6 +58,23 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
         }
       });
     }
+    // Start cooldown timer
+    startCooldown();
+  }
+
+  void startCooldown() {
+    _canResend = false;
+    _timer?.cancel(); // Cancel any existing timer first
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_resendCooldown > 0) {
+          _resendCooldown--;
+        } else {
+          _canResend = true;
+          _timer?.cancel();
+        }
+      });
+    });
   }
 
   @override
@@ -60,6 +86,8 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
     for (var focusNode in _focusNodes) {
       focusNode.dispose();
     }
+    _timer?.cancel(); // Use ?. to safely call cancel
+    _timer = null; // Optional: set to null
     super.dispose();
   }
 
@@ -94,6 +122,7 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
           } else {
             // Simulate successful verification for demo purposes
             await Future.delayed(Duration(seconds: 2));
+            if (!mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -112,6 +141,7 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
           } else {
             // Simulate successful verification for demo purposes
             await Future.delayed(Duration(seconds: 2));
+            if (!mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -128,9 +158,12 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
             // Simulate successful verification for demo purposes
             await Future.delayed(Duration(seconds: 2));
             var userData = await userapi.getUserByEmail(email: widget.email);
-            await usersharedpreferences.saveUserEmail(widget.email);
-            await usersharedpreferences.saveUserOrganizer(userData!.organizer);
-            await usersharedpreferences.saveUserName(userData.fullname);
+            if (userData != null) {
+              await usersharedpreferences.saveUserEmail(widget.email);
+              await usersharedpreferences.saveUserOrganizer(userData.organizer);
+              await usersharedpreferences.saveUserName(userData.fullname);
+            }
+            if (!mounted) return;
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => Changepage()),
@@ -143,9 +176,88 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
     } catch (e) {
       _showErrorDialog("An error occurred. Please try again.");
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _resendOtp() async {
+    if (_isLoading || !_canResend) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Generate a new 6-digit OTP
+      Random random = Random();
+      String newOtp = (random.nextInt(900000) + 100000).toString();
+
+      // Determine subject based on statusCase
+      String subject = "";
+      switch (widget.statusCase) {
+        case "signup":
+          subject = "Verify Your Email for Sign Up";
+          break;
+        case "reset":
+          subject = "Reset Your Password OTP";
+          break;
+        case "login":
+          subject = "Login Verification OTP";
+          break;
+        default:
+          subject = "Your OTP Code";
+      }
+
+      // Call your resend OTP API here
+      var response = await sentemailservices.sendEmail(
+        email: widget.email,
+        subject: subject,
+        code: newOtp,
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          // Update the OTP in the widget to the new OTP
+          widget.otp = newOtp;
+          // Reset cooldown
+          _resendCooldown = 60;
+          _canResend = false;
+        });
+
+        // Clear all OTP fields
+        for (var controller in _codeControllers) {
+          controller.clear();
+        }
+
+        // Start cooldown timer
+        startCooldown();
+
+        // Focus on first field
+        FocusScope.of(context).requestFocus(_focusNodes[0]);
+
+        // Handle successful resend (e.g., show a success message)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("OTP has been resent to your email."),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        // Handle failure (e.g., show an error message)
+        _showErrorDialog("Failed to resend OTP. Please try again.");
+      }
+    } catch (e) {
+      _showErrorDialog("An error occurred. Please try again.");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -361,22 +473,17 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
                 children: [
                   Center(
                     child: Text(
-                      "Didn't receive the code? ",
+                      _canResend
+                          ? "Didn't receive the code? "
+                          : "Resend OTP in $_resendCooldown seconds",
                       style: AppComponent.hintTextStyle,
                     ),
                   ),
                   GestureDetector(
-                    onTap: _isLoading
-                        ? null
-                        : () {
-                            // TODO: Implement resend OTP functionality
-                            _showErrorDialog(
-                              "Resend OTP functionality to be implemented.",
-                            );
-                          },
+                    onTap: (_isLoading || !_canResend) ? null : _resendOtp,
                     child: Center(
                       child: Text(
-                        "Resend OTP",
+                        _canResend ? "Resend OTP" : "",
                         style: AppComponent.primaryThemeTextStyle,
                       ),
                     ),
