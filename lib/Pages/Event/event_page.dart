@@ -3,8 +3,10 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/carouselWidget.dart';
 import 'package:mobile_assignment/Const/widget/eventWidget.dart';
+import 'package:mobile_assignment/Models/DTO/CategoryDto.dart';
 import 'package:mobile_assignment/Pages/Home/other/notification_page.dart';
 import 'package:mobile_assignment/Pages/Other/seeall_page.dart';
+import 'package:mobile_assignment/services/API/CategoryApi.dart';
 
 class EventPage extends StatefulWidget {
   const EventPage({super.key});
@@ -14,6 +16,45 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
+  Categoryapi categoryapi = Categoryapi();
+  List<Categorydto>? category = [];
+  bool isLoading = false;
+
+  void getAllEvents() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      final data = await categoryapi.getAllCategory();
+      if (!mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      if (data!.isNotEmpty) {
+        setState(() {
+          category = data;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAllEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -31,57 +72,60 @@ class _EventPageState extends State<EventPage> {
                 children: [
                   Text('On trend', style: AppComponent.labelStyle),
                   carouselWidget(),
-                  Column(
-                    children: [
-                      for (var category in [
-                        'Business',
-                        'Technology',
-                        'Entertainment',
-                      ])
-                        Container(
-                          height: 330,
-                          child: Column(
-                            children: [
-                              SizedBox(height: 10),
-                              Row(
+                  if (category!.isNotEmpty && category != null)
+                    ...List.generate(
+                      category!.length,
+                      (index) => category![index].events.isNotEmpty
+                          ? SizedBox(
+                              height: 330,
+                              child: Column(
                                 children: [
-                                  Text(
-                                    category, // Use category name
-                                    style: AppComponent.labelStyle,
-                                  ),
-                                  Spacer(),
-                                  GestureDetector(
-                                    onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SeeallPage(),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        category![index]
+                                            .categoryName, // Use category name
+                                        style: AppComponent.labelStyle,
                                       ),
-                                    ),
-                                    child: Text(
-                                      'See All >',
-                                      style: AppComponent.sublabelStyle,
+                                      Spacer(),
+                                      GestureDetector(
+                                        onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => SeeallPage(
+                                              data: category![index].events,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'See All >',
+                                          style: AppComponent.sublabelStyle,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  SizedBox(
+                                    height: 270,
+                                    child: ListView.builder(
+                                      itemCount: category![index].events.length,
+                                      shrinkWrap: false,
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                            return EventWidget(
+                                              data: category![index]
+                                                  .events[index],
+                                            );
+                                          },
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              Container(
-                                height: 270,
-                                child: ListView.builder(
-                                  itemCount: 3,
-                                  shrinkWrap: false,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                        return EventWidget();
-                                      },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+                            )
+                          : SizedBox(),
+                    ),
                 ],
               ),
             ),

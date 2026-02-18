@@ -19,7 +19,7 @@ class Userapi {
       return response;
     } catch (e) {
       // Return a response with error details
-      return http.Response(
+      return http.Response( 
         json.encode({'error': e.toString()}),
         500,
         headers: {'Content-Type': 'application/json'},

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/widget/seeAlleventWidget.dart';
+import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 
 class SeeallPage extends StatefulWidget {
-  const SeeallPage({super.key});
+  final List<Eventdto> data;
+  const SeeallPage({super.key, required this.data});
 
   @override
   State<SeeallPage> createState() => _SeeallPageState();
@@ -19,9 +21,9 @@ class _SeeallPageState extends State<SeeallPage> {
             child: Container(
               padding: EdgeInsets.all(5),
               child: ListView.builder(
-                itemCount: 3,
+                itemCount: widget.data.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Seealleventwidget();
+                  return Seealleventwidget(eventData: widget.data[index]);
                 },
               ),
             ),

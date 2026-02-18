@@ -3,7 +3,7 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/UserDto.dart';
 import 'package:mobile_assignment/Pages/Auth/resetsuccess_page.dart';
-import 'package:mobile_assignment/services/UserApi.dart';
+import 'package:mobile_assignment/services/API/UserApi.dart';
 
 class NewpassPage extends StatefulWidget {
   final String email;
@@ -46,6 +46,7 @@ class _NewpassPageState extends State<NewpassPage> {
       }
 
       Userdto updatedUser = Userdto(
+        id: existingUser.id,
         fullname: existingUser.fullname,
         email: widget.email,
         gender: existingUser.gender,

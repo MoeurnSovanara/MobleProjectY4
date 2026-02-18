@@ -1,11 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/eventdetailed_page.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class EventWidget extends StatefulWidget {
-  const EventWidget({super.key});
+  final Eventdto data;
+  const EventWidget({super.key, required this.data});
 
   @override
   State<EventWidget> createState() => _EventWidgetState();
@@ -16,8 +20,67 @@ class _EventWidgetState extends State<EventWidget> {
   bool isLiked = false;
   bool isDisliked = false;
   bool isBookmarked = false;
-  int likeCount = 809000; // 809k in actual number
+  int likeCount = 0;
   int dislikeCount = 0;
+  late int userId;
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  bool _imageError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+    _preloadImage();
+  }
+
+  Future<void> _initializeData() async {
+    firstLaunch();
+  }
+
+  void firstLaunch() async {
+    var storedUserId = await usersharedpreferences.getUserId();
+
+    if (storedUserId != null) {
+      userId = storedUserId;
+
+      // Calculate counts from all engagements first
+      int totalLikes = 0;
+      int totalDislikes = 0;
+
+      for (var item in widget.data.userEventEngagements) {
+        if (item.isLiked == true) totalLikes++;
+        if (item.isDisliked == true) totalDislikes++;
+
+        // Set current user's interaction
+        if (item.userId.toString() == userId) {
+          setState(() {
+            isLiked = item.isLiked == true;
+            isDisliked = item.isDisliked == true;
+            isBookmarked = item.isBookMarked == true;
+          });
+        }
+      }
+
+      setState(() {
+        likeCount = totalLikes;
+        dislikeCount = totalDislikes;
+      });
+    } else {
+      // If no user logged in, just show the counts from engagements
+      int totalLikes = 0;
+      int totalDislikes = 0;
+
+      for (var item in widget.data.userEventEngagements) {
+        if (item.isLiked == true) totalLikes++;
+        if (item.isDisliked == true) totalDislikes++;
+      }
+
+      setState(() {
+        likeCount = totalLikes;
+        dislikeCount = totalDislikes;
+      });
+    }
+  }
 
   // Like action
   void _handleLike() {
@@ -38,6 +101,8 @@ class _EventWidgetState extends State<EventWidget> {
         }
       }
     });
+
+    // TODO: Call API to update like status
   }
 
   // Dislike action
@@ -59,6 +124,8 @@ class _EventWidgetState extends State<EventWidget> {
         }
       }
     });
+
+    // TODO: Call API to update dislike status
   }
 
   // Bookmark action
@@ -77,14 +144,16 @@ class _EventWidgetState extends State<EventWidget> {
         duration: const Duration(milliseconds: 1500),
       ),
     );
+
+    // TODO: Call API to update bookmark status
   }
 
   // Share action using Flutter's built-in share
   void _handleShare() async {
     final String shareText =
-        'Check out this event: Performance art: Happening\n'
-        'Date: December 12\n'
-        'Location: 222 Street Tul kork, Phnom Penh\n'
+        'Check out this event: ${widget.data.title}\n'
+        'Date: ${_formatDate(widget.data.eventStart)}\n'
+        'Location: ${widget.data.venues?.venueLocation ?? 'Location TBA'}\n'
         '${isLiked ? 'I liked this event!' : ''}';
 
     try {
@@ -101,6 +170,32 @@ class _EventWidgetState extends State<EventWidget> {
       print('Share error: $e');
       _showShareDialog(shareText);
     }
+  }
+
+  // Format date to show day and month
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Date TBA';
+
+    // You can customize this based on your date format
+    return '${date.day} ${_getMonthAbbreviation(date.month)}';
+  }
+
+  String _getMonthAbbreviation(int month) {
+    const months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ];
+    return months[month - 1];
   }
 
   // Show share dialog with options
@@ -207,11 +302,47 @@ class _EventWidgetState extends State<EventWidget> {
   // Helper function to format large numbers
   String _formatNumber(int number) {
     if (number >= 1000000) {
-      return '${(number / 1000000).toStringAsFixed(1)} M';
+      return '${(number / 1000000).toStringAsFixed(1)}M';
     } else if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(1)} k';
+      return '${(number / 1000).toStringAsFixed(1)}K';
     }
     return number.toString();
+  }
+
+  // Preload image to check if it loads successfully
+  void _preloadImage() {
+    if (widget.data.image == null || widget.data.image!.isEmpty) {
+      setState(() {
+        _imageError = true;
+      });
+      return;
+    }
+
+    final Image image = Image.network(
+      "${headUrl}img/${widget.data.image}",
+      fit: BoxFit.fitHeight,
+    );
+
+    image.image
+        .resolve(ImageConfiguration())
+        .addListener(
+          ImageStreamListener(
+            (info, call) {
+              if (mounted) {
+                setState(() {
+                  _imageError = false;
+                });
+              }
+            },
+            onError: (exception, stackTrace) {
+              if (mounted) {
+                setState(() {
+                  _imageError = true;
+                });
+              }
+            },
+          ),
+        );
   }
 
   @override
@@ -240,15 +371,34 @@ class _EventWidgetState extends State<EventWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image Container with error handling
             Container(
               height: 120,
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/img/sample/upcoming2.png'),
-                  fit: BoxFit.fitHeight,
-                ),
+              decoration: BoxDecoration(
+                color: Colors.grey[200], // Fallback color
+                image:
+                    !_imageError &&
+                        widget.data.image != null &&
+                        widget.data.image!.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(
+                          "${headUrl}img/${widget.data.image}",
+                        ),
+                        fit: BoxFit.fitHeight,
+                        onError: (exception, stackTrace) {
+                          setState(() {
+                            _imageError = true;
+                          });
+                        },
+                      )
+                    : const DecorationImage(
+                        image: AssetImage("assets/img/other/errorImage.png"),
+                        fit: BoxFit.fitWidth,
+                      ),
+                borderRadius: BorderRadius.circular(8),
               ),
+              // Date and bookmark row - always show regardless of image error
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -264,7 +414,9 @@ class _EventWidgetState extends State<EventWidget> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          '12',
+                          widget.data.eventStart != null
+                              ? '${widget.data.eventStart!.day}'
+                              : '12',
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor,
@@ -273,7 +425,11 @@ class _EventWidgetState extends State<EventWidget> {
                           ),
                         ),
                         Text(
-                          'DEC',
+                          widget.data.eventStart != null
+                              ? _getMonthAbbreviation(
+                                  widget.data.eventStart!.month,
+                                )
+                              : 'DEC',
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.primaryColor,
@@ -299,6 +455,7 @@ class _EventWidgetState extends State<EventWidget> {
                         color: isBookmarked
                             ? AdvertiseColor.primaryColor
                             : Colors.black,
+                        size: 20,
                       ),
                     ),
                   ),
@@ -308,15 +465,18 @@ class _EventWidgetState extends State<EventWidget> {
             Container(
               padding: const EdgeInsets.all(10),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Performance art: Happ...",
+                    widget.data.title ?? 'Untitled Event',
                     style: TextStyle(
                       fontFamily: 'KantumruyPro',
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                       color: AdvertiseColor.textColor,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 5),
                   Row(
@@ -333,6 +493,7 @@ class _EventWidgetState extends State<EventWidget> {
                               color: isLiked
                                   ? AdvertiseColor.primaryColor
                                   : AdvertiseColor.textColor.withOpacity(0.5),
+                              size: 18,
                             ),
                             const SizedBox(width: 5),
                             Text(
@@ -345,6 +506,7 @@ class _EventWidgetState extends State<EventWidget> {
                                 fontWeight: isLiked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
+                                fontSize: 12,
                               ),
                             ),
                           ],
@@ -364,6 +526,7 @@ class _EventWidgetState extends State<EventWidget> {
                               color: isDisliked
                                   ? AdvertiseColor.textColor
                                   : AdvertiseColor.textColor.withOpacity(0.5),
+                              size: 18,
                             ),
                             const SizedBox(width: 5),
                             Text(
@@ -376,6 +539,7 @@ class _EventWidgetState extends State<EventWidget> {
                                 fontWeight: isDisliked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
+                                fontSize: 12,
                               ),
                             ),
                           ],
@@ -389,6 +553,7 @@ class _EventWidgetState extends State<EventWidget> {
                         child: Icon(
                           Icons.share_rounded,
                           color: AdvertiseColor.textColor.withOpacity(0.5),
+                          size: 18,
                         ),
                       ),
                     ],
@@ -399,15 +564,18 @@ class _EventWidgetState extends State<EventWidget> {
                       Icon(
                         Icons.location_on,
                         color: AdvertiseColor.textColor.withOpacity(0.5),
+                        size: 16,
                       ),
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          '222 Street Tul kork, PP',
+                          widget.data.venues?.venueLocation ?? 'Location TBA',
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor.withOpacity(0.5),
+                            fontSize: 12,
                           ),
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

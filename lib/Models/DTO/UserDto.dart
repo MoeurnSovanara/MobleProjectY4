@@ -1,4 +1,5 @@
 class Userdto {
+  final int id;
   final String fullname;
   final String email;
   final String gender;
@@ -11,6 +12,7 @@ class Userdto {
   final bool google;
 
   Userdto({
+    required this.id,
     required this.fullname,
     required this.email,
     required this.gender,
@@ -26,6 +28,7 @@ class Userdto {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'fullname': fullname,
       'email': email,
       'gender': gender,
@@ -40,21 +43,22 @@ class Userdto {
   }
 
   factory Userdto.fromJson(Map<String, dynamic> json) {
-  return Userdto(
-    fullname: json['fullname'] ?? "",
-    email: json['email'] ?? "",
-    gender: json['gender'] ?? "",
-    password: json['password'] ?? "",
-    phoneNumber: json['phoneNumber'] ?? "",
-    dateOfBirth: json['dateOfBirth'] != null 
-        ? DateTime.parse(json['dateOfBirth'])
-        : DateTime.now(), // Provide a default value
-    organizer: json['organizer'] ?? false,
-    verified: json['verified'] ?? false,
-    createdAt: json['createdAt'] != null
-        ? DateTime.parse(json['createdAt'])
-        : DateTime.now(), // Provide a default value
-    google: json['google'] ?? false,
-  );
-}
+    return Userdto(
+      id: json['id'] ?? 0,
+      fullname: json['fullname'] ?? "",
+      email: json['email'] ?? "",
+      gender: json['gender'] ?? "",
+      password: json['password'] ?? "",
+      phoneNumber: json['phoneNumber'] ?? "",
+      dateOfBirth: json['dateOfBirth'] != null
+          ? DateTime.parse(json['dateOfBirth'])
+          : DateTime.now(), // Provide a default value
+      organizer: json['organizer'] ?? false,
+      verified: json['verified'] ?? false,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(), // Provide a default value
+      google: json['google'] ?? false,
+    );
+  }
 }

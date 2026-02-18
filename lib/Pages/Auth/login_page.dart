@@ -6,7 +6,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Auth/forgetpass_page.dart';
 import 'package:mobile_assignment/Pages/Auth/signup_page.dart';
 import 'package:mobile_assignment/Pages/Auth/verifyOTP_page.dart';
-import 'package:mobile_assignment/services/UserApi.dart';
+import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/services/sentEmailServices.dart';
 
 class LoginPage extends StatefulWidget {

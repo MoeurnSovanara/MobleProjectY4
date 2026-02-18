@@ -4,8 +4,10 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/carouselWidget.dart';
 import 'package:mobile_assignment/Const/widget/eventWidget.dart';
 import 'package:mobile_assignment/Const/widget/videoCardWidget.dart';
+import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Home/other/notification_page.dart';
 import 'package:mobile_assignment/Pages/Other/seeall_page.dart';
+import 'package:mobile_assignment/services/API/EventApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,8 +18,55 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var _searchFieldContorller = TextEditingController();
+  TextEditingController _searchFieldContorller = TextEditingController();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  Eventapi eventapi = Eventapi();
+  List<Eventdto> eventdto = []; // Don't make it nullable if not needed
+  bool isLoading = false;
+
+  void getAllEvents() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final data = await eventapi.getAllEvents();
+
+      if (!mounted) return; // Just return, no setState needed
+
+      if (data != null && data.isNotEmpty) {
+        var presentDate = DateTime.now();
+        // Use where for filtering
+        var filterdata = data
+            .where((e) => e.eventStart.isAfter(presentDate))
+            .toList();
+
+        setState(() {
+          eventdto = filterdata;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          eventdto = [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAllEvents();
+  }
 
   final items = [
     {
@@ -48,99 +97,118 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.all(10),
               child: Column(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Upcoming Events",
-                            style: AppComponent.labelStyle,
-                          ),
-                          Spacer(),
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SeeallPage(),
-                              ),
-                            ),
-                            child: Text(
-                              'See All >',
-                              style: AppComponent.sublabelStyle,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        height: 270,
-                        child: ListView.builder(
-                          itemCount: 3,
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: false,
-
-                          itemBuilder: (BuildContext context, int index) {
-                            return EventWidget();
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text('Performing arts', style: AppComponent.labelStyle),
-                      SizedBox(height: 10),
-                      carouselWidget(),
-                      SizedBox(height: 10),
-                      Text(
-                        "Exploring the heart of Phnom Penh",
-                        style: AppComponent.labelStyle,
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        height: 240,
-                        margin: EdgeInsets.only(left: 5),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 3,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
+                  isLoading
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Center(child: CircularProgressIndicator()),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Container(
-                                  margin: EdgeInsets.only(left: 5),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadiusDirectional.circular(15),
-                                    child: Image.asset(
-                                      'assets/img/sample/heart.png',
-                                      fit: BoxFit.cover,
+                                Text(
+                                  "Upcoming Events",
+                                  style: AppComponent.labelStyle,
+                                ),
+                                Spacer(),
+                                GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          SeeallPage(data: eventdto!),
                                     ),
+                                  ),
+                                  child: Text(
+                                    'See All >',
+                                    style: AppComponent.sublabelStyle,
                                   ),
                                 ),
                               ],
-                            );
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text('Video highlights', style: AppComponent.labelStyle),
-                      SizedBox(height: 10),
-                      Container(
-                        height: 240,
-                        margin: EdgeInsets.only(left: 5),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              height: 270,
+                              child: ListView.builder(
+                                itemCount: eventdto!.length,
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: false,
 
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: items.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 12),
-                          itemBuilder: (_, i) => AssetVideoCard(
-                            thumbnailAsset: items[i]['thumb']!,
-                            videoAsset: items[i]['video']!,
-                          ),
+                                itemBuilder: (BuildContext context, int index) {
+                                  return EventWidget(data: eventdto![index]);
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Performing arts',
+                              style: AppComponent.labelStyle,
+                            ),
+                            SizedBox(height: 10),
+                            carouselWidget(),
+                            SizedBox(height: 10),
+                            Text(
+                              "Exploring the heart of Phnom Penh",
+                              style: AppComponent.labelStyle,
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              height: 240,
+                              margin: EdgeInsets.only(left: 5),
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 3,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Column(
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(left: 5),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadiusDirectional.circular(
+                                                15,
+                                              ),
+                                          child: Image.asset(
+                                            'assets/img/sample/heart.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Video highlights',
+                              style: AppComponent.labelStyle,
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              height: 240,
+                              margin: EdgeInsets.only(left: 5),
+
+                              child: ListView.separated(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: items.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(width: 12),
+                                itemBuilder: (_, i) => AssetVideoCard(
+                                  thumbnailAsset: items[i]['thumb']!,
+                                  videoAsset: items[i]['video']!,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -193,19 +261,22 @@ class _HomePageState extends State<HomePage> {
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 20,
                             ),
-                            icon: Icon(
+                            prefixIcon: Icon(
                               Icons.search,
                               color: AdvertiseColor.backgroundColor,
-                            ),
+                            ), // Use prefixIcon instead of icon
                             filled: true,
+                            fillColor: Colors.white.withOpacity(
+                              0.2,
+                            ), // Add a proper fill color
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.blueGrey),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.transparent),
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                            fillColor: Colors.transparent,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),

@@ -190,30 +190,29 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const Spacer(),
                     // Only show add button for organizers
-                    if (isOrganizer == true)
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Createeventpage(),
-                            ),
-                          );
-                        },
-                        icon: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: AdvertiseColor.primaryColor,
-                              width: 1.5,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Createeventpage(),
                           ),
-                          child: Icon(
-                            Icons.add,
+                        );
+                      },
+                      icon: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
                             color: AdvertiseColor.primaryColor,
+                            width: 1.5,
                           ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          color: AdvertiseColor.primaryColor,
                         ),
                       ),
+                    ),
                   ],
                 ),
               ),

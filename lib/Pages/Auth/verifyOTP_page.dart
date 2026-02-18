@@ -8,7 +8,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Auth/createprofile_page.dart';
 import 'package:mobile_assignment/Pages/Auth/newpass_page.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
-import 'package:mobile_assignment/services/UserApi.dart';
+import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/services/sentEmailServices.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
@@ -162,6 +162,7 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
               await usersharedpreferences.saveUserEmail(widget.email);
               await usersharedpreferences.saveUserOrganizer(userData.organizer);
               await usersharedpreferences.saveUserName(userData.fullname);
+              await usersharedpreferences.saveUserId(userData.id);
             }
             if (!mounted) return;
             Navigator.pushReplacement(

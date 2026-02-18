@@ -4,6 +4,7 @@ class Usersharedpreferences {
   static String userEmailKey = "USEREMAILKEY";
   static String userOrganizerKey = "ORGANIZERKEY";
   static String userNameKey = "USERNAMEKEY";
+  static String userIdKey = "USERIDKEY";
 
   Future<bool> saveUserEmail(String email) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -35,10 +36,21 @@ class Usersharedpreferences {
     return prefs.getString(userNameKey);
   }
 
+  Future<bool> saveUserId(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setInt(userIdKey, id);
+  }
+
+  Future<int?> getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(userIdKey);
+  }
+
   Future<void> clearUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove(userEmailKey);
     await prefs.remove(userOrganizerKey);
     await prefs.remove(userNameKey);
+    await prefs.remove(userIdKey);
   }
 }
