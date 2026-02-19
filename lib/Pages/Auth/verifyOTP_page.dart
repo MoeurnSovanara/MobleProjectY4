@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:math';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -12,6 +10,7 @@ import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/services/sentEmailServices.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
+// ignore: must_be_immutable
 class VerifyotpPage extends StatefulWidget {
   final String email;
   String otp;

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_assignment/Const/Component.dart';
-import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Profile/other/bookmark_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/editProfile_page.dart';

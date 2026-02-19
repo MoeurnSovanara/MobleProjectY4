@@ -1,10 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/bookticket_page.dart';
+import 'package:mobile_assignment/services/Helper/HelperClass.dart';
+import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
+import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
-class EventdetailedPage extends StatelessWidget {
-  const EventdetailedPage({super.key});
+class EventdetailedPage extends StatefulWidget {
+  final Eventdto eventdto;
+  const EventdetailedPage({super.key, required this.eventdto});
+
+  @override
+  State<EventdetailedPage> createState() => _EventdetailedPageState();
+}
+
+class _EventdetailedPageState extends State<EventdetailedPage> {
+  // State variables
+  InteractionHelper? _interactionHelper;
+  late int userId;
+  final helperclass = Helperclass();
+  PreloadImageHelper? _preloadImageHelper;
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  Future<void> firstJob() async {
+    bool isLiked = false;
+    bool isDisLiked = false;
+    bool isBookMarked = false;
+    int likeCount = 0;
+    int dislikedCount = 0;
+    int bookMarkedCount = 0;
+    var userId = await usersharedpreferences.getUserId();
+    if (userId != null) {
+      for (var item in widget.eventdto.userEventEngagements) {
+        if (item.isLiked == true) likeCount++;
+        if (item.isDisliked == true) dislikedCount++;
+        if (item.isBookMarked == true) bookMarkedCount;
+        if (userId == item.eventId) {
+          isBookMarked = item.isBookMarked == true;
+          isDisLiked = item.isDisliked == true;
+          isLiked = item.isLiked == true;
+        }
+      }
+    }
+
+    _interactionHelper = InteractionHelper(
+      isBookMarked: isBookMarked,
+      isLiked: isLiked,
+      isDisliked: isDisLiked,
+      likeCount: likeCount,
+      dislikeCount: dislikedCount,
+      bookmarkedCount: bookMarkedCount,
+      userId: userId!,
+      eventId: widget.eventdto.id,
+      onUpdate: () => setState(() {}),
+    );
+
+    _preloadImageHelper = PreloadImageHelper(
+      imageError: false,
+      imageName: widget.eventdto.image,
+      onUpdate: () => setState(() {}),
+      mounted: mounted,
+    );
+
+    _preloadImageHelper!.preloadImage(headUrl);
+  }
+
+  Future<void> firstTask() async {
+    await firstJob();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    firstTask();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update mounted state in helper when dependencies change
+    if (_preloadImageHelper != null) {
+      _preloadImageHelper!.mounted = mounted;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +101,17 @@ class EventdetailedPage extends StatelessWidget {
                   bottomRight: Radius.circular(15),
                 ),
                 image: DecorationImage(
-                  image: AssetImage('assets/img/sample/event.png'),
-                  fit: BoxFit.fill,
+                  image:
+                      _preloadImageHelper != null &&
+                          _preloadImageHelper!.hasValidImage
+                      ? NetworkImage("${headUrl}img/${widget.eventdto.image}")
+                      : const AssetImage("assets/img/other/errorImage.png")
+                            as ImageProvider,
+                  fit:
+                      _preloadImageHelper != null &&
+                          _preloadImageHelper!.hasValidImage
+                      ? BoxFit.fitHeight
+                      : BoxFit.fitWidth,
                 ),
               ),
               child: Row(
@@ -46,24 +135,35 @@ class EventdetailedPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.thumb_up_outlined,
-                        color: AdvertiseColor.primaryColor,
+                      IconButton(
+                        onPressed: _interactionHelper?.handleLike,
+                        icon: Icon(
+                          Icons.thumb_up_outlined,
+                          color: _interactionHelper?.isLiked == true
+                              ? AdvertiseColor.primaryColor
+                              : AdvertiseColor.textColor,
+                        ),
                       ),
+
                       Text(
-                        '1.5k',
+                        " ${_interactionHelper?.likeCount} ",
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'KantumruyPro',
                         ),
                       ),
                       SizedBox(width: 5),
-                      Icon(
-                        Icons.thumb_down_outlined,
-                        color: AdvertiseColor.dangerColor,
+                      IconButton(
+                        onPressed: _interactionHelper?.handleDislike,
+                        icon: Icon(
+                          Icons.thumb_down_outlined,
+                          color: _interactionHelper?.isDisliked == true
+                              ? AdvertiseColor.dangerColor
+                              : AdvertiseColor.textColor,
+                        ),
                       ),
                       Text(
-                        '1k',
+                        " ${_interactionHelper?.dislikeCount} ",
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'KantumruyPro',
@@ -71,37 +171,38 @@ class EventdetailedPage extends StatelessWidget {
                       ),
                       Spacer(),
                       Text(
-                        '100',
+                        ' ${_interactionHelper?.bookmarkedCount}',
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'KantumruyPro',
                         ),
                       ),
-                      Icon(
-                        Icons.bookmark_outline,
-                        color: AdvertiseColor.warningColor,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Text('Symphony', style: AppComponent.boldTextStyle),
-                      SizedBox(width: 5),
-                      Text(
-                        'ស៊ីមហ្វីនី',
-                        style: TextStyle(
-                          fontFamily: 'KantumruyPro',
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: AdvertiseColor.primaryColor,
+                      IconButton(
+                        onPressed: () => _interactionHelper!.handleBookMark(),
+                        icon: Icon(
+                          Icons.bookmark_outline,
+                          color: _interactionHelper?.isBookMarked == true
+                              ? AdvertiseColor.warningColor
+                              : AdvertiseColor.textColor,
                         ),
                       ),
                     ],
                   ),
+                  SizedBox(height: 5),
+                  Text(
+                    widget.eventdto.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: 'KantumruyPro',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: AdvertiseColor.primaryColor,
+                    ),
+                  ),
                   SizedBox(height: 10),
                   Text(
-                    'This is a longer piece of dummy text that spans multiple lines and can be used to test how your UI handles longer content. It helps ensure that text wrapping, overflow, and other text-related properties work correctly.',
+                    widget.eventdto.description,
                     style: AppComponent.detailTextStyle,
                   ),
                   SizedBox(height: 10),
@@ -122,7 +223,9 @@ class EventdetailedPage extends StatelessWidget {
                                       style: AppComponent.labelStyle,
                                     ),
                                     Text(
-                                      '16-March-2025',
+                                      Helperclass.formatFullDate(
+                                        widget.eventdto.eventStart,
+                                      ),
                                       style: AppComponent.hintTextStyle,
                                     ),
                                   ],
@@ -144,7 +247,9 @@ class EventdetailedPage extends StatelessWidget {
                                       style: AppComponent.labelStyle,
                                     ),
                                     Text(
-                                      '23-March-2025',
+                                      Helperclass.formatFullDate(
+                                        widget.eventdto.eventEnd,
+                                      ),
                                       style: AppComponent.hintTextStyle,
                                     ),
                                   ],
@@ -169,7 +274,7 @@ class EventdetailedPage extends StatelessWidget {
                                       style: AppComponent.labelStyle,
                                     ),
                                     Text(
-                                      '8:00AM-10:00AM',
+                                      '${Helperclass.formatTime(widget.eventdto.eventStart)}-${Helperclass.formatTime(widget.eventdto.eventStart)}',
                                       style: AppComponent.hintTextStyle,
                                     ),
                                   ],
@@ -183,10 +288,15 @@ class EventdetailedPage extends StatelessWidget {
                         children: [
                           Icon(Icons.location_on_outlined),
                           SizedBox(width: 5),
-                          Text(
-                            'Location: Phnom Penh',
-                            style: AppComponent.hintTextStyle.copyWith(
-                              color: AdvertiseColor.textColor,
+                          Expanded(
+                            child: Text(
+                              'Location: ${widget.eventdto.venues.venueLocation}',
+                              style: AppComponent.hintTextStyle.copyWith(
+                                color: AdvertiseColor.textColor,
+                              ),
+                              maxLines: 1,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           SizedBox(width: 10),
@@ -344,5 +454,11 @@ class EventdetailedPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up if needed
+    super.dispose();
   }
 }

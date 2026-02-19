@@ -5,6 +5,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/eventdetailed_page.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
+import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 import 'dart:io';
 
@@ -17,16 +18,10 @@ class Seealleventwidget extends StatefulWidget {
 }
 
 class _SeealleventwidgetState extends State<Seealleventwidget> {
-  // State variables
-  bool isLiked = false;
-  bool isDisliked = false;
-  bool isBookmarked = false;
-  int likeCount = 0;
-  int dislikeCount = 0;
-  late int userId;
   bool _imageError = false;
   final Usersharedpreferences usersharedpreferences = Usersharedpreferences();
   final helper = Helperclass();
+  InteractionHelper interactiveHelper = InteractionHelper();
 
   @override
   void initState() {
@@ -40,33 +35,39 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
   }
 
   Future<void> firstLaunch() async {
+    late int userId;
     var storedUserId = await usersharedpreferences.getUserId();
 
     if (storedUserId != null) {
       userId = storedUserId;
 
       // Calculate counts from all engagements first
-      int totalLikes = 0;
-      int totalDislikes = 0;
+      bool isLiked = false;
+      bool isDisliked = false;
+      bool isBookmarked = false;
+      int likeCount = 0;
+      int dislikeCount = 0;
 
       for (var item in widget.eventData.userEventEngagements) {
-        if (item.isLiked == true) totalLikes++;
-        if (item.isDisliked == true) totalDislikes++;
+        if (item.isLiked == true) likeCount++;
+        if (item.isDisliked == true) dislikeCount++;
 
         // Set current user's interaction
         if (item.userId.toString() == userId.toString()) {
-          setState(() {
-            isLiked = item.isLiked == true;
-            isDisliked = item.isDisliked == true;
-            isBookmarked = item.isBookMarked == true;
-          });
+          isLiked = item.isLiked == true;
+          isDisliked = item.isDisliked == true;
+          isBookmarked = item.isBookMarked == true;
         }
       }
 
-      setState(() {
-        likeCount = totalLikes;
-        dislikeCount = totalDislikes;
-      });
+      interactiveHelper = InteractionHelper(
+        isBookMarked: isBookmarked,
+        isDisliked: isDisliked,
+        isLiked: isLiked,
+        likeCount: likeCount,
+        dislikeCount: dislikeCount,
+        onUpdate: () => setState(() {}),
+      );
     } else {
       // If no user logged in, just show the counts from engagements
       int totalLikes = 0;
@@ -77,77 +78,11 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
         if (item.isDisliked == true) totalDislikes++;
       }
 
-      setState(() {
-        likeCount = totalLikes;
-        dislikeCount = totalDislikes;
-      });
+      interactiveHelper = InteractionHelper(
+        likeCount: totalLikes,
+        dislikeCount: totalDislikes,
+      );
     }
-  }
-
-  // Like action
-  void _handleLike() {
-    setState(() {
-      if (isLiked) {
-        // If already liked, unlike it
-        isLiked = false;
-        likeCount--;
-      } else {
-        // If not liked, like it
-        isLiked = true;
-        likeCount++;
-
-        // If disliked, remove dislike
-        if (isDisliked) {
-          isDisliked = false;
-          dislikeCount--;
-        }
-      }
-    });
-
-    // TODO: Call API to update like status
-  }
-
-  // Dislike action
-  void _handleDislike() {
-    setState(() {
-      if (isDisliked) {
-        // If already disliked, remove dislike
-        isDisliked = false;
-        dislikeCount--;
-      } else {
-        // If not disliked, dislike it
-        isDisliked = true;
-        dislikeCount++;
-
-        // If liked, remove like
-        if (isLiked) {
-          isLiked = false;
-          likeCount--;
-        }
-      }
-    });
-
-    // TODO: Call API to update dislike status
-  }
-
-  // Bookmark action
-  void _handleBookmark() {
-    setState(() {
-      isBookmarked = !isBookmarked;
-    });
-
-    // Show snackbar feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isBookmarked ? 'Event bookmarked!' : 'Bookmark removed',
-          style: const TextStyle(fontFamily: 'KantumruyPro'),
-        ),
-        duration: const Duration(milliseconds: 1500),
-      ),
-    );
-
-    // TODO: Call API to update bookmark status
   }
 
   // Share action
@@ -155,8 +90,8 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
     final String shareText =
         'Check out this event: ${widget.eventData.title}\n'
         'Date: ${helper.formatDate(widget.eventData.eventStart)}\n'
-        'Location: ${widget.eventData.venues?.venueLocation ?? 'Location TBA'}\n'
-        '${isLiked ? 'I liked this event!' : ''}';
+        'Location: ${widget.eventData.venues.venueLocation}\n'
+        '${interactiveHelper.isLiked ? 'I liked this event!' : ''}';
 
     try {
       _showShareDialog(shareText);
@@ -267,7 +202,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
 
   // Preload image to check if it loads successfully
   void _preloadImage() {
-    if (widget.eventData.image == null || widget.eventData.image!.isEmpty) {
+    if (widget.eventData.image.isEmpty) {
       setState(() {
         _imageError = true;
       });
@@ -306,7 +241,9 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => EventdetailedPage()),
+        MaterialPageRoute(
+          builder: (context) => EventdetailedPage(eventdto: widget.eventData),
+        ),
       ),
       child: Container(
         width: 220,
@@ -333,10 +270,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               decoration: BoxDecoration(
                 color: Colors.grey[200], // Fallback color
-                image:
-                    !_imageError &&
-                        widget.eventData.image != null &&
-                        widget.eventData.image!.isNotEmpty
+                image: !_imageError && widget.eventData.image.isNotEmpty
                     ? DecorationImage(
                         image: NetworkImage(
                           "${headUrl}img/${widget.eventData.image}",
@@ -370,9 +304,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          widget.eventData.eventStart != null
-                              ? '${widget.eventData.eventStart!.day}'
-                              : '12',
+                          '${widget.eventData.eventStart.day}',
                           style: const TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor,
@@ -381,11 +313,9 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                           ),
                         ),
                         Text(
-                          widget.eventData.eventStart != null
-                              ? helper.getMonthAbbreviation(
-                                  widget.eventData.eventStart!.month,
-                                )
-                              : 'DEC',
+                          helper.getMonthAbbreviation(
+                            widget.eventData.eventStart.month,
+                          ),
                           style: const TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.primaryColor,
@@ -399,7 +329,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                   const Spacer(),
                   // Bookmark button
                   GestureDetector(
-                    onTap: _handleBookmark,
+                    onTap: interactiveHelper.handleBookMark,
                     child: Container(
                       width: 30,
                       height: 35,
@@ -408,8 +338,10 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
-                        color: isBookmarked
+                        interactiveHelper.isBookMarked
+                            ? Icons.bookmark
+                            : Icons.bookmark_outline,
+                        color: interactiveHelper.isBookMarked
                             ? AdvertiseColor.primaryColor
                             : Colors.black,
                         size: 20,
@@ -428,7 +360,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                 children: [
                   // Event title
                   Text(
-                    widget.eventData.title ?? 'Untitled Event',
+                    widget.eventData.title,
                     style: const TextStyle(
                       fontFamily: 'KantumruyPro',
                       fontSize: 16,
@@ -445,27 +377,27 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                     children: [
                       // Like button
                       GestureDetector(
-                        onTap: _handleLike,
+                        onTap: interactiveHelper.handleLike,
                         child: Row(
                           children: [
                             Icon(
-                              isLiked
+                              interactiveHelper.isLiked
                                   ? Icons.thumb_up
                                   : Icons.thumb_up_outlined,
-                              color: isLiked
+                              color: interactiveHelper.isLiked
                                   ? AdvertiseColor.primaryColor
                                   : AdvertiseColor.textColor.withOpacity(0.5),
                               size: 18,
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              helper.formatNumber(likeCount),
+                              helper.formatNumber(interactiveHelper.likeCount),
                               style: TextStyle(
                                 fontFamily: 'KantumruyPro',
-                                color: isLiked
+                                color: interactiveHelper.isLiked
                                     ? AdvertiseColor.primaryColor
                                     : Colors.black,
-                                fontWeight: isLiked
+                                fontWeight: interactiveHelper.isLiked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 fontSize: 12,
@@ -478,27 +410,29 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
 
                       // Dislike button
                       GestureDetector(
-                        onTap: _handleDislike,
+                        onTap: interactiveHelper.handleDislike,
                         child: Row(
                           children: [
                             Icon(
-                              isDisliked
+                              interactiveHelper.isDisliked
                                   ? Icons.thumb_down
                                   : Icons.thumb_down_outlined,
-                              color: isDisliked
+                              color: interactiveHelper.isDisliked
                                   ? AdvertiseColor.textColor
                                   : AdvertiseColor.textColor.withOpacity(0.5),
                               size: 18,
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              helper.formatNumber(dislikeCount),
+                              helper.formatNumber(
+                                interactiveHelper.dislikeCount,
+                              ),
                               style: TextStyle(
                                 fontFamily: 'KantumruyPro',
-                                color: isDisliked
+                                color: interactiveHelper.isDisliked
                                     ? AdvertiseColor.textColor
                                     : Colors.black,
-                                fontWeight: isDisliked
+                                fontWeight: interactiveHelper.isDisliked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 fontSize: 12,
@@ -533,8 +467,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          widget.eventData.venues?.venueLocation ??
-                              'Location TBA',
+                          widget.eventData.venues.venueLocation,
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor.withOpacity(0.5),

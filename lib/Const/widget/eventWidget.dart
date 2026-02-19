@@ -5,6 +5,9 @@ import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/eventdetailed_page.dart';
+import 'package:mobile_assignment/services/Helper/HelperClass.dart';
+import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
+import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class EventWidget extends StatefulWidget {
@@ -17,27 +20,32 @@ class EventWidget extends StatefulWidget {
 
 class _EventWidgetState extends State<EventWidget> {
   // State variables
-  bool isLiked = false;
-  bool isDisliked = false;
-  bool isBookmarked = false;
-  int likeCount = 0;
-  int dislikeCount = 0;
+  InteractionHelper? _interactionHelper;
   late int userId;
+  final helperclass = Helperclass();
+  PreloadImageHelper? _preloadImageHelper;
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
-  bool _imageError = false;
 
   @override
   void initState() {
     super.initState();
     _initializeData();
-    _preloadImage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update mounted state in helper when dependencies change
+    if (_preloadImageHelper != null) {
+      _preloadImageHelper!.mounted = mounted;
+    }
   }
 
   Future<void> _initializeData() async {
-    firstLaunch();
+    await firstLaunch();
   }
 
-  void firstLaunch() async {
+  Future<void> firstLaunch() async {
     var storedUserId = await usersharedpreferences.getUserId();
 
     if (storedUserId != null) {
@@ -46,25 +54,44 @@ class _EventWidgetState extends State<EventWidget> {
       // Calculate counts from all engagements first
       int totalLikes = 0;
       int totalDislikes = 0;
+      bool currentUserLiked = false;
+      bool currentUserDisliked = false;
+      bool currentUserBookMarked = false;
 
       for (var item in widget.data.userEventEngagements) {
         if (item.isLiked == true) totalLikes++;
         if (item.isDisliked == true) totalDislikes++;
 
         // Set current user's interaction
-        if (item.userId.toString() == userId) {
-          setState(() {
-            isLiked = item.isLiked == true;
-            isDisliked = item.isDisliked == true;
-            isBookmarked = item.isBookMarked == true;
-          });
+        if (item.userId == userId) {
+          currentUserLiked = item.isLiked == true;
+          currentUserDisliked = item.isDisliked == true;
+          currentUserBookMarked = item.isBookMarked == true;
         }
       }
 
-      setState(() {
-        likeCount = totalLikes;
-        dislikeCount = totalDislikes;
-      });
+      // Initialize the helper with the calculated values
+      _interactionHelper = InteractionHelper(
+        isLiked: currentUserLiked,
+        isDisliked: currentUserDisliked,
+        isBookMarked: currentUserBookMarked,
+        likeCount: totalLikes,
+        dislikeCount: totalDislikes,
+        userId: userId,
+        eventId: widget.data.id,
+        onUpdate: () => setState(() {}),
+      );
+
+      // Initialize image preloader
+      _preloadImageHelper = PreloadImageHelper(
+        imageError: false,
+        imageName: widget.data.image,
+        mounted: mounted,
+        onUpdate: () => setState(() {}),
+      );
+
+      // Preload the image
+      _preloadImageHelper!.preloadImage(headUrl);
     } else {
       // If no user logged in, just show the counts from engagements
       int totalLikes = 0;
@@ -75,130 +102,37 @@ class _EventWidgetState extends State<EventWidget> {
         if (item.isDisliked == true) totalDislikes++;
       }
 
-      setState(() {
-        likeCount = totalLikes;
-        dislikeCount = totalDislikes;
-      });
+      // Initialize helper with default values
+      _interactionHelper = InteractionHelper(
+        likeCount: totalLikes,
+        dislikeCount: totalDislikes,
+        onUpdate: () => setState(() {}),
+      );
+
+      // Initialize image preloader even for non-logged users
+      _preloadImageHelper = PreloadImageHelper(
+        imageError: false,
+        imageName: widget.data.image,
+        mounted: mounted,
+        onUpdate: () => setState(() {}),
+      );
+
+      // Preload the image
+      _preloadImageHelper!.preloadImage(headUrl);
     }
   }
 
-  // Like action
-  void _handleLike() {
-    setState(() {
-      if (isLiked) {
-        // If already liked, unlike it
-        isLiked = false;
-        likeCount--;
-      } else {
-        // If not liked, like it
-        isLiked = true;
-        likeCount++;
-
-        // If disliked, remove dislike
-        if (isDisliked) {
-          isDisliked = false;
-          dislikeCount--;
-        }
-      }
-    });
-
-    // TODO: Call API to update like status
-  }
-
-  // Dislike action
-  void _handleDislike() {
-    setState(() {
-      if (isDisliked) {
-        // If already disliked, remove dislike
-        isDisliked = false;
-        dislikeCount--;
-      } else {
-        // If not disliked, dislike it
-        isDisliked = true;
-        dislikeCount++;
-
-        // If liked, remove like
-        if (isLiked) {
-          isLiked = false;
-          likeCount--;
-        }
-      }
-    });
-
-    // TODO: Call API to update dislike status
-  }
-
-  // Bookmark action
-  void _handleBookmark() {
-    setState(() {
-      isBookmarked = !isBookmarked;
-    });
-
-    // Show snackbar feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isBookmarked ? 'Event bookmarked!' : 'Bookmark removed',
-          style: const TextStyle(fontFamily: 'KantumruyPro'),
-        ),
-        duration: const Duration(milliseconds: 1500),
-      ),
-    );
-
-    // TODO: Call API to update bookmark status
-  }
-
-  // Share action using Flutter's built-in share
+  // Share action
   void _handleShare() async {
     final String shareText =
         'Check out this event: ${widget.data.title}\n'
-        'Date: ${_formatDate(widget.data.eventStart)}\n'
-        'Location: ${widget.data.venues?.venueLocation ?? 'Location TBA'}\n'
-        '${isLiked ? 'I liked this event!' : ''}';
+        'Date: ${helperclass.formatDate(widget.data.eventStart)}\n'
+        'Location: ${widget.data.venues.venueLocation}\n'
+        '${_interactionHelper?.isLiked == true ? 'I liked this event!' : ''}';
 
-    try {
-      // For web platform
-      if (Platform.isAndroid || Platform.isIOS) {
-        // Use the share_plus package if you need cross-platform sharing
-        // For now, show a dialog with copy option
-        _showShareDialog(shareText);
-      } else {
-        // For other platforms, show dialog
-        _showShareDialog(shareText);
-      }
-    } catch (e) {
-      print('Share error: $e');
-      _showShareDialog(shareText);
-    }
+    _showShareDialog(shareText);
   }
 
-  // Format date to show day and month
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'Date TBA';
-
-    // You can customize this based on your date format
-    return '${date.day} ${_getMonthAbbreviation(date.month)}';
-  }
-
-  String _getMonthAbbreviation(int month) {
-    const months = [
-      'JAN',
-      'FEB',
-      'MAR',
-      'APR',
-      'MAY',
-      'JUN',
-      'JUL',
-      'AUG',
-      'SEP',
-      'OCT',
-      'NOV',
-      'DEC',
-    ];
-    return months[month - 1];
-  }
-
-  // Show share dialog with options
   void _showShareDialog(String text) {
     showModalBottomSheet(
       context: context,
@@ -270,7 +204,6 @@ class _EventWidgetState extends State<EventWidget> {
     );
   }
 
-  // Copy to clipboard
   void _copyToClipboard(String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -284,10 +217,7 @@ class _EventWidgetState extends State<EventWidget> {
     );
   }
 
-  // For native sharing (Android/iOS)
   void _showNativeShare(String text) {
-    // This would require the share_plus package
-    // For now, we'll show a message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -299,58 +229,19 @@ class _EventWidgetState extends State<EventWidget> {
     );
   }
 
-  // Helper function to format large numbers
-  String _formatNumber(int number) {
-    if (number >= 1000000) {
-      return '${(number / 1000000).toStringAsFixed(1)}M';
-    } else if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(1)}K';
-    }
-    return number.toString();
-  }
-
-  // Preload image to check if it loads successfully
-  void _preloadImage() {
-    if (widget.data.image == null || widget.data.image!.isEmpty) {
-      setState(() {
-        _imageError = true;
-      });
-      return;
-    }
-
-    final Image image = Image.network(
-      "${headUrl}img/${widget.data.image}",
-      fit: BoxFit.fitHeight,
-    );
-
-    image.image
-        .resolve(ImageConfiguration())
-        .addListener(
-          ImageStreamListener(
-            (info, call) {
-              if (mounted) {
-                setState(() {
-                  _imageError = false;
-                });
-              }
-            },
-            onError: (exception, stackTrace) {
-              if (mounted) {
-                setState(() {
-                  _imageError = true;
-                });
-              }
-            },
-          ),
-        );
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Ensure helpers are initialized
+    if (_interactionHelper == null || _preloadImageHelper == null) {
+      return const SizedBox.shrink();
+    }
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => EventdetailedPage()),
+        MaterialPageRoute(
+          builder: (context) => EventdetailedPage(eventdto: widget.data),
+        ),
       ),
       child: Container(
         width: 220,
@@ -376,29 +267,18 @@ class _EventWidgetState extends State<EventWidget> {
               height: 120,
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               decoration: BoxDecoration(
-                color: Colors.grey[200], // Fallback color
-                image:
-                    !_imageError &&
-                        widget.data.image != null &&
-                        widget.data.image!.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(
-                          "${headUrl}img/${widget.data.image}",
-                        ),
-                        fit: BoxFit.fitHeight,
-                        onError: (exception, stackTrace) {
-                          setState(() {
-                            _imageError = true;
-                          });
-                        },
-                      )
-                    : const DecorationImage(
-                        image: AssetImage("assets/img/other/errorImage.png"),
-                        fit: BoxFit.fitWidth,
-                      ),
+                color: Colors.grey[200],
+                image: DecorationImage(
+                  image: _preloadImageHelper!.hasValidImage
+                      ? NetworkImage("${headUrl}img/${widget.data.image}")
+                      : const AssetImage("assets/img/other/errorImage.png")
+                            as ImageProvider,
+                  fit: _preloadImageHelper!.hasValidImage
+                      ? BoxFit.fitHeight
+                      : BoxFit.fitWidth,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              // Date and bookmark row - always show regardless of image error
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -414,9 +294,7 @@ class _EventWidgetState extends State<EventWidget> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          widget.data.eventStart != null
-                              ? '${widget.data.eventStart!.day}'
-                              : '12',
+                          '${widget.data.eventStart.day}',
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor,
@@ -425,11 +303,9 @@ class _EventWidgetState extends State<EventWidget> {
                           ),
                         ),
                         Text(
-                          widget.data.eventStart != null
-                              ? _getMonthAbbreviation(
-                                  widget.data.eventStart!.month,
-                                )
-                              : 'DEC',
+                          helperclass.getMonthAbbreviation(
+                            widget.data.eventStart.month,
+                          ),
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.primaryColor,
@@ -442,7 +318,7 @@ class _EventWidgetState extends State<EventWidget> {
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: _handleBookmark,
+                    onTap: _interactionHelper!.handleBookMark,
                     child: Container(
                       width: 30,
                       height: 35,
@@ -451,8 +327,10 @@ class _EventWidgetState extends State<EventWidget> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
-                        color: isBookmarked
+                        _interactionHelper!.isBookMarked
+                            ? Icons.bookmark
+                            : Icons.bookmark_outline,
+                        color: _interactionHelper!.isBookMarked
                             ? AdvertiseColor.primaryColor
                             : Colors.black,
                         size: 20,
@@ -468,7 +346,7 @@ class _EventWidgetState extends State<EventWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.data.title ?? 'Untitled Event',
+                    widget.data.title,
                     style: TextStyle(
                       fontFamily: 'KantumruyPro',
                       fontSize: 16,
@@ -483,27 +361,29 @@ class _EventWidgetState extends State<EventWidget> {
                     children: [
                       // Like button
                       GestureDetector(
-                        onTap: _handleLike,
+                        onTap: _interactionHelper!.handleLike,
                         child: Row(
                           children: [
                             Icon(
-                              isLiked
+                              _interactionHelper!.isLiked
                                   ? Icons.thumb_up
                                   : Icons.thumb_up_outlined,
-                              color: isLiked
+                              color: _interactionHelper!.isLiked
                                   ? AdvertiseColor.primaryColor
                                   : AdvertiseColor.textColor.withOpacity(0.5),
                               size: 18,
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              _formatNumber(likeCount),
+                              helperclass.formatNumber(
+                                _interactionHelper!.likeCount,
+                              ),
                               style: TextStyle(
                                 fontFamily: 'KantumruyPro',
-                                color: isLiked
+                                color: _interactionHelper!.isLiked
                                     ? AdvertiseColor.primaryColor
                                     : Colors.black,
-                                fontWeight: isLiked
+                                fontWeight: _interactionHelper!.isLiked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 fontSize: 12,
@@ -516,27 +396,29 @@ class _EventWidgetState extends State<EventWidget> {
 
                       // Dislike button
                       GestureDetector(
-                        onTap: _handleDislike,
+                        onTap: _interactionHelper!.handleDislike,
                         child: Row(
                           children: [
                             Icon(
-                              isDisliked
+                              _interactionHelper!.isDisliked
                                   ? Icons.thumb_down
                                   : Icons.thumb_down_outlined,
-                              color: isDisliked
+                              color: _interactionHelper!.isDisliked
                                   ? AdvertiseColor.textColor
                                   : AdvertiseColor.textColor.withOpacity(0.5),
                               size: 18,
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              _formatNumber(dislikeCount),
+                              helperclass.formatNumber(
+                                _interactionHelper!.dislikeCount,
+                              ),
                               style: TextStyle(
                                 fontFamily: 'KantumruyPro',
-                                color: isDisliked
+                                color: _interactionHelper!.isDisliked
                                     ? AdvertiseColor.textColor
                                     : Colors.black,
-                                fontWeight: isDisliked
+                                fontWeight: _interactionHelper!.isDisliked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 fontSize: 12,
@@ -569,7 +451,7 @@ class _EventWidgetState extends State<EventWidget> {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          widget.data.venues?.venueLocation ?? 'Location TBA',
+                          widget.data.venues.venueLocation,
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -588,5 +470,11 @@ class _EventWidgetState extends State<EventWidget> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up if needed
+    super.dispose();
   }
 }

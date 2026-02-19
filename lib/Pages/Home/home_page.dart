@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          SeeallPage(data: eventdto!),
+                                          SeeallPage(data: eventdto),
                                     ),
                                   ),
                                   child: Text(
@@ -134,12 +134,12 @@ class _HomePageState extends State<HomePage> {
                             Container(
                               height: 270,
                               child: ListView.builder(
-                                itemCount: eventdto!.length,
+                                itemCount: eventdto.length,
                                 scrollDirection: Axis.horizontal,
                                 shrinkWrap: false,
 
                                 itemBuilder: (BuildContext context, int index) {
-                                  return EventWidget(data: eventdto![index]);
+                                  return EventWidget(data: eventdto[index]);
                                 },
                               ),
                             ),

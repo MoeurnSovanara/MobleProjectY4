@@ -27,7 +27,6 @@ class Helperclass {
     ];
     return months[month - 1];
   }
-  
 
   // Helper function to format large numbers
   String formatNumber(int number) {

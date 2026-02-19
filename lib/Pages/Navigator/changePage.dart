@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Dashboard/dashboard_page.dart';
 import 'package:mobile_assignment/Pages/Event/event_page.dart';
