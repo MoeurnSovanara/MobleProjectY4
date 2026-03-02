@@ -108,41 +108,48 @@ class _HomePageState extends State<HomePage> {
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Upcoming Events",
-                                  style: AppComponent.labelStyle,
-                                ),
-                                Spacer(),
-                                GestureDetector(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          SeeallPage(data: eventdto),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'See All >',
-                                    style: AppComponent.sublabelStyle,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            eventdto.isNotEmpty
+                                ? Row(
+                                    children: [
+                                      Text(
+                                        "Upcoming Events",
+                                        style: AppComponent.labelStyle,
+                                      ),
+                                      Spacer(),
+                                      GestureDetector(
+                                        onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                SeeallPage(data: eventdto),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'See All >',
+                                          style: AppComponent.sublabelStyle,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : SizedBox(),
                             SizedBox(height: 10),
-                            Container(
-                              height: 270,
-                              child: ListView.builder(
-                                itemCount: eventdto.length,
-                                scrollDirection: Axis.horizontal,
-                                shrinkWrap: false,
+                            eventdto.isNotEmpty
+                                ? Container(
+                                    height: 270,
+                                    child: ListView.builder(
+                                      itemCount: eventdto.length,
+                                      scrollDirection: Axis.horizontal,
+                                      shrinkWrap: false,
 
-                                itemBuilder: (BuildContext context, int index) {
-                                  return EventWidget(data: eventdto[index]);
-                                },
-                              ),
-                            ),
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                            return EventWidget(
+                                              data: eventdto[index],
+                                            );
+                                          },
+                                    ),
+                                  )
+                                : SizedBox(),
                             SizedBox(height: 10),
                             Text(
                               'Performing arts',

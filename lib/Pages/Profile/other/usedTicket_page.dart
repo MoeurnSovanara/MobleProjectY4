@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/UsedCardWidget.dart';
+import 'package:mobile_assignment/Models/DTO/TicketDto.dart';
+import 'package:mobile_assignment/services/API/TicketApi.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class UsedticketPage extends StatefulWidget {
   const UsedticketPage({super.key});
@@ -11,6 +14,28 @@ class UsedticketPage extends StatefulWidget {
 }
 
 class _UsedticketPageState extends State<UsedticketPage> {
+  Ticketapi ticketapi = Ticketapi();
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  List<Ticketdto> usedTicket = [];
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void firstTask() async {
+    var allTicket = await ticketapi.GetAllTicket();
+    var uId = await usersharedpreferences.getUserId();
+    if (!mounted) return;
+    if (allTicket != null && uId != null) {
+      var filterUsedTicket = allTicket
+          .where((e) => e.userId == uId && e.status == "used")
+          .toList();
+      setState(() {
+        usedTicket = filterUsedTicket;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,26 +48,49 @@ class _UsedticketPageState extends State<UsedticketPage> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 170 * 5,
-                child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Column(
-                      children: [Usedcardwidget(), SizedBox(height: 10)],
-                    );
-                  },
+      body: usedTicket.isEmpty
+          ? Container(
+              padding: EdgeInsets.all(10),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.warning,
+                      color: AdvertiseColor.dangerColor,
+                      size: 50,
+                    ),
+                    Text(
+                      "No Tickets Found!",
+                      style: AppComponent.boldTextStyle,
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            )
+          : SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 170 * usedTicket.length.toDouble(),
+                      child: ListView.builder(
+                        itemCount: usedTicket.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              Usedcardwidget(usedTicket: usedTicket[index]),
+                              SizedBox(height: 10),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }

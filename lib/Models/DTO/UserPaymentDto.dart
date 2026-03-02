@@ -1,4 +1,7 @@
-class Userdto {
+
+import 'package:mobile_assignment/Models/DTO/PaymentDto.dart';
+
+class UserPaymentdto {
   final int id;
   final String fullname;
   final String email;
@@ -11,8 +14,9 @@ class Userdto {
   final String? profilePicture;
   final DateTime createdAt;
   final bool google;
+  final Paymentdto? paymentdto;
 
-  Userdto({
+  UserPaymentdto({
     required this.id,
     required this.fullname,
     required this.email,
@@ -25,6 +29,7 @@ class Userdto {
     this.profilePicture,
     required this.createdAt,
     required this.google,
+    this.paymentdto,
   });
 
   Map<String, dynamic> toJson() {
@@ -41,11 +46,12 @@ class Userdto {
       'profilePicture': profilePicture,
       'createdAt': createdAt.toIso8601String(),
       'isGoogle': google,
+      'payments': paymentdto?.toJson(),
     };
   }
 
-  factory Userdto.fromJson(Map<String, dynamic> json) {
-    return Userdto(
+  factory UserPaymentdto.fromJson(Map<String, dynamic> json) {
+    return UserPaymentdto(
       id: json['id'] ?? 0,
       fullname: json['fullName'] ?? "",
       email: json['email'] ?? "",
@@ -62,6 +68,7 @@ class Userdto {
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(), // Provide a default value
       google: json['isGoogle'] ?? false,
+      paymentdto: Paymentdto.fromJson(json['payments'] ?? ""),
     );
   }
 }

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/TicketDto.dart';
+import 'package:mobile_assignment/services/Helper/HelperClass.dart';
+import 'package:mobile_assignment/services/Helper/TimeHelperClass.dart';
 
 class Usedcardwidget extends StatelessWidget {
-  const Usedcardwidget({super.key});
+  final Ticketdto usedTicket;
+  const Usedcardwidget({super.key, required this.usedTicket});
 
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
+    final helperclass = Helperclass();
+    final timerhelper = Timehelperclass();
     return Container(
       height: screenWidth <= 402 ? 140 : 160,
       decoration: BoxDecoration(
@@ -19,7 +26,12 @@ class Usedcardwidget extends StatelessWidget {
         width: double.infinity,
         child: Row(
           children: [
-            Image.asset('assets/img/sample/ticket.png', height: 140),
+            Image.network(
+              '${headUrl}img/${usedTicket.ticketType.events.image}',
+              height: 140,
+              errorBuilder: (context, error, stackTrace) =>
+                  Image.asset("assets/img/other/errorImage.png", height: 140),
+            ),
             SizedBox(width: 5),
             SizedBox(
               width: 150,
@@ -27,12 +39,12 @@ class Usedcardwidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Cambodian Tranditional Dance',
+                    usedTicket.ticketType.events.title,
                     maxLines: 2,
                     style: AppComponent.labelStyle.copyWith(fontSize: 14),
                   ),
                   Text(
-                    'Mon Nov at 1:45 PM',
+                    '${helperclass.formatDate(usedTicket.ticketType.events.eventStart)} at ${timerhelper.formatTimeAMPM(usedTicket.ticketType.events.startTime)}',
                     style: AppComponent.detailTextStyle,
                   ),
                   Spacer(),
@@ -41,7 +53,7 @@ class Usedcardwidget extends StatelessWidget {
                       Icon(Icons.location_on_outlined),
                       Expanded(
                         child: Text(
-                          'Phnom Penh, Cambodia',
+                          usedTicket.ticketType.events.venues.venueLocation,
                           style: AppComponent.detailTextStyle,
                         ),
                       ),

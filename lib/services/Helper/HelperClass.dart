@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:intl/intl.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 
@@ -38,25 +41,25 @@ class Helperclass {
     return number.toString();
   }
 
-  // Calculate total likes/dislikes from userEventEngagements
+  // Calculate total likes/dislikes from eventEngagement
   static int getTotalLikes(Eventdto eventData) {
-    // Check if userEventEngagements is not null
-    if (eventData.userEventEngagements.isEmpty) {
+    // Check if eventEngagement is not null
+    if (eventData.eventEngagement.isEmpty) {
       return 0;
     }
 
-    return eventData.userEventEngagements
+    return eventData.eventEngagement
         .where((engagement) => engagement.isLiked == true)
         .length;
   }
 
   static int getTotalDislikes(Eventdto eventData) {
-    // Check if userEventEngagements is not null
-    if (eventData.userEventEngagements.isEmpty) {
+    // Check if eventEngagement is not null
+    if (eventData.eventEngagement.isEmpty) {
       return 0;
     }
 
-    return eventData.userEventEngagements
+    return eventData.eventEngagement
         .where((engagement) => engagement.isLiked == false)
         .length;
   }
@@ -69,5 +72,15 @@ class Helperclass {
   // Optional: Add a helper method to format time
   static String formatTime(DateTime date) {
     return DateFormat('hh:mm a').format(date);
+  }
+
+  Color getRandomColor() {
+    Random random = Random();
+    return Color.fromRGBO(
+      random.nextInt(256), // R
+      random.nextInt(256), // G
+      random.nextInt(256), // B
+      1.0, // Opacity
+    );
   }
 }

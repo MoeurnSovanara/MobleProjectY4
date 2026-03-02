@@ -48,7 +48,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
       int likeCount = 0;
       int dislikeCount = 0;
 
-      for (var item in widget.eventData.userEventEngagements) {
+      for (var item in widget.eventData.eventEngagement) {
         if (item.isLiked == true) likeCount++;
         if (item.isDisliked == true) dislikeCount++;
 
@@ -73,7 +73,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
       int totalLikes = 0;
       int totalDislikes = 0;
 
-      for (var item in widget.eventData.userEventEngagements) {
+      for (var item in widget.eventData.eventEngagement) {
         if (item.isLiked == true) totalLikes++;
         if (item.isDisliked == true) totalDislikes++;
       }

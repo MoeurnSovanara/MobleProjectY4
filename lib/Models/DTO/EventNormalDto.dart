@@ -1,9 +1,6 @@
-import 'package:mobile_assignment/Models/DTO/CategoryDtoName.dart';
-import 'package:mobile_assignment/Models/DTO/TicketTypeDto.dart';
-import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
-import 'package:mobile_assignment/Models/DTO/VenueDto.dart';
+import 'package:mobile_assignment/Models/DTO/VenuesNameDto.dart';
 
-class Eventdto {
+class Eventnormaldto {
   final int id;
   final int categoryId;
   final int userId;
@@ -11,19 +8,15 @@ class Eventdto {
   final String title;
   final String image;
   final String description;
-  final String capacityTicketd;
+  final String CapacityTicketd;
   final DateTime eventStart;
   final DateTime eventEnd;
-  final Duration? startTime; // Made nullable to match your model
-  final Duration? endTime; // Made nullable to match your model
-  final DateTime createdAt;
   final DateTime updatedAt;
-  final CategoryDtoName category;
-  final List<Usereventengagementdto> eventEngagement;
-  final Venuedto venues;
-  final List<TicketTypeDto> ticketTypes;
+  final Duration? startTime;
+  final Duration? endTime;
+  final Venuesnamedto venues;
 
-  Eventdto({
+  Eventnormaldto({
     required this.id,
     required this.categoryId,
     required this.userId,
@@ -31,17 +24,13 @@ class Eventdto {
     required this.title,
     required this.image,
     required this.description,
-    required this.capacityTicketd,
+    required this.CapacityTicketd,
     required this.eventStart,
     required this.eventEnd,
-    this.startTime, // Now optional
-    this.endTime, // Now optional
-    required this.createdAt,
+    this.startTime,
+    this.endTime,
     required this.updatedAt,
-    required this.category,
-    required this.eventEngagement,
     required this.venues,
-    required this.ticketTypes,
   });
 
   // Helper function to parse TimeSpan string to Duration
@@ -78,56 +67,38 @@ class Eventdto {
       'title': title,
       'image': image,
       'description': description,
-      'capacityTicketd': capacityTicketd,
+      'capacityTicketd': CapacityTicketd,
       'eventStart': eventStart.toIso8601String(),
       'eventEnd': eventEnd.toIso8601String(),
-      'startTime': _formatTimeSpan(startTime), // ADDED
-      'endTime': _formatTimeSpan(endTime), // ADDED
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'category': category.toJson(),
-      'eventEngagement': eventEngagement.map((e) => e.toJson()).toList(),
+      'updateAt': updatedAt.toIso8601String(),
+      'startTime': _formatTimeSpan(startTime),
+      'endTime': _formatTimeSpan(endTime),
       'venues': venues.toJson(),
-      'ticketTypes': ticketTypes.map((e) => e.toJson()).toList(),
     };
   }
 
-  factory Eventdto.fromJson(Map<String, dynamic> json) {
-    return Eventdto(
+  factory Eventnormaldto.fromJson(Map<String, dynamic> json) {
+    return Eventnormaldto(
       id: json['id'] ?? 0,
       categoryId: json['categoryId'] ?? 0,
       userId: json['userId'] ?? 0,
       venuesId: json['venuesId'] ?? 0,
       title: json['title'] ?? "",
-      image: json['image'] ?? "",
+      image: json['image'] ?? 0,
       description: json['description'] ?? "",
-      capacityTicketd: json['capacityTicketd'] ?? "",
+      CapacityTicketd: json['capacityTicketd'] ?? "",
       eventStart: DateTime.parse(
         json['eventStart'] ?? DateTime.now().toIso8601String(),
       ),
       eventEnd: DateTime.parse(
         json['eventEnd'] ?? DateTime.now().toIso8601String(),
       ),
-      startTime: _parseTimeSpan(json['startTime']), // ADDED
-      endTime: _parseTimeSpan(json['endTime']), // ADDED
-      createdAt: DateTime.parse(
-        json['createdAt'] ?? DateTime.now().toIso8601String(),
-      ),
       updatedAt: DateTime.parse(
-        json['updatedAt'] ?? DateTime.now().toIso8601String(),
+        json['updateAt'] ?? DateTime.now().toIso8601String(),
       ),
-      category: CategoryDtoName.fromJson(json['category'] ?? {}),
-      eventEngagement:
-          (json['eventEngagement'] as List<dynamic>?)
-              ?.map((e) => Usereventengagementdto.fromJson(e))
-              .toList() ??
-          [],
-      venues: Venuedto.fromJson(json['venues'] ?? {}),
-      ticketTypes:
-          (json['ticketTypes'] as List<dynamic>?)
-              ?.map((e) => TicketTypeDto.fromJson(e))
-              .toList() ??
-          [],
+      startTime: _parseTimeSpan(json['startTime']),
+      endTime: _parseTimeSpan(json['endTime']),
+      venues: Venuesnamedto.fromJson(json['venues']),
     );
   }
 }

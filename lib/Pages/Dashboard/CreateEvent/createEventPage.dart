@@ -7,6 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/TicketInforWidget.dart';
+import 'package:mobile_assignment/Models/DTO/CategoryDto.dart';
+import 'package:mobile_assignment/Models/DTO/TicketTypeDto.dart';
+import 'package:mobile_assignment/services/API/CategoryApi.dart';
 
 class Createeventpage extends StatefulWidget {
   const Createeventpage({super.key});
@@ -31,18 +34,19 @@ class _CreateeventpageState extends State<Createeventpage> {
   int _currentStep = 1;
   final _formKey = GlobalKey<FormState>();
   String? _selectedEventCategory;
-  final List<String> _ticketTypes = ['Business', 'Sport', 'Art', 'Game'];
+  List<Categorydto> _ticketTypes = [];
   DateTime? _startDate;
   DateTime? _endDate;
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
+  Categoryapi categoryapi = Categoryapi();
 
   // Form controllers
   final TextEditingController _eventTitleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _locationNameController = TextEditingController();
   final TextEditingController _locationLinkController = TextEditingController();
-  final TextEditingController _zoneController = TextEditingController();
+  final TextEditingController _locationInfoController = TextEditingController();
   final TextEditingController _ticketTypeController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -56,18 +60,29 @@ class _CreateeventpageState extends State<Createeventpage> {
   final TextEditingController _bankAccountNumberController =
       TextEditingController();
 
-  // Color selection
-  String? _selectedColor;
-  final List<String> _colors = ['Blue', 'Yellow', 'Red', 'Green'];
-
   // Zone list
   final List<Map<String, dynamic>> _zones = [];
 
   // Tickets list
-  final List<Map<String, dynamic>> _tickets = [];
+  final List<TicketTypeDto> _tickets = [];
 
   // Payment method
   String _paymentMethod = 'paypal'; // Default payment method
+
+  Future<void> firstTask() async {
+    var categoryData = await categoryapi.getAllCategoryName();
+    if (categoryData != null) {
+      setState(() {
+        _ticketTypes = categoryData;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    firstTask();
+  }
 
   void _pickDate({bool isStartDate = true}) async {
     final DateTime? picked = await showDatePicker(
@@ -103,39 +118,21 @@ class _CreateeventpageState extends State<Createeventpage> {
     }
   }
 
-  void _addZone() {
-    if (_zoneController.text.isNotEmpty &&
-        _selectedEventCategory != null &&
-        _selectedColor != null) {
-      setState(() {
-        _zones.add({
-          'name': _zoneController.text,
-          'type': _selectedEventCategory!,
-          'color': _selectedColor!,
-        });
-        _zoneController.clear();
-        _selectedEventCategory = null;
-        _selectedColor = null;
-      });
-    }
-  }
-
-  void _removeZone(int index) {
-    setState(() {
-      _zones.removeAt(index);
-    });
-  }
-
   void _addTicket() {
     if (_ticketTypeController.text.isNotEmpty &&
         _quantityController.text.isNotEmpty &&
         _priceController.text.isNotEmpty) {
       setState(() {
-        _tickets.add({
-          'type': _ticketTypeController.text,
-          'quantity': int.tryParse(_quantityController.text) ?? 0,
-          'price': double.tryParse(_priceController.text) ?? 0.0,
-        });
+        _tickets.add(
+          TicketTypeDto(
+            id: 0,
+            eventId: 0,
+            typeName: _ticketTypeController.text,
+            price: double.parse(_priceController.text),
+            quantityAvailable: int.parse(_quantityController.text),
+            totalTickets: int.parse(_quantityController.text),
+          ),
+        );
         _ticketTypeController.clear();
         _quantityController.clear();
         _priceController.clear();
@@ -344,108 +341,18 @@ class _CreateeventpageState extends State<Createeventpage> {
 
   Widget _buildStep5() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _paymentMethod = 'paypal';
-                  });
-                },
-                child: Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AdvertiseColor.primaryColor),
-                    color: _paymentMethod == 'paypal'
-                        ? AdvertiseColor.primaryColor
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      bottomLeft: Radius.circular(15),
-                    ),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.credit_card,
-                        color: _paymentMethod == 'paypal'
-                            ? AdvertiseColor.backgroundColor
-                            : AdvertiseColor.textColor,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        'PayPal',
-                        style: AppComponent.elevatedButtonTextStyle.copyWith(
-                          color: _paymentMethod == 'paypal'
-                              ? AdvertiseColor.backgroundColor
-                              : AdvertiseColor.textColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _paymentMethod = 'QR_Code';
-                  });
-                },
-                child: Container(
-                  height: 60,
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AdvertiseColor.primaryColor),
-                    color: _paymentMethod == 'QR_Code'
-                        ? AdvertiseColor.primaryColor
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(15),
-                      bottomRight: Radius.circular(15),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.qr_code,
-                        color: _paymentMethod == 'QR_Code'
-                            ? AdvertiseColor.backgroundColor
-                            : AdvertiseColor.textColor,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Qr Code',
-                        style: AppComponent.elevatedButtonTextStyle.copyWith(
-                          color: _paymentMethod == 'QR_Code'
-                              ? AdvertiseColor.backgroundColor
-                              : AdvertiseColor.textColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+        // Remove the payment method toggle, just show PayPal directly
+        Text(
+          'Payment Information',
+          style: AppComponent.labelTextStyle.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        SizedBox(height: 10),
-        Container(
-          padding: EdgeInsets.all(10),
-          child: Divider(color: AdvertiseColor.textColor),
-        ),
-        if (_paymentMethod == 'paypal')
-          _buildPaypalForm()
-        else
-          _buildCreditCardForm(),
+        SizedBox(height: 20),
+        _buildPaypalForm(),
       ],
     );
   }
@@ -540,75 +447,7 @@ class _CreateeventpageState extends State<Createeventpage> {
     );
   }
 
-  Widget _buildCreditCardForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Account Name', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
-          TextFormField(
-            controller: _bankAccountNameController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter account name';
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-              hintText: 'Enter account name',
-              hintStyle: AppComponent.hintTextStyle,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-          Text('Account Number', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
-          TextFormField(
-            controller: _bankAccountNumberController,
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter account number';
-              }
-              if (value.length < 10) {
-                return 'Account number must be at least 10 digits';
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-              hintText: 'Enter account number',
-              hintStyle: AppComponent.hintTextStyle,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-          Center(
-            child: Image.asset(
-              'assets/img/other/credit.png',
-              fit: BoxFit.fitWidth,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildStep4() {
-    var screenWidth = MediaQuery.of(context).size.width;
     return Form(
       key: _formKey,
       child: Column(
@@ -637,13 +476,19 @@ class _CreateeventpageState extends State<Createeventpage> {
             ),
           ),
           SizedBox(height: 10),
-          Text('Location Link', style: AppComponent.labelTextStyle),
+          Text('Location', style: AppComponent.labelTextStyle),
           SizedBox(height: 5),
           TextFormField(
-            controller: _locationLinkController,
+            controller: _locationInfoController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter location';
+              }
+              return null;
+            },
             keyboardType: TextInputType.url,
             decoration: InputDecoration(
-              hintText: 'Enter location link',
+              hintText: 'Enter location',
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -655,271 +500,26 @@ class _CreateeventpageState extends State<Createeventpage> {
             ),
           ),
           SizedBox(height: 10),
-          SizedBox(
-            height: 80,
-            width: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Zone', style: AppComponent.labelTextStyle),
-                      SizedBox(height: 5),
-                      TextFormField(
-                        controller: _zoneController,
-                        decoration: InputDecoration(
-                          hintText: 'Enter zone name',
-                          hintStyle: AppComponent.hintTextStyle,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Choose Ticket type',
-                        style: AppComponent.labelTextStyle,
-                      ),
-                      SizedBox(height: 5),
-                      DropdownButtonFormField<String>(
-                        value: _selectedEventCategory,
-                        hint: Text(
-                          'Pick Ticket Type',
-                          style: AppComponent.hintTextStyle,
-                        ),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          filled: true,
-                          fillColor: AdvertiseColor.backgroundColor,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: screenWidth <= 375 ? 2.5 : 8,
-                            vertical: 5,
-                          ),
-                        ),
-                        items: _ticketTypes.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedEventCategory = newValue;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          SizedBox(
-            height: 80,
-            width: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Choose Color', style: AppComponent.labelTextStyle),
-                      SizedBox(height: 5),
-                      DropdownButtonFormField<String>(
-                        value: _selectedColor,
-                        hint: Text(
-                          'Pick Color',
-                          style: AppComponent.hintTextStyle,
-                        ),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          filled: true,
-                          fillColor: AdvertiseColor.backgroundColor,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                        ),
-                        items: _colors.map((String value) {
-                          Color color;
-                          switch (value) {
-                            case 'Blue':
-                              color = Colors.blue;
-                              break;
-                            case 'Yellow':
-                              color = Colors.yellow;
-                              break;
-                            case 'Red':
-                              color = Colors.red;
-                              break;
-                            case 'Green':
-                              color = Colors.green;
-                              break;
-                            default:
-                              color = Colors.blue;
-                          }
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  color: color,
-                                  margin: EdgeInsets.only(right: 10),
-                                ),
-                                Text(value),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedColor = newValue;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          GestureDetector(
-            onTap: _addZone,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
+          Text('Location Link', style: AppComponent.labelTextStyle),
+          SizedBox(height: 5),
+          TextFormField(
+            controller: _locationLinkController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter location link';
+              }
+              return null;
+            },
+            keyboardType: TextInputType.url,
+            decoration: InputDecoration(
+              hintText: 'Enter location link',
+              hintStyle: AppComponent.hintTextStyle,
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                color: AdvertiseColor.primaryColor,
               ),
-              width: 135,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text('Add Zone', style: AppComponent.elevatedButtonTextStyle),
-                  Icon(Icons.add, color: AdvertiseColor.backgroundColor),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-          Text('Added Zones', style: AppComponent.labelTextStyle),
-          DottedBorder(
-            borderType: BorderType.RRect,
-            radius: Radius.circular(12),
-            padding: EdgeInsets.all(6),
-            color: Colors.blue,
-            strokeWidth: 2,
-            dashPattern: [6, 3],
-            child: Container(
-              padding: EdgeInsets.all(10),
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_zones.isEmpty)
-                    Center(
-                      child: Text(
-                        'No zones added yet',
-                        style: AppComponent.hintTextStyle,
-                      ),
-                    ),
-                  ..._zones.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final zone = entry.value;
-                    Color borderColor;
-                    Color bgColor;
-                    switch (zone['color']) {
-                      case 'Blue':
-                        borderColor = Colors.blue;
-                        bgColor = Colors.blue.withOpacity(0.5);
-                        break;
-                      case 'Yellow':
-                        borderColor = Colors.yellow;
-                        bgColor = Colors.yellow.withOpacity(0.5);
-                        break;
-                      case 'Red':
-                        borderColor = Colors.red;
-                        bgColor = Colors.red.withOpacity(0.5);
-                        break;
-                      case 'Green':
-                        borderColor = Colors.green;
-                        bgColor = Colors.green.withOpacity(0.5);
-                        break;
-                      default:
-                        borderColor = Colors.blue;
-                        bgColor = Colors.blue.withOpacity(0.5);
-                    }
-
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      width: double.infinity,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: borderColor),
-                        borderRadius: BorderRadius.circular(8),
-                        color: bgColor,
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: IconButton(
-                              onPressed: () => _removeZone(index),
-                              icon: Icon(Icons.cancel_outlined),
-                            ),
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: Text(
-                                  zone['name'],
-                                  style: AppComponent.boldTextStyle,
-                                ),
-                              ),
-                              Center(
-                                child: Text(
-                                  zone['type'],
-                                  style: AppComponent.labelTextStyle,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
               ),
             ),
           ),
@@ -938,12 +538,7 @@ class _CreateeventpageState extends State<Createeventpage> {
           SizedBox(height: 10),
           TextFormField(
             controller: _ticketTypeController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter ticket type';
-              }
-              return null;
-            },
+
             decoration: InputDecoration(
               hintText: 'Enter your ticket type',
               hintStyle: AppComponent.hintTextStyle,
@@ -962,15 +557,7 @@ class _CreateeventpageState extends State<Createeventpage> {
           TextFormField(
             controller: _quantityController,
             keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter quantity';
-              }
-              if (int.tryParse(value) == null) {
-                return 'Please enter a valid number';
-              }
-              return null;
-            },
+
             decoration: InputDecoration(
               hintText: 'Enter quantity',
               hintStyle: AppComponent.hintTextStyle,
@@ -989,15 +576,7 @@ class _CreateeventpageState extends State<Createeventpage> {
           TextFormField(
             controller: _priceController,
             keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter price';
-              }
-              if (double.tryParse(value) == null) {
-                return 'Please enter a valid price';
-              }
-              return null;
-            },
+
             decoration: InputDecoration(
               hintText: 'Enter price',
               hintStyle: AppComponent.hintTextStyle,
@@ -1043,8 +622,16 @@ class _CreateeventpageState extends State<Createeventpage> {
               itemCount: _tickets.length,
               itemBuilder: (BuildContext context, int index) {
                 return TicketInfo_widget(
-                  image: 'assets/img/sample/event.png',
+                  image: 'assets/img/other/ticket.png',
                   status: true,
+                  ticketTypeDto: TicketTypeDto(
+                    id: 0,
+                    eventId: 0,
+                    typeName: _tickets[index].typeName,
+                    price: _tickets[index].price,
+                    quantityAvailable: _tickets[index].quantityAvailable,
+                    totalTickets: _tickets[index].totalTickets,
+                  ),
                 );
               },
             ),
@@ -1181,8 +768,11 @@ class _CreateeventpageState extends State<Createeventpage> {
               filled: true,
               fillColor: AdvertiseColor.backgroundColor,
             ),
-            items: _ticketTypes.map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
+            items: _ticketTypes.map((value) {
+              return DropdownMenuItem<String>(
+                value: value.categoryName,
+                child: Text(value.categoryName),
+              );
             }).toList(),
             onChanged: (String? newValue) {
               setState(() {

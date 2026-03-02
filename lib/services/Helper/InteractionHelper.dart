@@ -27,7 +27,7 @@ class InteractionHelper {
     this.eventId = 0,
   });
 
-  void handleLike() {
+  Future<void> handleLike() async {
     if (isLiked) {
       isLiked = false;
       likeCount--;
@@ -41,10 +41,10 @@ class InteractionHelper {
       }
     }
     onUpdate?.call();
-    _callApi('like', isLiked);
+    await _callApi('like', isLiked);
   }
 
-  void handleDislike() {
+  Future<void> handleDislike() async {
     if (isDisliked) {
       isDisliked = false;
       dislikeCount--;
@@ -58,10 +58,10 @@ class InteractionHelper {
       }
     }
     onUpdate?.call();
-    _callApi('dislike', isDisliked);
+    await _callApi('dislike', isDisliked);
   }
 
-  void handleBookMark() {
+  Future<void> handleBookMark() async {
     if (isBookMarked) {
       isBookMarked = false;
       bookmarkedCount--;
@@ -70,39 +70,47 @@ class InteractionHelper {
       bookmarkedCount++;
     }
     onUpdate?.call();
-    _callApi('bookmarked', isBookMarked);
+    await _callApi('bookmarked', isBookMarked);
   }
 
   Future<void> _callApi(String action, bool value) async {
     UsereventEngagementApi usereventEngagementApi = UsereventEngagementApi();
-    switch (action) {
-      case 'bookmared':
-        var isExisted = await usereventEngagementApi.findExistData(
+    var isExisted = await usereventEngagementApi.findExistData(
+      userId: userId,
+      eventId: eventId,
+    );
+    if (isExisted) {
+      var response = await usereventEngagementApi.updateEventEngagement(
+        userId: userId,
+        eventId: eventId,
+        userEventEngagement: Usereventengagementdto(
           userId: userId,
           eventId: eventId,
-        );
-        if (isExisted) {
-          print('Data Exist: $isExisted');
-        }
-      case 'like':
-        var isExisted = await usereventEngagementApi.findExistData(
+          isBookMarked: isBookMarked,
+          isLiked: isLiked,
+          isDisliked: isDisliked,
+        ),
+      );
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        print("Update Successfully");
+      } else {
+        print("Failed to Update");
+      }
+    } else {
+      var response = await usereventEngagementApi.createEventEngagement(
+        userEventEngagement: Usereventengagementdto(
           userId: userId,
           eventId: eventId,
-        );
-        if (isExisted) {
-          print('Data Exist: $isExisted');
-        }
-      case 'dislike':
-        var isExisted = await usereventEngagementApi.findExistData(
-          userId: userId,
-          eventId: eventId,
-        );
-        if (isExisted) {
-          print('Data Exist: $isExisted');
-        }
+          isBookMarked: isBookMarked,
+          isLiked: isLiked,
+          isDisliked: isDisliked,
+        ),
+      );
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        print('Create Successfully');
+      } else {
+        print('Failed to create');
+      }
     }
-
-    // TODO: Implement API call
-    print('API: $action = $value');
   }
 }

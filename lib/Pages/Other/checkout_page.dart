@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/EventDto.dart';
+import 'package:mobile_assignment/services/Helper/HelperClass.dart';
+import 'package:mobile_assignment/services/Helper/TimeHelperClass.dart';
 
 class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key});
+  final Eventdto eventdto;
+  const CheckoutPage({super.key, required this.eventdto});
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -18,20 +22,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final TextEditingController _cardNameController = TextEditingController();
 
   String? _selectedTicketType;
-  final List<String> _ticketTypes = [
-    'VIP Ticket',
-    'Premium Ticket',
-    'Standard Ticket',
-    'General Ticket',
-  ];
+  List<String> _ticketTypes = [];
 
   int _selectedPaymentMethod = 0; // 0 for Card, 1 for QR
   int _quantity = 1;
   int _currentStep = 1; // 1: Ticket Details, 2: Payment, 3: Success
+  double _ticketPrice = 0.00;
+  final timeHelper = Timehelperclass();
+
+  void fristJob() {
+    setState(() {
+      _ticketTypes = widget.eventdto.ticketTypes
+          .map((e) => e.typeName)
+          .toList();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    fristJob();
     _quantityController.text = _quantity.toString();
   }
 
@@ -165,19 +175,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   _buildDateInfo(
                     Icons.calendar_month_outlined,
                     'Start Date',
-                    '16-Dec-2025',
+                    Helperclass.formatFullDate(widget.eventdto.eventStart),
                   ),
                   Spacer(),
                   _buildDateInfo(
                     Icons.calendar_month_outlined,
                     'End Date',
-                    '23-Mar-2025',
+                    Helperclass.formatFullDate(widget.eventdto.eventEnd),
                   ),
                   Spacer(),
                   _buildDateInfo(
                     Icons.timer_outlined,
                     'Time',
-                    '11:00 AM - 2:50 PM',
+                    '${timeHelper.formatTimeAMPM(widget.eventdto.startTime)} - ${timeHelper.formatTime(widget.eventdto.endTime)}',
                   ),
                 ],
               ),
@@ -207,7 +217,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                   Spacer(),
                   Text(
-                    '\$${(_quantity * 284.2).toStringAsFixed(1)}',
+                    '\$${(_quantity * _ticketPrice).toStringAsFixed(1)}',
                     style: AppComponent.primaryThemeTextStyle.copyWith(
                       fontWeight: FontWeight.w700,
                       fontSize: 20,
@@ -487,6 +497,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
             onChanged: (String? newValue) {
               setState(() {
                 _selectedTicketType = newValue;
+                if (newValue != null) {
+                  final selectedTicket = widget.eventdto.ticketTypes.firstWhere(
+                    (e) => e.typeName.contains(newValue),
+                  );
+                  _ticketPrice = selectedTicket.price;
+                } else {
+                  _ticketPrice = 0.00;
+                }
               });
             },
             validator: (value) {
@@ -525,7 +543,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   Text('Event:', style: TextStyle(color: Colors.grey.shade600)),
                   Flexible(
                     child: Text(
-                      'Traditional Dance Show',
+                      widget.eventdto.title,
                       textAlign: TextAlign.end,
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
@@ -583,7 +601,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     style: AppComponent.boldTextStyle.copyWith(fontSize: 16),
                   ),
                   Text(
-                    '\$${(_quantity * 284.2).toStringAsFixed(1)}',
+                    '\$${(_quantity * _ticketPrice).toStringAsFixed(1)}',
                     style: AppComponent.primaryThemeTextStyle.copyWith(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

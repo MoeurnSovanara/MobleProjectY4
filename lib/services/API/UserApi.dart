@@ -1,11 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Models/DTO/UserDto.dart';
+import 'package:mobile_assignment/Models/DTO/UserPaymentDto.dart';
 
 class Userapi {
-  final String baseUrl = "${headUrl}users";
+  final String baseUrl = "${headUrl}api/users";
 
   Future<http.Response> createUser({required Userdto user}) async {
     final uri = Uri.parse("$baseUrl/create");
@@ -19,7 +21,7 @@ class Userapi {
       return response;
     } catch (e) {
       // Return a response with error details
-      return http.Response( 
+      return http.Response(
         json.encode({'error': e.toString()}),
         500,
         headers: {'Content-Type': 'application/json'},
@@ -83,5 +85,56 @@ class Userapi {
       print("Error logging in user: $e");
       return null;
     }
+  }
+
+  Future<void> uploadUserImage({
+    required File? image,
+    required String imageName,
+  }) async {
+    final url = Uri.parse("$baseUrl/upload-userimage");
+    if (image != null) {
+      try {
+        var request = http.MultipartRequest('POST', url);
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'image',
+            image.path,
+            filename: imageName,
+          ),
+        );
+
+        var response = await request.send();
+        var responseBody = await response.stream.bytesToString();
+        if (response.statusCode == 200) {
+          print('Upload Successfully!');
+        } else {
+          print('Upload Failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
+      } catch (e) {
+        print('Error: $e');
+      }
+    }
+  }
+
+  // ignore: non_constant_identifier_names
+  Future<UserPaymentdto?> GetUserByUserId({required int id}) async {
+    final url = Uri.parse("$baseUrl/id/$id");
+    UserPaymentdto? userdata;
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'applicatoin/json;charset=UTF-8',
+        },
+      );
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final jsonData = json.decode(response.body);
+        userdata = UserPaymentdto.fromJson(jsonData);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+    return userdata;
   }
 }

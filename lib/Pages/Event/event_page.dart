@@ -25,27 +25,33 @@ class _EventPageState extends State<EventPage> {
       setState(() {
         isLoading = true;
       });
-      final data = await categoryapi.getAllCategory();
-      if (!mounted) {
-        setState(() {
-          isLoading = false;
-        });
-        return;
-      }
 
-      if (data!.isNotEmpty) {
+      final data = await categoryapi.getAllCategory();
+
+      // Check if widget is still mounted before any setState
+      if (!mounted) return;
+
+      if (data != null && data.isNotEmpty) {
         setState(() {
           category = data;
           isLoading = false;
         });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      // Check mounted before showing SnackBar
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -113,10 +119,13 @@ class _EventPageState extends State<EventPage> {
                                       shrinkWrap: false,
                                       scrollDirection: Axis.horizontal,
                                       itemBuilder:
-                                          (BuildContext context, int index) {
+                                          (
+                                            BuildContext context,
+                                            int eventIndex,
+                                          ) {
                                             return EventWidget(
                                               data: category![index]
-                                                  .events[index],
+                                                  .events[eventIndex],
                                             );
                                           },
                                     ),

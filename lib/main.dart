@@ -15,8 +15,8 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
-  // runApp(DevicePreview(builder: (context) => MyApp()));
-  runApp(MyApp());
+  runApp(DevicePreview(builder: (context) => MyApp()));
+  // runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {

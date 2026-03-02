@@ -27,9 +27,9 @@ class Usereventengagementdto {
     return Usereventengagementdto(
       userId: json['userId'] ?? 0,
       eventId: json['eventId'] ?? 0,
-      isBookMarked: json['bookMarked'] ?? false,
-      isLiked: json['liked'] ?? false,
-      isDisliked: json['disliked'] ?? false,
+      isBookMarked: json['isBookMarked'] ?? false,
+      isLiked: json['isLiked'] ?? false,
+      isDisliked: json['isDisliked'] ?? false,
     );
   }
 }

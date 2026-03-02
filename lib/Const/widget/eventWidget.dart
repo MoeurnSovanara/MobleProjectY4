@@ -58,7 +58,7 @@ class _EventWidgetState extends State<EventWidget> {
       bool currentUserDisliked = false;
       bool currentUserBookMarked = false;
 
-      for (var item in widget.data.userEventEngagements) {
+      for (var item in widget.data.eventEngagement) {
         if (item.isLiked == true) totalLikes++;
         if (item.isDisliked == true) totalDislikes++;
 
@@ -97,7 +97,7 @@ class _EventWidgetState extends State<EventWidget> {
       int totalLikes = 0;
       int totalDislikes = 0;
 
-      for (var item in widget.data.userEventEngagements) {
+      for (var item in widget.data.eventEngagement) {
         if (item.isLiked == true) totalLikes++;
         if (item.isDisliked == true) totalDislikes++;
       }

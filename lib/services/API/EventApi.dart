@@ -5,7 +5,7 @@ import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 
 class Eventapi {
-  final baseUrl = "${headUrl}events";
+  final baseUrl = "${headUrl}api/events";
 
   Future<List<Eventdto>?> getAllEvents() async {
     final uri = Uri.parse(baseUrl);

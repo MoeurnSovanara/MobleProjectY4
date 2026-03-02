@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/TicketTypeDto.dart';
 
 class TicketInfo_widget extends StatelessWidget {
   final bool status;
   final String image;
+  final TicketTypeDto ticketTypeDto;
   const TicketInfo_widget({
     super.key,
     required this.status,
     required this.image,
+    required this.ticketTypeDto,
   });
 
   @override
@@ -23,7 +26,7 @@ class TicketInfo_widget extends StatelessWidget {
       ),
       padding: EdgeInsets.symmetric(
         vertical: 5,
-        horizontal: screenWidth <= 375 ? 18 : 20,
+        horizontal: screenWidth <= 393 ? 12 : 20,
       ),
       margin: EdgeInsets.only(bottom: 10),
       child: Row(
@@ -33,13 +36,27 @@ class TicketInfo_widget extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('VIP', style: AppComponent.boldTextStyle),
+              SizedBox(
+                width: 150,
+                child: Text(
+                  ticketTypeDto.typeName,
+                  style: AppComponent.boldTextStyle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               SizedBox(height: 5),
               status
                   ? Row(
                       children: [
-                        Text('Available:', style: AppComponent.detailTextStyle),
-                        Text(' 20', style: AppComponent.primaryThemeTextStyle),
+                        Text(
+                          'Available: ',
+                          style: AppComponent.detailTextStyle,
+                        ),
+                        Text(
+                          ticketTypeDto.quantityAvailable.toString(),
+                          style: AppComponent.primaryThemeTextStyle,
+                        ),
                         Text(' ticket', style: AppComponent.detailTextStyle),
                       ],
                     )
@@ -62,7 +79,7 @@ class TicketInfo_widget extends StatelessWidget {
           Spacer(),
           Expanded(child: VerticalDivider(thickness: 1)),
           Text(
-            '\$ 120',
+            '\$ ${ticketTypeDto.price}',
             style: AppComponent.boldTextStyle.copyWith(
               fontSize: screenWidth <= 375 ? 18 : 24,
               color: AdvertiseColor.textColor.withOpacity(0.5),

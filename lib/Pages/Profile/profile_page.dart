@@ -1,15 +1,16 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/UserDto.dart';
 import 'package:mobile_assignment/Pages/Profile/other/bookmark_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/editProfile_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/newdevice_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/password_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/usedTicket_page.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
+import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -21,17 +22,18 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _notificationsEnabled = true;
-  File? _pickedImage;
-
+  Userdto? userdto;
   // Initialize variables
   bool? isOrganizer = false;
   bool _isLoading = true;
   String userName = "Yang Jungwon";
   String userEmail = "jungwon@gmail.com";
   String userPhone = "+855 123 456 789";
+  String userImage = "";
   String userLocation = "Cambodia, Phnom Penh";
   String userJoinedDate = "18-June-2023";
 
+  Userapi userapi = Userapi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
 
   @override
@@ -49,12 +51,13 @@ class _ProfilePageState extends State<ProfilePage> {
       // Load user email and name
       String? email = await usersharedpreferences.getUserEmail();
       String? name = await usersharedpreferences.getUserName();
-
+      var userData = await userapi.getUserByEmail(email: email!);
       if (mounted) {
         setState(() {
           isOrganizer = organizerResult ?? false;
-          userEmail = email ?? "jungwon@gmail.com";
+          userEmail = email;
           userName = name ?? "Yang Jungwon";
+          userImage = userData!.profilePicture ?? "";
           _isLoading = false;
         });
       }
@@ -64,17 +67,6 @@ class _ProfilePageState extends State<ProfilePage> {
           _isLoading = false;
         });
       }
-    }
-  }
-
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-    );
-    if (pickedFile != null) {
-      setState(() {
-        _pickedImage = File(pickedFile.path);
-      });
     }
   }
 
@@ -267,7 +259,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => EditprofilePage()),
-                );
+                ).then((value) {
+                  _loadUserData();
+                });
               } else if (value == 'logout') {
                 _logout();
               }
@@ -320,73 +314,49 @@ class _ProfilePageState extends State<ProfilePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: AdvertiseColor.textColor,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(40),
-                                child: _pickedImage != null
-                                    ? Image.file(
-                                        _pickedImage!,
-                                        fit: BoxFit.cover,
-                                        height: 95,
-                                        width: 95,
-                                      )
-                                    : Image.asset(
-                                        'assets/img/other/avatar.png',
-                                        fit: BoxFit.cover,
-                                        height: 95,
-                                        width: 95,
-                                      ),
-                              ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: AdvertiseColor.textColor,
+                              width: 2,
                             ),
-                            GestureDetector(
-                              onTap: _pickImage,
-                              child: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  size: 16,
-                                  color: Colors.black,
-                                ),
-                              ),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(40),
+                            child: Image.network(
+                              '${headUrl}lib/img/user/$userImage',
+                              fit: BoxFit.cover,
+                              height: 95,
+                              width: 95,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                    "assets/img/other/errorImage.png",
+                                    height: 95,
+                                    width: 95,
+                                    fit: BoxFit.cover,
+                                  ),
                             ),
-                          ],
+                          ),
                         ),
                         const SizedBox(width: 10),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(userName, style: AppComponent.labelStyle),
-                            const SizedBox(height: 10),
-                            Text(
-                              userEmail,
-                              style: AppComponent.sublabelStyle.copyWith(
-                                color: AdvertiseColor.textColor,
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(userName, style: AppComponent.labelStyle),
+                              const SizedBox(height: 10),
+                              Text(
+                                userEmail,
+                                style: AppComponent.sublabelStyle.copyWith(
+                                  color: AdvertiseColor.textColor,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
