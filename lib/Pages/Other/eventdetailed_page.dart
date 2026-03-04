@@ -5,10 +5,10 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/bookticket_page.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
-import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
 import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
 import 'package:mobile_assignment/services/Helper/TimeHelperClass.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventdetailedPage extends StatefulWidget {
   final Eventdto eventdto;
@@ -19,56 +19,27 @@ class EventdetailedPage extends StatefulWidget {
 }
 
 class _EventdetailedPageState extends State<EventdetailedPage> {
-  // State variables
-  InteractionHelper? _interactionHelper;
   late int userId;
   final helperclass = Helperclass();
   PreloadImageHelper? _preloadImageHelper;
   bool _isLoading = true;
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
   final timeHelperClass = Timehelperclass();
+  int likeCount = 0;
+  int dislikeCount = 0;
+  int bookmarkCount = 0;
+
   Future<void> firstJob() async {
     setState(() => _isLoading = true);
+    int lCount = 0;
+    int dCount = 0;
+    int bCount = 0;
     try {
-      bool isLiked = false;
-      bool isDisLiked = false;
-      bool isBookMarked = false;
-      int likeCount = 0;
-      int dislikedCount = 0;
-      int bookMarkedCount = 0;
-
-      var userId = await usersharedpreferences.getUserId();
-
-      if (userId != null) {
-        for (var item in widget.eventdto.eventEngagement) {
-          // Count all engagements
-          if (item.isLiked == true) likeCount++;
-          if (item.isDisliked == true) dislikedCount++;
-          if (item.isBookMarked == true) bookMarkedCount++;
-
-          // Check if this engagement belongs to current user
-          // Compare with userId, not eventId!
-          if (userId == item.userId) {
-            // ✅ Fixed: Compare with userId
-            if (item.isLiked == true) isLiked = true;
-            if (item.isDisliked == true) isDisLiked = true;
-            if (item.isBookMarked == true) isBookMarked = true;
-          }
-        }
+      for (var data in widget.eventdto.eventEngagement) {
+        data.isLiked == true ? lCount++ : null;
+        data.isDisliked == true ? dCount++ : null;
+        data.isBookMarked == true ? bCount++ : null;
       }
-
-      _interactionHelper = InteractionHelper(
-        isBookMarked: isBookMarked,
-        isLiked: isLiked,
-        isDisliked: isDisLiked,
-        likeCount: likeCount,
-        dislikeCount: dislikedCount,
-        bookmarkedCount: bookMarkedCount,
-        userId: userId ?? 0, // Provide default value if userId is null
-        eventId: widget.eventdto.id,
-        onUpdate: () => setState(() {}),
-      );
-
       _preloadImageHelper = PreloadImageHelper(
         imageError: false,
         imageName: widget.eventdto.image,
@@ -77,6 +48,11 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
       );
 
       _preloadImageHelper!.preloadImage(headUrl);
+      setState(() {
+        likeCount = lCount;
+        dislikeCount = dCount;
+        bookmarkCount = bCount;
+      });
     } finally {
       if (mounted) {
         setState(() {
@@ -125,14 +101,12 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                 image:
                     _preloadImageHelper != null &&
                         _preloadImageHelper!.hasValidImage
-                    ? NetworkImage("${headUrl}img/${widget.eventdto.image}")
+                    ? NetworkImage(
+                        "${headUrl}lib/img/Event/${widget.eventdto.image}",
+                      )
                     : const AssetImage("assets/img/other/errorImage.png")
                           as ImageProvider,
-                fit:
-                    _preloadImageHelper != null &&
-                        _preloadImageHelper!.hasValidImage
-                    ? BoxFit.fitHeight
-                    : BoxFit.fitWidth,
+                fit: BoxFit.fitWidth,
               ),
             ),
             child: Row(
@@ -156,34 +130,24 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
               children: [
                 Row(
                   children: [
-                    IconButton(
-                      onPressed: _interactionHelper?.handleLike,
-                      icon: Icon(
-                        Icons.thumb_up_outlined,
-                        color: _interactionHelper?.isLiked == true
-                            ? AdvertiseColor.primaryColor
-                            : AdvertiseColor.textColor,
-                      ),
+                    Icon(
+                      Icons.thumb_up_outlined,
+                      color: AdvertiseColor.primaryColor,
                     ),
                     Text(
-                      " ${_interactionHelper?.likeCount} ",
+                      " $likeCount ",
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'KantumruyPro',
                       ),
                     ),
                     SizedBox(width: 5),
-                    IconButton(
-                      onPressed: _interactionHelper?.handleDislike,
-                      icon: Icon(
-                        Icons.thumb_down_outlined,
-                        color: _interactionHelper?.isDisliked == true
-                            ? AdvertiseColor.dangerColor
-                            : AdvertiseColor.textColor,
-                      ),
+                    Icon(
+                      Icons.thumb_down_outlined,
+                      color: AdvertiseColor.dangerColor,
                     ),
                     Text(
-                      " ${_interactionHelper?.dislikeCount} ",
+                      " $dislikeCount ",
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'KantumruyPro',
@@ -191,20 +155,15 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                     ),
                     Spacer(),
                     Text(
-                      ' ${_interactionHelper?.bookmarkedCount}',
+                      ' $bookmarkCount ',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'KantumruyPro',
                       ),
                     ),
-                    IconButton(
-                      onPressed: () => _interactionHelper!.handleBookMark(),
-                      icon: Icon(
-                        Icons.bookmark_outline,
-                        color: _interactionHelper?.isBookMarked == true
-                            ? AdvertiseColor.warningColor
-                            : AdvertiseColor.textColor,
-                      ),
+                    Icon(
+                      Icons.bookmark_outline,
+                      color: AdvertiseColor.warningColor,
                     ),
                   ],
                 ),
@@ -313,7 +272,7 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                         SizedBox(width: 5),
                         Expanded(
                           child: Text(
-                            'Location: ${widget.eventdto.venues.venueLocation}',
+                            'Location: ${widget.eventdto.venues.venueInfo}',
                             style: AppComponent.hintTextStyle.copyWith(
                               color: AdvertiseColor.textColor,
                             ),
@@ -323,7 +282,17 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                           ),
                         ),
                         SizedBox(width: 10),
-                        Image.asset('assets/img/other/googlemap.png'),
+                        GestureDetector(
+                          onTap: () async {
+                            final Uri url = Uri.parse(
+                              widget.eventdto.venues.venueLocation,
+                            );
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url);
+                            }
+                          },
+                          child: Image.asset('assets/img/other/googlemap.png'),
+                        ),
                       ],
                     ),
                     // Column(

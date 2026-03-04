@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
+import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
 import 'package:mobile_assignment/Pages/Other/eventdetailed_page.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
@@ -12,7 +13,12 @@ import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class EventWidget extends StatefulWidget {
   final Eventdto data;
-  const EventWidget({super.key, required this.data});
+  final Function(Usereventengagementdto) onEventUpdated;
+  const EventWidget({
+    super.key,
+    required this.data,
+    required this.onEventUpdated,
+  });
 
   @override
   State<EventWidget> createState() => _EventWidgetState();
@@ -79,7 +85,9 @@ class _EventWidgetState extends State<EventWidget> {
         dislikeCount: totalDislikes,
         userId: userId,
         eventId: widget.data.id,
-        onUpdate: () => setState(() {}),
+        onUpdate: (updatedEvent) => setState(() {
+          widget.onEventUpdated(updatedEvent);
+        }),
       );
 
       // Initialize image preloader
@@ -106,7 +114,9 @@ class _EventWidgetState extends State<EventWidget> {
       _interactionHelper = InteractionHelper(
         likeCount: totalLikes,
         dislikeCount: totalDislikes,
-        onUpdate: () => setState(() {}),
+        onUpdate: (updatedEvent) => setState(() {
+          widget.onEventUpdated(updatedEvent);
+        }),
       );
 
       // Initialize image preloader even for non-logged users
@@ -270,12 +280,12 @@ class _EventWidgetState extends State<EventWidget> {
                 color: Colors.grey[200],
                 image: DecorationImage(
                   image: _preloadImageHelper!.hasValidImage
-                      ? NetworkImage("${headUrl}img/${widget.data.image}")
+                      ? NetworkImage(
+                          "${headUrl}lib/img/Event/${widget.data.image}",
+                        )
                       : const AssetImage("assets/img/other/errorImage.png")
                             as ImageProvider,
-                  fit: _preloadImageHelper!.hasValidImage
-                      ? BoxFit.fitHeight
-                      : BoxFit.fitWidth,
+                  fit: BoxFit.fitWidth,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -451,7 +461,7 @@ class _EventWidgetState extends State<EventWidget> {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          widget.data.venues.venueLocation,
+                          widget.data.venues.venueInfo,
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor.withOpacity(0.5),

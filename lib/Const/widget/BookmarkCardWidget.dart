@@ -3,6 +3,8 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/NotGetUserEventEngagementDto.dart';
+import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
+import 'package:mobile_assignment/services/API/userevent_engagement_api.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
 import 'package:mobile_assignment/services/Helper/TimeHelperClass.dart';
@@ -66,7 +68,7 @@ class _BookmarkcardwidgetState extends State<Bookmarkcardwidget> {
     }
   }
 
-  void _handleHelperUpdate() {
+  void _handleHelperUpdate(Usereventengagementdto) {
     // Don't update local state, just trigger parent refresh
     if (widget.onBookmarkremoved != null) {
       widget.onBookmarkremoved!();

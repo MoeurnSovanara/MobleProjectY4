@@ -5,6 +5,7 @@ import 'package:mobile_assignment/Const/widget/carouselWidget.dart';
 import 'package:mobile_assignment/Const/widget/eventWidget.dart';
 import 'package:mobile_assignment/Const/widget/videoCardWidget.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
+import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
 import 'package:mobile_assignment/Pages/Home/other/notification_page.dart';
 import 'package:mobile_assignment/Pages/Other/seeall_page.dart';
 import 'package:mobile_assignment/services/API/EventApi.dart';
@@ -83,6 +84,36 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
+  void _updateEvent(Usereventengagementdto updatedEngagement) {
+    setState(() {
+      // Find the event that contains this engagement
+      int eventIndex = eventdto.indexWhere(
+        (event) => event.id == updatedEngagement.eventId,
+      );
+
+      if (eventIndex != -1) {
+        // Get the event
+        Eventdto event = eventdto[eventIndex];
+
+        // Find and update the specific engagement in the event's engagement list
+        int engagementIndex = event.eventEngagement.indexWhere(
+          (engagement) => engagement.userId == updatedEngagement.userId,
+        );
+
+        if (engagementIndex != -1) {
+          // Update existing engagement
+          event.eventEngagement[engagementIndex] = updatedEngagement;
+        } else {
+          // Add new engagement if not found
+          event.eventEngagement.add(updatedEngagement);
+        }
+
+        // Replace the event in the list
+        eventdto[eventIndex] = event;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -117,13 +148,22 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Spacer(),
                                       GestureDetector(
-                                        onTap: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                SeeallPage(data: eventdto),
-                                          ),
-                                        ),
+                                        onTap: () async {
+                                          bool? shouldRefresh =
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SeeallPage(
+                                                        data: eventdto,
+                                                      ),
+                                                ),
+                                              );
+
+                                          if (shouldRefresh == true) {
+                                            getAllEvents();
+                                          }
+                                        },
                                         child: Text(
                                           'See All >',
                                           style: AppComponent.sublabelStyle,
@@ -145,6 +185,7 @@ class _HomePageState extends State<HomePage> {
                                           (BuildContext context, int index) {
                                             return EventWidget(
                                               data: eventdto[index],
+                                              onEventUpdated: _updateEvent,
                                             );
                                           },
                                     ),

@@ -6,6 +6,7 @@ import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/eventdetailed_page.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
+import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 import 'dart:io';
 
@@ -18,16 +19,30 @@ class Seealleventwidget extends StatefulWidget {
 }
 
 class _SeealleventwidgetState extends State<Seealleventwidget> {
-  bool _imageError = false;
   final Usersharedpreferences usersharedpreferences = Usersharedpreferences();
   final helper = Helperclass();
   InteractionHelper interactiveHelper = InteractionHelper();
+  PreloadImageHelper? _preloadImageHelper;
 
   @override
   void initState() {
     super.initState();
+    _preloadImageHelper = PreloadImageHelper(
+      imageError: false,
+      imageName: widget.eventData.image,
+      mounted: mounted,
+      onUpdate: () => setState(() {}),
+    );
     _initializeData();
-    _preloadImage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update mounted state in helper when dependencies change
+    if (_preloadImageHelper != null) {
+      _preloadImageHelper!.mounted = mounted;
+    }
   }
 
   Future<void> _initializeData() async {
@@ -66,8 +81,19 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
         isLiked: isLiked,
         likeCount: likeCount,
         dislikeCount: dislikeCount,
+        onUpdate: (updatedEvent) => setState(() {}),
+        userId: userId, // ADD THIS
+        eventId: widget.eventData.id, // ADD THIS
+      );
+
+      _preloadImageHelper = PreloadImageHelper(
+        imageError: false,
+        imageName: widget.eventData.image,
+        mounted: mounted,
         onUpdate: () => setState(() {}),
       );
+
+      _preloadImageHelper!.preloadImage(headUrl);
     } else {
       // If no user logged in, just show the counts from engagements
       int totalLikes = 0;
@@ -81,7 +107,21 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
       interactiveHelper = InteractionHelper(
         likeCount: totalLikes,
         dislikeCount: totalDislikes,
+        // For non-logged users, we still might want to track eventId
+        // but userId will be 0 (or you could handle it differently)
+        eventId: widget.eventData.id, // ADD THIS
       );
+
+      // Initialize image preloader even for non-logged users
+      _preloadImageHelper = PreloadImageHelper(
+        imageError: false,
+        imageName: widget.eventData.image,
+        mounted: mounted,
+        onUpdate: () => setState(() {}),
+      );
+
+      // Preload the image
+      _preloadImageHelper!.preloadImage(headUrl);
     }
   }
 
@@ -200,42 +240,6 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
     );
   }
 
-  // Preload image to check if it loads successfully
-  void _preloadImage() {
-    if (widget.eventData.image.isEmpty) {
-      setState(() {
-        _imageError = true;
-      });
-      return;
-    }
-
-    final Image image = Image.network(
-      "${headUrl}img/${widget.eventData.image}",
-      fit: BoxFit.fitHeight,
-    );
-
-    image.image
-        .resolve(ImageConfiguration())
-        .addListener(
-          ImageStreamListener(
-            (info, call) {
-              if (mounted) {
-                setState(() {
-                  _imageError = false;
-                });
-              }
-            },
-            onError: (exception, stackTrace) {
-              if (mounted) {
-                setState(() {
-                  _imageError = true;
-                });
-              }
-            },
-          ),
-        );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -270,22 +274,15 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               decoration: BoxDecoration(
                 color: Colors.grey[200], // Fallback color
-                image: !_imageError && widget.eventData.image.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(
-                          "${headUrl}img/${widget.eventData.image}",
-                        ),
-                        fit: BoxFit.fitHeight,
-                        onError: (exception, stackTrace) {
-                          setState(() {
-                            _imageError = true;
-                          });
-                        },
-                      )
-                    : const DecorationImage(
-                        image: AssetImage("assets/img/other/errorImage.png"),
-                        fit: BoxFit.fitWidth,
-                      ),
+                image: DecorationImage(
+                  image: _preloadImageHelper!.hasValidImage
+                      ? NetworkImage(
+                          "${headUrl}lib/img/Event/${widget.eventData.image}",
+                        )
+                      : const AssetImage("assets/img/other/errorImage.png")
+                            as ImageProvider,
+                  fit: BoxFit.fitWidth,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -467,7 +464,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          widget.eventData.venues.venueLocation,
+                          widget.eventData.venues.venueInfo,
                           style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor.withOpacity(0.5),

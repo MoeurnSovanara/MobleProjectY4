@@ -3,7 +3,7 @@ import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Models/DTO/TicketTypeDto.dart';
 import 'package:http/http.dart' as http;
 
-class Tickettypecontroller {
+class TickettypeApi {
   final baseUrl = "${headUrl}api/TicketType";
 
   Future<List<TicketTypeDto>?> createTicketType({

@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
 import 'package:mobile_assignment/services/API/userevent_engagement_api.dart';
 
@@ -13,7 +12,7 @@ class InteractionHelper {
   int userId;
   int eventId;
 
-  final VoidCallback? onUpdate;
+  final Function(Usereventengagementdto)? onUpdate;
 
   InteractionHelper({
     this.isLiked = false,
@@ -28,6 +27,13 @@ class InteractionHelper {
   });
 
   Future<void> handleLike() async {
+    // Store previous state for rollback
+    bool previousLiked = isLiked;
+    int previousLikeCount = likeCount;
+    bool previousDisliked = isDisliked;
+    int previousDislikeCount = dislikeCount;
+
+    // Update local state optimistically
     if (isLiked) {
       isLiked = false;
       likeCount--;
@@ -40,11 +46,43 @@ class InteractionHelper {
         dislikeCount--;
       }
     }
-    onUpdate?.call();
-    await _callApi('like', isLiked);
+
+    try {
+      Usereventengagementdto updatedEvent = await _callApi('like', isLiked);
+      if (onUpdate != null) {
+        onUpdate!(updatedEvent);
+      }
+    } catch (e) {
+      // Rollback on error
+      isLiked = previousLiked;
+      likeCount = previousLikeCount;
+      isDisliked = previousDisliked;
+      dislikeCount = previousDislikeCount;
+
+      // Still notify with original state
+      if (onUpdate != null) {
+        onUpdate!(
+          Usereventengagementdto(
+            userId: userId,
+            eventId: eventId,
+            isLiked: isLiked,
+            isDisliked: isDisliked,
+            isBookMarked: isBookMarked,
+          ),
+        );
+      }
+      print('Error in handleLike: $e');
+    }
   }
 
   Future<void> handleDislike() async {
+    // Store previous state
+    bool previousDisliked = isDisliked;
+    int previousDislikeCount = dislikeCount;
+    bool previousLiked = isLiked;
+    int previousLikeCount = likeCount;
+
+    // Update local state optimistically
     if (isDisliked) {
       isDisliked = false;
       dislikeCount--;
@@ -57,11 +95,43 @@ class InteractionHelper {
         likeCount--;
       }
     }
-    onUpdate?.call();
-    await _callApi('dislike', isDisliked);
+
+    try {
+      Usereventengagementdto updatedEvent = await _callApi(
+        'dislike',
+        isDisliked,
+      );
+      if (onUpdate != null) {
+        onUpdate!(updatedEvent);
+      }
+    } catch (e) {
+      // Rollback on error
+      isDisliked = previousDisliked;
+      dislikeCount = previousDislikeCount;
+      isLiked = previousLiked;
+      likeCount = previousLikeCount;
+
+      if (onUpdate != null) {
+        onUpdate!(
+          Usereventengagementdto(
+            userId: userId,
+            eventId: eventId,
+            isLiked: isLiked,
+            isDisliked: isDisliked,
+            isBookMarked: isBookMarked,
+          ),
+        );
+      }
+      print('Error in handleDislike: $e');
+    }
   }
 
   Future<void> handleBookMark() async {
+    // Store previous state
+    bool previousBookMarked = isBookMarked;
+    int previousBookmarkedCount = bookmarkedCount;
+
+    // Update local state optimistically
     if (isBookMarked) {
       isBookMarked = false;
       bookmarkedCount--;
@@ -69,48 +139,82 @@ class InteractionHelper {
       isBookMarked = true;
       bookmarkedCount++;
     }
-    onUpdate?.call();
-    await _callApi('bookmarked', isBookMarked);
+
+    try {
+      Usereventengagementdto updatedEvent = await _callApi(
+        'bookmarked',
+        isBookMarked,
+      );
+      if (onUpdate != null) {
+        onUpdate!(updatedEvent);
+      }
+    } catch (e) {
+      // Rollback on error
+      isBookMarked = previousBookMarked;
+      bookmarkedCount = previousBookmarkedCount;
+
+      if (onUpdate != null) {
+        onUpdate!(
+          Usereventengagementdto(
+            userId: userId,
+            eventId: eventId,
+            isLiked: isLiked,
+            isDisliked: isDisliked,
+            isBookMarked: isBookMarked,
+          ),
+        );
+      }
+      print('Error in handleBookMark: $e');
+    }
   }
 
-  Future<void> _callApi(String action, bool value) async {
+  Future<Usereventengagementdto> _callApi(String action, bool value) async {
     UsereventEngagementApi usereventEngagementApi = UsereventEngagementApi();
-    var isExisted = await usereventEngagementApi.findExistData(
-      userId: userId,
-      eventId: eventId,
-    );
-    if (isExisted) {
-      var response = await usereventEngagementApi.updateEventEngagement(
+
+    try {
+      var isExisted = await usereventEngagementApi.findExistData(
         userId: userId,
         eventId: eventId,
-        userEventEngagement: Usereventengagementdto(
+      );
+
+      Usereventengagementdto engagementDto = Usereventengagementdto(
+        userId: userId,
+        eventId: eventId,
+        isBookMarked: isBookMarked,
+        isLiked: isLiked,
+        isDisliked: isDisliked,
+      );
+
+      if (isExisted) {
+        var response = await usereventEngagementApi.updateEventEngagement(
           userId: userId,
           eventId: eventId,
-          isBookMarked: isBookMarked,
-          isLiked: isLiked,
-          isDisliked: isDisliked,
-        ),
-      );
-      if (response.statusCode >= 200 && response.statusCode <= 299) {
-        print("Update Successfully");
+          userEventEngagement: engagementDto,
+        );
+
+        if (response.statusCode >= 200 && response.statusCode <= 299) {
+          print("Update Successfully");
+          return engagementDto;
+        } else {
+          print("Failed to Update");
+          return engagementDto; // Return current state even on failure
+        }
       } else {
-        print("Failed to Update");
+        var response = await usereventEngagementApi.createEventEngagement(
+          userEventEngagement: engagementDto,
+        );
+
+        if (response.statusCode >= 200 && response.statusCode <= 299) {
+          print('Create Successfully');
+          return engagementDto;
+        } else {
+          print('Failed to create');
+          return engagementDto; // Return current state even on failure
+        }
       }
-    } else {
-      var response = await usereventEngagementApi.createEventEngagement(
-        userEventEngagement: Usereventengagementdto(
-          userId: userId,
-          eventId: eventId,
-          isBookMarked: isBookMarked,
-          isLiked: isLiked,
-          isDisliked: isDisliked,
-        ),
-      );
-      if (response.statusCode >= 200 && response.statusCode <= 299) {
-        print('Create Successfully');
-      } else {
-        print('Failed to create');
-      }
+    } catch (e) {
+      print('Error in API call: $e');
+      rethrow; // Rethrow to trigger rollback
     }
   }
 }

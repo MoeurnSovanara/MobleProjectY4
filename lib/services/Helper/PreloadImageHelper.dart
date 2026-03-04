@@ -21,7 +21,7 @@ class PreloadImageHelper {
     }
 
     final Image image = Image.network(
-      "$baseUrl/img/$imageName",
+      "$baseUrl/lib/img/Event/$imageName",
       fit: BoxFit.fitHeight,
     );
 

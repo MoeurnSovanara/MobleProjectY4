@@ -1,6 +1,4 @@
-import 'package:mobile_assignment/Models/DTO/VenuesNameDto.dart';
-
-class Eventnormaldto {
+class Createeventdto {
   final int id;
   final int categoryId;
   final int userId;
@@ -13,11 +11,10 @@ class Eventnormaldto {
   final DateTime eventEnd;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final Duration? startTime;
-  final Duration? endTime;
-  final Venuesnamedto venues;
+  final Duration startTime;
+  final Duration endTime;
 
-  Eventnormaldto({
+  Createeventdto({
     required this.id,
     required this.categoryId,
     required this.userId,
@@ -28,16 +25,14 @@ class Eventnormaldto {
     required this.capacityTicketd,
     required this.eventStart,
     required this.eventEnd,
-    this.startTime,
-    this.endTime,
+    required this.startTime,
+    required this.endTime,
     required this.createdAt,
     required this.updatedAt,
-    required this.venues,
   });
 
-  // Helper function to parse TimeSpan string to Duration
-  static Duration? _parseTimeSpan(String? timeString) {
-    if (timeString == null || timeString.isEmpty) return null;
+  static Duration _parseTimeSpan(String? timeString) {
+    if (timeString == null || timeString.isEmpty) return Duration();
 
     try {
       List<String> parts = timeString.split(':');
@@ -48,7 +43,7 @@ class Eventnormaldto {
       );
     } catch (e) {
       print('Error parsing time span: $e');
-      return null;
+      return Duration();
     }
   }
 
@@ -76,12 +71,11 @@ class Eventnormaldto {
       'updatedAt': updatedAt.toIso8601String(),
       'startTime': _formatTimeSpan(startTime),
       'endTime': _formatTimeSpan(endTime),
-      'venues': venues.toJson(),
     };
   }
 
-  factory Eventnormaldto.fromJson(Map<String, dynamic> json) {
-    return Eventnormaldto(
+  factory Createeventdto.fromJson(Map<String, dynamic> json) {
+    return Createeventdto(
       id: json['id'] ?? 0,
       categoryId: json['categoryId'] ?? 0,
       userId: json['userId'] ?? 0,
@@ -104,7 +98,6 @@ class Eventnormaldto {
       ),
       startTime: _parseTimeSpan(json['startTime']),
       endTime: _parseTimeSpan(json['endTime']),
-      venues: Venuesnamedto.fromJson(json['venues']),
     );
   }
 }

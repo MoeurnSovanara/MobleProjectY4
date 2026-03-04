@@ -14,7 +14,14 @@ class _SeeallPageState extends State<SeeallPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('See all Event'), centerTitle: true),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context, true),
+          icon: Icon(Icons.arrow_back),
+        ),
+        title: Text('See all Event'),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           Expanded(

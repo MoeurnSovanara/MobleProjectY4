@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
@@ -8,8 +9,17 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/TicketInforWidget.dart';
 import 'package:mobile_assignment/Models/DTO/CategoryDto.dart';
+import 'package:mobile_assignment/Models/DTO/CreateEventDto.dart';
+import 'package:mobile_assignment/Models/DTO/PaymentDto.dart';
 import 'package:mobile_assignment/Models/DTO/TicketTypeDto.dart';
+import 'package:mobile_assignment/Models/DTO/VenuesNameDto.dart';
 import 'package:mobile_assignment/services/API/CategoryApi.dart';
+import 'package:mobile_assignment/services/API/EventApi.dart';
+import 'package:mobile_assignment/services/API/PaymentApi.dart';
+import 'package:mobile_assignment/services/API/TicketTypApi.dart';
+import 'package:mobile_assignment/services/API/VenuesApi.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
+import 'package:uuid/uuid.dart';
 
 class Createeventpage extends StatefulWidget {
   const Createeventpage({super.key});
@@ -33,7 +43,7 @@ class _CreateeventpageState extends State<Createeventpage> {
 
   int _currentStep = 1;
   final _formKey = GlobalKey<FormState>();
-  String? _selectedEventCategory;
+  int? _selectedEventCategory;
   List<Categorydto> _ticketTypes = [];
   DateTime? _startDate;
   DateTime? _endDate;
@@ -52,13 +62,20 @@ class _CreateeventpageState extends State<Createeventpage> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _paypalAccountIdController =
       TextEditingController();
-  final TextEditingController _paypalEmailController = TextEditingController();
-  final TextEditingController _paypalAccountTypeController =
+  final TextEditingController _paypalSecretKeyController =
+      TextEditingController();
+  final TextEditingController _paypalCurrencyCodeController =
       TextEditingController();
   final TextEditingController _bankAccountNameController =
       TextEditingController();
   final TextEditingController _bankAccountNumberController =
       TextEditingController();
+  Paymentapi paymentapi = Paymentapi();
+  Eventapi eventapi = Eventapi();
+  Venuesapi venuesapi = Venuesapi();
+  TickettypeApi tickettypeApi = TickettypeApi();
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  var uuid = Uuid();
 
   // Zone list
   final List<Map<String, dynamic>> _zones = [];
@@ -100,6 +117,11 @@ class _CreateeventpageState extends State<Createeventpage> {
         }
       });
     }
+  }
+
+  Duration? _timeOfDayToDuration(TimeOfDay? time) {
+    if (time == null) return null;
+    return Duration(hours: time.hour, minutes: time.minute);
   }
 
   void _pickTime({bool isStartTime = true}) async {
@@ -158,82 +180,234 @@ class _CreateeventpageState extends State<Createeventpage> {
     });
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // Collect all form data
-      final eventData = {
-        'title': _eventTitleController.text,
-        'category': _selectedEventCategory,
-        'startDate': _startDate,
-        'endDate': _endDate,
-        'startTime': _startTime,
-        'endTime': _endTime,
-        'description': _descriptionController.text,
-        'image': _pickedImage?.path,
-        'tickets': _tickets,
-        'locationName': _locationNameController.text,
-        'locationLink': _locationLinkController.text,
-        'zones': _zones,
-        'paymentMethod': _paymentMethod,
-        'paypalAccountId': _paypalAccountIdController.text,
-        'paypalEmail': _paypalEmailController.text,
-        'paypalAccountType': _paypalAccountTypeController.text,
-        'bankAccountName': _bankAccountNameController.text,
-        'bankAccountNumber': _bankAccountNumberController.text,
-      };
-
-      print('Event Data: $eventData');
-
-      // Show success dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            contentPadding: EdgeInsets.all(20),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: AdvertiseColor.primaryColor,
-                  size: 60,
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Success',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'KantumruyPro',
-                    color: AdvertiseColor.primaryColor,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'You have created an event successfully',
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AdvertiseColor.primaryColor,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // Close dialog
-                    Navigator.pop(context); // Navigate back
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            ),
-          );
-        },
-      );
+  Future<void> _submitForm() async {
+    // Validate form first
+    if (!_formKey.currentState!.validate()) {
+      _showErrorDialog('Please fill in all required fields');
+      return;
     }
+
+    // Validate tickets
+    if (_tickets.isEmpty) {
+      _showErrorDialog('Please add at least one ticket type');
+      return;
+    }
+
+    // Validate dates
+    if (_startDate == null || _endDate == null) {
+      _showErrorDialog('Please select event start and end dates');
+      return;
+    }
+
+    if (_endDate!.isBefore(_startDate!)) {
+      _showErrorDialog('End date must be after start date');
+      return;
+    }
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+
+    try {
+      // Get user ID
+      final uId = await usersharedpreferences.getUserId();
+      if (uId == null) {
+        Navigator.pop(context); // Close loading dialog
+        _showErrorDialog('User not logged in');
+        return;
+      }
+
+      // Create venue
+      final venue = await venuesapi.CreateVenues(
+        venue: Venuesnamedto(
+          id: 0,
+          venueInfo: _locationInfoController.text,
+          venueLocation: _locationLinkController.text,
+          venueName: _locationNameController.text,
+        ),
+      );
+
+      if (venue == null) {
+        Navigator.pop(context); // Close loading dialog
+        _showErrorDialog('Failed to create venue');
+        return;
+      }
+
+      // Upload image
+      String? uniqueImagename;
+      if (_pickedImage != null) {
+        uniqueImagename = 'event_${uuid.v4()}.png';
+        await eventapi.uploadEventImage(
+          image: _pickedImage,
+          imageName: uniqueImagename,
+        );
+      } else {
+        Navigator.pop(context); // Close loading dialog
+        _showErrorDialog('Please select an event image');
+        return;
+      }
+
+      // Create event
+      final event = await eventapi.CreateEvent(
+        event: Createeventdto(
+          id: 0,
+          categoryId: _selectedEventCategory!,
+          userId: uId,
+          venuesId: venue.id,
+          title: _eventTitleController.text,
+          image: uniqueImagename,
+          description: _descriptionController.text,
+          capacityTicketd: _calculateTotalTickets(),
+          eventStart: _combineDateTime(_startDate!, _startTime!),
+          eventEnd: _combineDateTime(_endDate!, _endTime!),
+          startTime: _timeOfDayToDuration(_startTime)!,
+          endTime: _timeOfDayToDuration(_endTime)!,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+      if (event == null) {
+        Navigator.pop(context); // Close loading dialog
+        _showErrorDialog('Failed to create event');
+        return;
+      }
+
+      // Create ticket types
+      final ticketTypes = _tickets
+          .map(
+            (ticket) => TicketTypeDto(
+              id: 0,
+              eventId: event.id,
+              typeName: ticket.typeName,
+              price: ticket.price,
+              quantityAvailable: ticket.quantityAvailable,
+              totalTickets: ticket.totalTickets,
+            ),
+          )
+          .toList();
+
+      final createdTickets = await tickettypeApi.createTicketType(
+        ticketTypes: ticketTypes,
+      );
+
+      if (createdTickets == null || createdTickets.isEmpty) {
+        // Consider rolling back event creation or handling partial failure
+        Navigator.pop(context); // Close loading dialog
+        _showErrorDialog('Event created but failed to create ticket types');
+        return;
+      }
+
+      // Create payment
+      final paymentResponse = await paymentapi.CreatePayment(
+        payment: Paymentdto(
+          paymentId: 0,
+          userId: uId,
+          clientId: _paypalAccountIdController.text,
+          secretKey: _paypalSecretKeyController.text,
+          currencyCode: _paypalCurrencyCodeController.text,
+        ),
+      );
+
+      Navigator.pop(context); // Close loading dialog
+
+      if (paymentResponse.statusCode < 300) {
+        _showSuccessDialog();
+      } else {
+        _showErrorDialog('Event created but payment setup failed');
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog
+      _showErrorDialog('An error occurred: ${e.toString()}');
+    }
+  }
+
+  // Helper methods
+  int _calculateTotalTickets() {
+    return _tickets.fold(0, (sum, ticket) => sum + ticket.totalTickets);
+  }
+
+  DateTime _combineDateTime(DateTime date, TimeOfDay time) {
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: const Text(
+            'Error',
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          contentPadding: const EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: AdvertiseColor.primaryColor,
+                size: 60,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Success',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'KantumruyPro',
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'You have created an event successfully',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AdvertiseColor.primaryColor,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context); // Navigate back
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildCurrentStep() {
@@ -386,22 +560,19 @@ class _CreateeventpageState extends State<Createeventpage> {
             ),
           ),
           SizedBox(height: 10),
-          Text('Email', style: AppComponent.labelTextStyle),
+          Text('Secret Key', style: AppComponent.labelTextStyle),
           SizedBox(height: 10),
           TextFormField(
-            controller: _paypalEmailController,
+            controller: _paypalSecretKeyController,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter email address';
-              }
-              if (!value.contains('@')) {
-                return 'Please enter a valid email';
+                return 'Please Enter your Secret Key';
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter email address',
+              hintText: 'Enter Secret Key',
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -413,18 +584,18 @@ class _CreateeventpageState extends State<Createeventpage> {
             ),
           ),
           SizedBox(height: 10),
-          Text('Account Type', style: AppComponent.labelTextStyle),
+          Text('Currency Code', style: AppComponent.labelTextStyle),
           SizedBox(height: 10),
           TextFormField(
-            controller: _paypalAccountTypeController,
+            controller: _paypalCurrencyCodeController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter account type';
+                return 'Please enter currency code';
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter account type',
+              hintText: 'Enter currency code',
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -755,7 +926,7 @@ class _CreateeventpageState extends State<Createeventpage> {
           SizedBox(height: 10),
           Text('Category', style: AppComponent.labelTextStyle),
           SizedBox(height: 5),
-          DropdownButtonFormField<String>(
+          DropdownButtonFormField<int>(
             value: _selectedEventCategory,
             hint: Text(
               'Select Event Category',
@@ -768,19 +939,21 @@ class _CreateeventpageState extends State<Createeventpage> {
               filled: true,
               fillColor: AdvertiseColor.backgroundColor,
             ),
-            items: _ticketTypes.map((value) {
-              return DropdownMenuItem<String>(
-                value: value.categoryName,
+            items: _ticketTypes.map((Categorydto value) {
+              return DropdownMenuItem<int>(
+                value: value.id, // Use the ID as the value
                 child: Text(value.categoryName),
               );
             }).toList(),
-            onChanged: (String? newValue) {
+            onChanged: (int? newValue) {
+              // Change to int?
               setState(() {
-                _selectedEventCategory = newValue;
+                _selectedEventCategory = newValue; // Now stores the ID
               });
             },
             validator: (value) {
-              if (value == null || value.isEmpty) {
+              if (value == null) {
+                // Remove .isEmpty check
                 return 'Please select a category';
               }
               return null;

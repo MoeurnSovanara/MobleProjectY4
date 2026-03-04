@@ -11,7 +11,7 @@ class Eventdto {
   final String title;
   final String image;
   final String description;
-  final String capacityTicketd;
+  final int capacityTicketd;
   final DateTime eventStart;
   final DateTime eventEnd;
   final Duration? startTime; // Made nullable to match your model

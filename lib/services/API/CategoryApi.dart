@@ -14,7 +14,7 @@ class Categoryapi {
       final response = await http.get(
         uri,
         headers: <String, String>{
-          'Content-type': 'applicatoin/json,charset=UTF-8',
+          'Content-type': 'application/json,charset=UTF-8',
         },
       );
       if (response.statusCode >= 200 && response.statusCode <= 299) {
