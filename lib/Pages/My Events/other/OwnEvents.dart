@@ -2,10 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/editEventWidget.dart';
+import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/createEventPage.dart';
+import 'package:mobile_assignment/services/API/EventApi.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
-class Ownevents extends StatelessWidget {
+class Ownevents extends StatefulWidget {
   const Ownevents({super.key});
+
+  @override
+  State<Ownevents> createState() => _OwneventsState();
+}
+
+class _OwneventsState extends State<Ownevents> {
+  Eventapi eventapi = Eventapi();
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  List<Eventdto> event = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEvent();
+  }
+
+  void _loadUserEvent() async {
+    if (mounted) {
+      var userId = await usersharedpreferences.getUserId();
+      if (userId != null) {
+        var allEvent = await eventapi.getAllEvents();
+        List<Eventdto> filterEvent = allEvent!
+            .where((e) => e.userId == userId)
+            .toList();
+        setState(() {
+          event = filterEvent;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +70,9 @@ class Ownevents extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(5),
               child: ListView.builder(
-                itemCount: 3,
+                itemCount: event.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Editeventwidget();
+                  return Editeventwidget(eventData: event[index]);
                 },
               ),
             ),

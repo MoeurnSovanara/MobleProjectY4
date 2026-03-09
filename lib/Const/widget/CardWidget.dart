@@ -192,6 +192,17 @@ class _CardWidgetState extends State<CardWidget> {
                     overflow: TextOverflow.ellipsis,
                   ),
 
+                  SizedBox(height: 5),
+
+                  Text(
+                    "${widget.tickets.quantity} tickets",
+                    style: AppComponent.detailTextStyle.copyWith(
+                      fontSize: screenWidth <= 393 ? 12 : 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
                   const SizedBox(height: 5),
 
                   // Price
@@ -205,7 +216,7 @@ class _CardWidgetState extends State<CardWidget> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      _formatPrice(ticketPrice),
+                      _formatPrice(ticketPrice * widget.tickets.quantity),
                       style: AppComponent.elevatedButtonTextStyle.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: screenWidth <= 393 ? 12 : 14,

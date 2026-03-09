@@ -7,7 +7,7 @@ import 'package:mobile_assignment/Models/DTO/PaymentDto.dart';
 class Paymentapi {
   final baseUrl = "${headUrl}api/Payment";
 
-  Future<http.Response> CreatePayment({required Paymentdto payment}) async {
+  Future<http.Response> createPayment({required Paymentdto payment}) async {
     final url = Uri.parse(baseUrl);
     late http.Response respose;
     try {
@@ -22,5 +22,24 @@ class Paymentapi {
       return respose;
     }
     return respose;
+  }
+
+  Future<Paymentdto?> getPayment({required int userId}) async {
+    final url = Uri.parse('$baseUrl?userId=$userId');
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'content-type': 'application/json;charset=UTF-8;',
+        },
+      );
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        dynamic jsonData = json.decode(response.body);
+        return Paymentdto.fromJson(jsonData);
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
   }
 }

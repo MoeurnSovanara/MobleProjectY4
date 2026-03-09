@@ -20,6 +20,7 @@ class _UsedticketPageState extends State<UsedticketPage> {
   @override
   void initState() {
     super.initState();
+    firstTask();
   }
 
   void firstTask() async {

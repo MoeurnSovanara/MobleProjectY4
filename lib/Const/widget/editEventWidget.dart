@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/createEventPage.dart';
+import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
 
-class Editeventwidget extends StatelessWidget {
-  const Editeventwidget({super.key});
+class Editeventwidget extends StatefulWidget {
+  final Eventdto eventData;
+  Editeventwidget({super.key, required this.eventData});
+
+  @override
+  State<Editeventwidget> createState() => _EditeventwidgetState();
+}
+
+class _EditeventwidgetState extends State<Editeventwidget> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> initializeData() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +102,7 @@ class Editeventwidget extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  "Performance art: Happy Celebration of Modern Creativity, Culture",
+                  widget.eventData.title,
                   style: TextStyle(
                     fontFamily: 'KantumruyPro',
                     fontSize: 16,
@@ -153,10 +168,14 @@ class Editeventwidget extends StatelessWidget {
                       color: AdvertiseColor.textColor.withOpacity(0.5),
                     ),
                     SizedBox(width: 5),
-                    Text(
-                      '222 Street Tul kork, PP',
-                      style: TextStyle(
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
+                    Flexible(
+                      child: Text(
+                        widget.eventData.venues.venueInfo,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AdvertiseColor.textColor.withOpacity(0.5),
+                        ),
                       ),
                     ),
                   ],

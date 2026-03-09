@@ -67,7 +67,9 @@ class _TicketPageState extends State<TicketPage> {
       if (mounted) {
         List<Ticketdto> allT = [];
         if (tickets != null) {
-          allT = tickets.where((e) => e.userId == _userId).toList();
+          allT = tickets
+              .where((e) => e.userId == _userId && e.status == "active")
+              .toList();
         }
         setState(() {
           _allTickets = allT; // Use directly, no need to map

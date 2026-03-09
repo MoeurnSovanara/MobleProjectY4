@@ -297,7 +297,7 @@ class _CreateeventpageState extends State<Createeventpage> {
       }
 
       // Create payment
-      final paymentResponse = await paymentapi.CreatePayment(
+      final paymentResponse = await paymentapi.createPayment(
         payment: Paymentdto(
           paymentId: 0,
           userId: uId,

@@ -1,10 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_paypal_payment/flutter_paypal_payment.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/CreateTicketDto.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
+import 'package:mobile_assignment/services/API/PaymentApi.dart';
 import 'package:mobile_assignment/services/API/TicketApi.dart';
 import 'package:mobile_assignment/services/API/TicketTypApi.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
@@ -32,9 +33,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   List<String> _ticketTypes = [];
   Ticketapi ticketapi = Ticketapi();
   TickettypeApi tickettypeApi = TickettypeApi();
+  Paymentapi paymentapi = Paymentapi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
 
-  int _selectedPaymentMethod = 0; // 0 for Card, 1 for QR
   int _quantity = 1;
   int _currentStep = 1; // 1: Ticket Details, 2: Payment, 3: Success
   double _ticketPrice = 0.00;
@@ -80,6 +81,57 @@ class _CheckoutPageState extends State<CheckoutPage> {
         _quantityController.text = _quantity.toString();
       });
     }
+  }
+
+  void _payPalPayment() async {
+    var payment = await paymentapi.getPayment(userId: widget.eventdto.userId);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => PaypalCheckoutView(
+          sandboxMode: true,
+          clientId: payment!.clientId,
+          secretKey: payment.secretKey,
+          transactions: [
+            {
+              "amount": {
+                "total": '${_quantity * _ticketPrice}',
+                "currency": payment.currencyCode,
+              },
+              "description": "The payment transaction description.",
+              // "payment_options": {
+              //   "allowed_payment_method":
+              //       "INSTANT_FUNDING_SOURCE"
+              // },
+              "item_list": {
+                "items": [
+                  {
+                    "name": widget.eventdto.title,
+                    "quantity": _quantity,
+                    "price": _ticketPrice,
+                    "currency": payment.currencyCode,
+                  },
+                ],
+              },
+            },
+          ],
+          note: "Contact us for any questions on your order.",
+          onSuccess: (Map params) async {
+            _processPayment();
+            Navigator.pop(context);
+          },
+          onError: (error) {
+            print("onError: $error");
+            Navigator.pop(context);
+          },
+          onCancel: () {
+            print('cancelled:');
+            if (mounted) {
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void _processPayment() async {
@@ -169,7 +221,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
       if (mounted) Navigator.pop(context);
 
       if (response.statusCode >= 200 && response.statusCode <= 299) {
-
         // Payment successful - move to success step
         setState(() {
           _currentStep = 3;
@@ -232,15 +283,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
         if (!_formKey.currentState!.validate()) {
           return;
         }
-      }
 
-      if (_currentStep == 2) {
-        _processPayment();
+        // Move to step 2 only after validation passes
+        setState(() {
+          _currentStep++;
+        });
+      } else if (_currentStep == 2) {
+        // Don't increment step here, let the payment callback handle it
+        _payPalPayment();
       }
-
-      setState(() {
-        _currentStep++;
-      });
     } else {
       // Payment complete - navigate back or show success
       Navigator.pop(context);
@@ -270,15 +321,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Event Details
-              Image.asset(
-                'assets/img/sample/event.png',
+              Image.network(
+                "${headUrl}lib/img/Event/${widget.eventdto.image}",
                 fit: BoxFit.fitWidth,
                 height: 180,
                 width: double.infinity,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  'assets/img/other/errorImage.png',
+                  fit: BoxFit.fitHeight,
+                  height: 180,
+                  width: double.infinity,
+                ),
               ),
               SizedBox(height: 16),
               Text(
-                'Traditional Dance Show The Abduction of Sota',
+                widget.eventdto.title,
                 style: AppComponent.labelStyle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

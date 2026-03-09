@@ -230,6 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(
             "Profile Page",
             style: AppComponent.labelStyle.copyWith(fontSize: 25),
@@ -243,6 +244,7 @@ class _ProfilePageState extends State<ProfilePage> {
     var screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           "Profile Page",
           style: AppComponent.labelStyle.copyWith(fontSize: 25),

@@ -6,6 +6,7 @@ class Ticketdto {
   final int userId;
   final TicketTypeAddEventDto ticketType;
   final String uniqueTicketCode;
+  final int quantity;
   final String status;
 
   Ticketdto({
@@ -14,6 +15,7 @@ class Ticketdto {
     required this.userId,
     required this.ticketType,
     required this.uniqueTicketCode,
+    required this.quantity,
     required this.status,
   });
 
@@ -24,6 +26,7 @@ class Ticketdto {
       'userId': userId,
       'ticketType': ticketType.toJson(),
       'uniqueTicketCode': uniqueTicketCode,
+      'quantity': quantity,
       'status': status,
     };
   }
@@ -35,6 +38,7 @@ class Ticketdto {
       userId: json['userId'] ?? 0,
       ticketType: TicketTypeAddEventDto.fromJson(json['ticketType']),
       uniqueTicketCode: json['uniqueTicketCode'] ?? "",
+      quantity: json['quantity'] ?? 1,
       status: json['status'] ?? "",
     );
   }

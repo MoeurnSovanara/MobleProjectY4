@@ -406,6 +406,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
+      automaticallyImplyLeading: false,
       title: Image.asset('assets/img/other/logo2.png', height: 40),
       centerTitle: true,
       backgroundColor: AdvertiseColor.primaryColor,
