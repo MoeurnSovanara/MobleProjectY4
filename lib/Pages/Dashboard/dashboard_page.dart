@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/createEventPage.dart';
 import 'package:mobile_assignment/services/API/CategoryApi.dart';
@@ -24,6 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
   bool? isOrganizer = false;
   String? userName = "";
   String? userEmail = "";
+  String? userImage = "";
   int? userId = 0;
 
   // Dynamic data
@@ -51,6 +53,7 @@ class _DashboardPageState extends State<DashboardPage> {
       final name = await _prefs.getUserName();
       final email = await _prefs.getUserEmail();
       final id = await _prefs.getUserId();
+      final image = await _prefs.getUserImage();
 
       if (mounted) {
         setState(() {
@@ -58,6 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
           userId = id;
           userName = name;
           userEmail = email;
+          userImage = image;
         });
       }
 
@@ -425,11 +429,14 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: Row(
         children: [
-          Image.asset(
-            'assets/img/other/avatar.png',
-            fit: BoxFit.cover,
-            width: 50,
-            height: 50,
+          Image.network(
+            '${headUrl}lib/img/User/$userImage',
+            errorBuilder: (context, error, stackTrace) => Image.asset(
+              'assets/img/other/avatar.png',
+              fit: BoxFit.cover,
+              width: 50,
+              height: 50,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(

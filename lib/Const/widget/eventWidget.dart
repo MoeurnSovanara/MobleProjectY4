@@ -32,9 +32,16 @@ class _EventWidgetState extends State<EventWidget> {
   PreloadImageHelper? _preloadImageHelper;
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
 
+  // Flag to track initialization status
+  bool _isInitialized = false;
+
+  // Cancellation token for async operations
+  bool _isDisposed = false;
+
   @override
   void initState() {
     super.initState();
+    _isDisposed = false;
     _initializeData();
   }
 
@@ -42,16 +49,30 @@ class _EventWidgetState extends State<EventWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Update mounted state in helper when dependencies change
-    if (_preloadImageHelper != null) {
+    if (_preloadImageHelper != null && mounted) {
       _preloadImageHelper!.mounted = mounted;
     }
   }
 
   Future<void> _initializeData() async {
-    await firstLaunch();
+    if (!mounted) return;
+
+    try {
+      await _firstLaunch();
+
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+      }
+    } catch (e) {
+      print('Error initializing EventWidget: $e');
+    }
   }
 
-  Future<void> firstLaunch() async {
+  Future<void> _firstLaunch() async {
+    if (_isDisposed) return;
+
     var storedUserId = await usersharedpreferences.getUserId();
 
     if (storedUserId != null) {
@@ -85,9 +106,13 @@ class _EventWidgetState extends State<EventWidget> {
         dislikeCount: totalDislikes,
         userId: userId,
         eventId: widget.data.id,
-        onUpdate: (updatedEvent) => setState(() {
-          widget.onEventUpdated(updatedEvent);
-        }),
+        onUpdate: (updatedEvent) {
+          if (mounted && !_isDisposed) {
+            setState(() {
+              widget.onEventUpdated(updatedEvent);
+            });
+          }
+        },
       );
 
       // Initialize image preloader
@@ -95,11 +120,17 @@ class _EventWidgetState extends State<EventWidget> {
         imageError: false,
         imageName: widget.data.image,
         mounted: mounted,
-        onUpdate: () => setState(() {}),
+        onUpdate: () {
+          if (mounted && !_isDisposed) {
+            setState(() {});
+          }
+        },
       );
 
       // Preload the image
-      _preloadImageHelper!.preloadImage(headUrl);
+      if (!_isDisposed) {
+        _preloadImageHelper!.preloadImage(headUrl);
+      }
     } else {
       // If no user logged in, just show the counts from engagements
       int totalLikes = 0;
@@ -114,9 +145,13 @@ class _EventWidgetState extends State<EventWidget> {
       _interactionHelper = InteractionHelper(
         likeCount: totalLikes,
         dislikeCount: totalDislikes,
-        onUpdate: (updatedEvent) => setState(() {
-          widget.onEventUpdated(updatedEvent);
-        }),
+        onUpdate: (updatedEvent) {
+          if (mounted && !_isDisposed) {
+            setState(() {
+              widget.onEventUpdated(updatedEvent);
+            });
+          }
+        },
       );
 
       // Initialize image preloader even for non-logged users
@@ -124,16 +159,24 @@ class _EventWidgetState extends State<EventWidget> {
         imageError: false,
         imageName: widget.data.image,
         mounted: mounted,
-        onUpdate: () => setState(() {}),
+        onUpdate: () {
+          if (mounted && !_isDisposed) {
+            setState(() {});
+          }
+        },
       );
 
       // Preload the image
-      _preloadImageHelper!.preloadImage(headUrl);
+      if (!_isDisposed) {
+        _preloadImageHelper!.preloadImage(headUrl);
+      }
     }
   }
 
   // Share action
   void _handleShare() async {
+    if (!mounted) return;
+
     final String shareText =
         'Check out this event: ${widget.data.title}\n'
         'Date: ${helperclass.formatDate(widget.data.eventStart)}\n'
@@ -144,6 +187,8 @@ class _EventWidgetState extends State<EventWidget> {
   }
 
   void _showShareDialog(String text) {
+    if (!mounted) return;
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -215,6 +260,8 @@ class _EventWidgetState extends State<EventWidget> {
   }
 
   void _copyToClipboard(String text) {
+    if (!mounted) return;
+
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -228,6 +275,8 @@ class _EventWidgetState extends State<EventWidget> {
   }
 
   void _showNativeShare(String text) {
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -241,18 +290,40 @@ class _EventWidgetState extends State<EventWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure helpers are initialized
-    if (_interactionHelper == null || _preloadImageHelper == null) {
-      return const SizedBox.shrink();
+    // Show loading or error state if not initialized
+    if (!_isInitialized ||
+        _interactionHelper == null ||
+        _preloadImageHelper == null) {
+      return Container(
+        width: 220,
+        height: 500,
+        margin: const EdgeInsets.only(left: 15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      );
     }
 
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EventdetailedPage(eventdto: widget.data),
-        ),
-      ),
+      onTap: () {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EventdetailedPage(eventdto: widget.data),
+            ),
+          );
+        }
+      },
       child: Container(
         width: 220,
         height: 500,
@@ -328,7 +399,11 @@ class _EventWidgetState extends State<EventWidget> {
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: _interactionHelper!.handleBookMark,
+                    onTap: () {
+                      if (mounted && _interactionHelper != null) {
+                        _interactionHelper!.handleBookMark();
+                      }
+                    },
                     child: Container(
                       width: 30,
                       height: 35,
@@ -371,7 +446,11 @@ class _EventWidgetState extends State<EventWidget> {
                     children: [
                       // Like button
                       GestureDetector(
-                        onTap: _interactionHelper!.handleLike,
+                        onTap: () {
+                          if (mounted && _interactionHelper != null) {
+                            _interactionHelper!.handleLike();
+                          }
+                        },
                         child: Row(
                           children: [
                             Icon(
@@ -406,7 +485,11 @@ class _EventWidgetState extends State<EventWidget> {
 
                       // Dislike button
                       GestureDetector(
-                        onTap: _interactionHelper!.handleDislike,
+                        onTap: () {
+                          if (mounted && _interactionHelper != null) {
+                            _interactionHelper!.handleDislike();
+                          }
+                        },
                         child: Row(
                           children: [
                             Icon(
@@ -484,7 +567,13 @@ class _EventWidgetState extends State<EventWidget> {
 
   @override
   void dispose() {
-    // Clean up if needed
+    // Set disposed flag to prevent any further state updates
+    _isDisposed = true;
+
+    // Clean up helpers
+    _interactionHelper = null;
+    _preloadImageHelper = null;
+
     super.dispose();
   }
 }

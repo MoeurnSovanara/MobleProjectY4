@@ -57,7 +57,7 @@ class Userdto {
           : DateTime.now(), // Provide a default value
       organizer: json['isOrganizer'] ?? false,
       verified: json['isVerified'] ?? false,
-      profilePicture: json['profilePicture'] ?? "",
+      profilePicture: json['profilePicture'],
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(), // Provide a default value

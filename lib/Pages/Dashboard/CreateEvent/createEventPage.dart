@@ -12,11 +12,13 @@ import 'package:mobile_assignment/Models/DTO/CategoryDto.dart';
 import 'package:mobile_assignment/Models/DTO/CreateEventDto.dart';
 import 'package:mobile_assignment/Models/DTO/PaymentDto.dart';
 import 'package:mobile_assignment/Models/DTO/TicketTypeDto.dart';
+import 'package:mobile_assignment/Models/DTO/UserDto.dart';
 import 'package:mobile_assignment/Models/DTO/VenuesNameDto.dart';
 import 'package:mobile_assignment/services/API/CategoryApi.dart';
 import 'package:mobile_assignment/services/API/EventApi.dart';
 import 'package:mobile_assignment/services/API/PaymentApi.dart';
 import 'package:mobile_assignment/services/API/TicketTypApi.dart';
+import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/services/API/VenuesApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 import 'package:uuid/uuid.dart';
@@ -66,25 +68,16 @@ class _CreateeventpageState extends State<Createeventpage> {
       TextEditingController();
   final TextEditingController _paypalCurrencyCodeController =
       TextEditingController();
-  final TextEditingController _bankAccountNameController =
-      TextEditingController();
-  final TextEditingController _bankAccountNumberController =
-      TextEditingController();
   Paymentapi paymentapi = Paymentapi();
   Eventapi eventapi = Eventapi();
   Venuesapi venuesapi = Venuesapi();
   TickettypeApi tickettypeApi = TickettypeApi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  Userapi userapi = Userapi();
   var uuid = Uuid();
-
-  // Zone list
-  final List<Map<String, dynamic>> _zones = [];
 
   // Tickets list
   final List<TicketTypeDto> _tickets = [];
-
-  // Payment method
-  String _paymentMethod = 'paypal'; // Default payment method
 
   Future<void> firstTask() async {
     var categoryData = await categoryapi.getAllCategoryName();
@@ -313,6 +306,32 @@ class _CreateeventpageState extends State<Createeventpage> {
           currencyCode: _paypalCurrencyCodeController.text,
         ),
       );
+
+      var isOrgainizer = await usersharedpreferences.getUserOrganizer();
+      if (isOrgainizer == false) {
+        var userEmail = await usersharedpreferences.getUserEmail();
+
+        var existUserData = await userapi.getUserByEmail(email: userEmail!);
+        if (existUserData != null) {
+          var newUserdata = new Userdto(
+            id: existUserData.id,
+            fullname: existUserData.fullname,
+            email: existUserData.email,
+            gender: existUserData.gender,
+            password: existUserData.password,
+            phoneNumber: existUserData.phoneNumber,
+            dateOfBirth: existUserData.dateOfBirth,
+            organizer: !existUserData.organizer,
+            verified: existUserData.verified,
+            createdAt: existUserData.createdAt,
+            google: existUserData.google,
+          );
+          var updateUser = await userapi.updateUser(user: newUserdata);
+          if (updateUser != null) {
+            await usersharedpreferences.saveUserOrganizer(updateUser.organizer);
+          }
+        }
+      }
 
       Navigator.pop(context); // Close loading dialog
 

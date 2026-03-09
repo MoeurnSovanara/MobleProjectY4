@@ -162,6 +162,9 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
               await usersharedpreferences.saveUserOrganizer(userData.organizer);
               await usersharedpreferences.saveUserName(userData.fullname);
               await usersharedpreferences.saveUserId(userData.id);
+              await usersharedpreferences.saveUserImage(
+                userData.profilePicture!,
+              );
             }
             if (!mounted) return;
             Navigator.pushReplacement(

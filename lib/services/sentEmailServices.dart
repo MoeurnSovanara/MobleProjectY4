@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_assignment/Const/Global/global.dart';
 
 class Sentemailservices {
-  final String baseUrl = "${headUrl}SentEmail/";
+  final String baseUrl = "${headUrl}api/SentEmail/";
 
   Future<http.Response> sendEmail({
     required String email,

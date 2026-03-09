@@ -8,7 +8,7 @@ class Categoryapi {
   final baseUrl = "${headUrl}api/category";
 
   Future<List<Categorydto>?> getAllCategory() async {
-    final uri = Uri.parse(baseUrl);
+    final uri = Uri.parse("$baseUrl/all");
     List<Categorydto>? data = [];
     try {
       final response = await http.get(

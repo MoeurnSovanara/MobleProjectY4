@@ -65,15 +65,13 @@ class _TicketPageState extends State<TicketPage> {
       final tickets = await _ticketApi.GetAllTicket();
 
       if (mounted) {
+        List<Ticketdto> allT = [];
+        if (tickets != null) {
+          allT = tickets.where((e) => e.userId == _userId).toList();
+        }
         setState(() {
-          _allTickets =
-              tickets
-                  ?.map(
-                    (json) => Ticketdto.fromJson(json as Map<String, dynamic>),
-                  )
-                  .toList() ??
-              [];
-          _filteredTickets = _allTickets;
+          _allTickets = allT; // Use directly, no need to map
+          _filteredTickets = allT;
           _errorMessage = _allTickets.isEmpty ? 'No tickets found' : null;
           _isLoading = false;
         });

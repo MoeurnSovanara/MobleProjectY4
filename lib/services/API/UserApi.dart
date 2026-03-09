@@ -125,7 +125,7 @@ class Userapi {
       final response = await http.get(
         url,
         headers: <String, String>{
-          'Content-Type': 'applicatoin/json;charset=UTF-8',
+          'Content-Type': 'application/json;charset=UTF-8',
         },
       );
       if (response.statusCode >= 200 && response.statusCode <= 299) {

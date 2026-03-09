@@ -4,6 +4,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/UserDto.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
 import 'package:mobile_assignment/services/API/UserApi.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class CreateprofilePage extends StatefulWidget {
   final String email;
@@ -22,6 +23,7 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
   DateTime? _selectedDate;
   String? _selectedGender;
   Userapi userapi = Userapi();
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
 
   void CreateProfile() async {
     if (_formKey.currentState!.validate()) {
@@ -40,6 +42,12 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
       );
       var createdUser = await userapi.createUser(user: newUser);
       if (createdUser.statusCode >= 200 && createdUser.statusCode < 300) {
+        var getUser = await userapi.getUserByEmail(email: widget.email);
+        await usersharedpreferences.saveUserEmail(getUser!.email);
+        await usersharedpreferences.saveUserId(getUser.id);
+        await usersharedpreferences.saveUserImage(getUser.profilePicture!);
+        await usersharedpreferences.saveUserOrganizer(getUser.organizer);
+        await usersharedpreferences.saveUserName(getUser.fullname);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Changepage()),

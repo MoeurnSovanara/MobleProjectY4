@@ -53,6 +53,7 @@ class _NewpassPageState extends State<NewpassPage> {
         password: _newPasswordController.text.trim(),
         phoneNumber: existingUser.phoneNumber, // Fixed: was using password
         dateOfBirth: existingUser.dateOfBirth,
+        profilePicture: existingUser.profilePicture,
         organizer: existingUser.organizer,
         verified: existingUser.verified,
         createdAt: existingUser.createdAt,

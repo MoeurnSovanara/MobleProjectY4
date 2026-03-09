@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/TicketDto.dart';
 import 'package:intl/intl.dart';
@@ -24,8 +25,7 @@ class CardWidget extends StatefulWidget {
 
 class _CardWidgetState extends State<CardWidget> {
   late PreloadImageHelper _imageHelper;
-  final String baseUrl =
-      "YOUR_BASE_URL_HERE"; // Replace with your actual base URL
+  final String baseUrl = headUrl; // Replace with your actual base URL
 
   @override
   void initState() {
@@ -245,7 +245,7 @@ class _CardWidgetState extends State<CardWidget> {
   Widget _buildEventImage() {
     if (_imageHelper.hasValidImage) {
       return Image.network(
-        "$baseUrl/img/${_imageHelper.imageName}",
+        "$baseUrl/lib/img/Event/${_imageHelper.imageName}",
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           return _buildPlaceholderImage();

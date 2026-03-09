@@ -17,7 +17,7 @@ class _BookticketPageState extends State<BookticketPage> {
   bool isloading = false;
   int totalTicket = 0;
   int remainingTicket = 0;
-  final List<bool> data = [false, true, true, true];
+  late List<bool> ticketStatus;
   void firstJob() {
     int tTicket = 0;
     int rTicket = 0;
@@ -29,6 +29,10 @@ class _BookticketPageState extends State<BookticketPage> {
       tTicket += round.totalTickets;
       rTicket += round.quantityAvailable;
     }
+    ticketStatus = List.generate(
+      widget.eventdto.ticketTypes.length,
+      (index) => widget.eventdto.ticketTypes[index].quantityAvailable > 0,
+    );
     setState(() {
       totalTicket = tTicket;
       remainingTicket = rTicket;
@@ -135,13 +139,13 @@ class _BookticketPageState extends State<BookticketPage> {
                     ),
                     SizedBox(height: 10),
                     SizedBox(
-                      height: data.length * 90,
+                      height: ticketStatus.length * 90,
                       child: ListView.builder(
                         itemCount: widget.eventdto.ticketTypes.length,
                         itemBuilder: (BuildContext context, int index) {
                           return TicketInfo_widget(
                             image: 'assets/img/other/ticket.png',
-                            status: data[index],
+                            status: ticketStatus[index],
                             ticketTypeDto: widget.eventdto.ticketTypes[index],
                           );
                         },

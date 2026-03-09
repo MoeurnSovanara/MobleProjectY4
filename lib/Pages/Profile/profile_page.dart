@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/Global/global.dart';
@@ -40,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadUserData();
+    print("${headUrl}lib/img/user/$userImage");
   }
 
   // Add this method to load user data
@@ -326,6 +326,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             borderRadius: BorderRadius.circular(40),
                             child: Image.network(
                               '${headUrl}lib/img/user/$userImage',
+
                               fit: BoxFit.cover,
                               height: 95,
                               width: 95,

@@ -16,6 +16,7 @@ class _MyeventsState extends State<Myevents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: null,
         title: Image.asset('assets/img/other/logo2.png'),
         centerTitle: true,
         backgroundColor: AdvertiseColor.primaryColor,
