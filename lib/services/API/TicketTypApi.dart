@@ -44,4 +44,25 @@ class TickettypeApi {
 
     return createdTicketTypes;
   }
+
+  Future<http.Response> updateTicketType({
+    required int ticketTypeId,
+    required int quantity,
+  }) async {
+    final url = Uri.parse(
+      '$baseUrl?ticketTypeId=$TickettypeApi&quantity=$quantity',
+    );
+    late http.Response response;
+    try {
+      response = await http.put(
+        url,
+        headers: <String, String>{
+          'content-type': 'application/json;charset=UTF-8',
+        },
+      );
+    } catch (e) {
+      return response;
+    }
+    return response;
+  }
 }

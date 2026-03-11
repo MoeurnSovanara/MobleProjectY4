@@ -210,17 +210,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ticketTypeId: ticketTypeId,
         uniqueTicketCode: uniqueKey,
         quantity: _quantity,
+        price: _ticketPrice,
         status:
             'active', // or 'pending', 'active', etc. based on your status enum
       );
 
       // Create the ticket using the API
       var response = await ticketapi.CreateAllTicket(createTicket: newTicket);
-
+      var response2 = await tickettypeApi.updateTicketType(
+        ticketTypeId: ticketTypeId,
+        quantity: _quantity,
+      );
       // Close loading dialog
       if (mounted) Navigator.pop(context);
 
-      if (response.statusCode >= 200 && response.statusCode <= 299) {
+      if (response.statusCode >= 200 &&
+          response.statusCode <= 299 &&
+          response2.statusCode >= 200 &&
+          response2.statusCode <= 299) {
         // Payment successful - move to success step
         setState(() {
           _currentStep = 3;

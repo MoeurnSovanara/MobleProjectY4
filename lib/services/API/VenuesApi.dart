@@ -27,4 +27,21 @@ class Venuesapi {
     }
     return data;
   }
+
+  Future<http.Response> updateVeneus({required Venuesnamedto venue}) async {
+    final url = Uri.parse(baseUrl);
+    late http.Response response;
+    try {
+      response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        body: json.encode(venue.toJson()),
+      );
+    } catch (e) {
+      return response;
+    }
+    return response;
+  }
 }

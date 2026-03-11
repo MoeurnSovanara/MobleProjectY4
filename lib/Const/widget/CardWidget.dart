@@ -138,7 +138,7 @@ class _CardWidgetState extends State<CardWidget> {
                   // Event title
                   Text(
                     eventTitle,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppComponent.labelStyle.copyWith(
                       fontSize: screenWidth <= 393 ? 14 : 16,
@@ -146,26 +146,37 @@ class _CardWidgetState extends State<CardWidget> {
                   ),
 
                   // Ticket type badge
-                  Container(
-                    margin: const EdgeInsets.only(top: 2, bottom: 2),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getTicketTypeColor(
-                        ticketTypeName,
-                      ).withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      ticketTypeName,
-                      style: AppComponent.detailTextStyle.copyWith(
-                        fontSize: 10,
-                        color: _getTicketTypeColor(ticketTypeName),
-                        fontWeight: FontWeight.bold,
+                  Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 2, bottom: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getTicketTypeColor(
+                            ticketTypeName,
+                          ).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          ticketTypeName,
+                          style: AppComponent.detailTextStyle.copyWith(
+                            fontSize: 10,
+                            color: _getTicketTypeColor(ticketTypeName),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
+                      Spacer(),
+                      Text(
+                        "X ${widget.tickets.quantity}",
+                        style: AppComponent.boldTextStyle.copyWith(
+                          color: AdvertiseColor.blueColor,
+                        ),
+                      ),
+                    ],
                   ),
 
                   // Date and time
@@ -185,17 +196,6 @@ class _CardWidgetState extends State<CardWidget> {
                   // Location
                   Text(
                     eventLocation,
-                    style: AppComponent.detailTextStyle.copyWith(
-                      fontSize: screenWidth <= 393 ? 12 : 14,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  SizedBox(height: 5),
-
-                  Text(
-                    "${widget.tickets.quantity} tickets",
                     style: AppComponent.detailTextStyle.copyWith(
                       fontSize: screenWidth <= 393 ? 12 : 14,
                     ),

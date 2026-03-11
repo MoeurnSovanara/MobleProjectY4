@@ -79,4 +79,21 @@ class Eventapi {
     }
     return data;
   }
+
+  Future<http.Response> updateEvent({required Createeventdto event}) async {
+    final url = Uri.parse(baseUrl);
+    late http.Response response;
+    try {
+      response = await http.put(
+        url,
+        headers: <String, String>{
+          'content-type': 'application/json;charset=UTF-8;',
+        },
+        body: json.encode(event.toJson()),
+      );
+    } catch (e) {
+      return response;
+    }
+    return response;
+  }
 }

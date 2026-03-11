@@ -573,11 +573,15 @@ class _DashboardPageState extends State<DashboardPage> {
                         color: item['color'],
                       ),
                     ),
-                    Text(
-                      item['label'],
-                      style: TextStyle(
-                        fontFamily: 'KantumruyPro',
-                        color: item['color'],
+                    Flexible(
+                      child: Text(
+                        item['label'],
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontFamily: 'KantumruyPro',
+                          color: item['color'],
+                        ),
                       ),
                     ),
                   ],

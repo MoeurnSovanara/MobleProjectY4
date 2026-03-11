@@ -5,6 +5,7 @@ class Createticketdto {
   final int ticketTypeId;
   final String uniqueTicketCode;
   final int quantity;
+  final double price;
   final String status;
 
   Createticketdto({
@@ -14,6 +15,7 @@ class Createticketdto {
     required this.ticketTypeId,
     required this.uniqueTicketCode,
     required this.quantity,
+    required this.price,
     required this.status,
   });
 
@@ -25,6 +27,7 @@ class Createticketdto {
       'ticketTypeId': ticketTypeId,
       'uniqueTicketCode': uniqueTicketCode,
       'quantity': quantity,
+      'price': price,
       'status': status,
     };
   }
@@ -37,6 +40,7 @@ class Createticketdto {
       ticketTypeId: json['ticketTypeId'] ?? 0,
       uniqueTicketCode: json['uniqueTicketCode'] ?? "",
       quantity: json['quantity'] ?? 0,
+      price: json['price'] ?? 0,
       status: json['status'] ?? "",
     );
   }

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
-import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/createEventPage.dart';
-import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
+import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/editEventPage.dart';
 
 class Editeventwidget extends StatefulWidget {
   final Eventdto eventData;
-  Editeventwidget({super.key, required this.eventData});
+  const Editeventwidget({super.key, required this.eventData});
 
   @override
   State<Editeventwidget> createState() => _EditeventwidgetState();
@@ -139,7 +138,8 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Createeventpage(),
+                            builder: (context) =>
+                                Editeventpage(eventData: widget.eventData),
                           ),
                         );
                       },

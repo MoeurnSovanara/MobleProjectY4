@@ -17,6 +17,7 @@ class _UsedticketPageState extends State<UsedticketPage> {
   Ticketapi ticketapi = Ticketapi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
   List<Ticketdto> usedTicket = [];
+  bool _loading = false;
   @override
   void initState() {
     super.initState();
@@ -24,14 +25,23 @@ class _UsedticketPageState extends State<UsedticketPage> {
   }
 
   void firstTask() async {
+    setState(() {
+      _loading = true;
+    });
     var allTicket = await ticketapi.GetAllTicket();
     var uId = await usersharedpreferences.getUserId();
-    if (!mounted) return;
+    if (!mounted) {
+      setState(() {
+        _loading = false;
+        return;
+      });
+    }
     if (allTicket != null && uId != null) {
       var filterUsedTicket = allTicket
           .where((e) => e.userId == uId && e.status == "used")
           .toList();
       setState(() {
+        _loading = false;
         usedTicket = filterUsedTicket;
       });
     }
@@ -49,7 +59,9 @@ class _UsedticketPageState extends State<UsedticketPage> {
         ),
         centerTitle: true,
       ),
-      body: usedTicket.isEmpty
+      body: _loading
+          ? Center(child: CircularProgressIndicator())
+          : usedTicket.isEmpty
           ? Container(
               padding: EdgeInsets.all(10),
               child: Center(
