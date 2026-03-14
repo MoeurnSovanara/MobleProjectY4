@@ -3,8 +3,6 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/NotGetUserEventEngagementDto.dart';
-import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
-import 'package:mobile_assignment/services/API/userevent_engagement_api.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
 import 'package:mobile_assignment/services/Helper/TimeHelperClass.dart';
@@ -155,7 +153,7 @@ class _BookmarkcardwidgetState extends State<Bookmarkcardwidget> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                '${headUrl}img/${widget.data.events.image}',
+                '${headUrl}lib/img/Event/${widget.data.events.image}',
                 height: 140,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Image.asset(
@@ -188,7 +186,7 @@ class _BookmarkcardwidgetState extends State<Bookmarkcardwidget> {
                       SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          widget.data.events.venues.venueLocation,
+                          widget.data.events.venues.venueInfo,
                           style: AppComponent.detailTextStyle,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
