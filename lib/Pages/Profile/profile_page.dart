@@ -5,6 +5,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/UserDto.dart';
 import 'package:mobile_assignment/Pages/Profile/other/bookmark_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/editProfile_page.dart';
+import 'package:mobile_assignment/Pages/Profile/other/myTicket_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/newdevice_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/password_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/usedTicket_page.dart';
@@ -25,12 +26,10 @@ class _ProfilePageState extends State<ProfilePage> {
   // Initialize variables
   bool? isOrganizer = false;
   bool _isLoading = true;
-  String userName = "Yang Jungwon";
-  String userEmail = "jungwon@gmail.com";
-  String userPhone = "+855 123 456 789";
+  String userName = "N/A";
+  String userEmail = "N/A";
+  String userPhone = "N/A";
   String userImage = "";
-  String userLocation = "Cambodia, Phnom Penh";
-  String userJoinedDate = "18-June-2023";
 
   Userapi userapi = Userapi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
@@ -56,8 +55,9 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           isOrganizer = organizerResult ?? false;
           userEmail = email;
-          userName = name ?? "Yang Jungwon";
-          userImage = userData!.profilePicture ?? "";
+          userName = name ?? "N/A";
+          userPhone = userData!.phoneNumber.toString();
+          userImage = userData.profilePicture ?? "";
           _isLoading = false;
         });
       }
@@ -310,7 +310,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 width: double.infinity,
-                height: isOrganizer == true ? 310 : 130,
+                height: isOrganizer == true ? 200 : 130,
                 child: Column(
                   children: [
                     Row(
@@ -384,56 +384,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                   Text(
                                     userPhone,
-                                    style: AppComponent.sublabelStyle.copyWith(
-                                      color: AdvertiseColor.textColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              const Icon(Icons.pin_drop_outlined, size: 26),
-                              const SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Location",
-                                    style: AppComponent.sublabelStyle.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AdvertiseColor.textColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    userLocation,
-                                    style: AppComponent.sublabelStyle.copyWith(
-                                      color: AdvertiseColor.textColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              const Icon(Icons.calendar_month, size: 26),
-                              const SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Joined",
-                                    style: AppComponent.sublabelStyle.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AdvertiseColor.textColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    userJoinedDate,
                                     style: AppComponent.sublabelStyle.copyWith(
                                       color: AdvertiseColor.textColor,
                                     ),
@@ -606,10 +556,44 @@ class _ProfilePageState extends State<ProfilePage> {
 
               // Used Ticket
               const SizedBox(height: 10),
+              if (isOrganizer = false)
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UsedticketPage()),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AdvertiseColor.textColor.withOpacity(0.5),
+                      ),
+                    ),
+                    height: 70,
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.file_copy_outlined,
+                          color: AdvertiseColor.primaryColor,
+                        ),
+                        const SizedBox(width: 5),
+                        Text('Used Ticket', style: AppComponent.labelTextStyle),
+                        const Spacer(),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: AdvertiseColor.textColor.withOpacity(0.5),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UsedticketPage()),
+                  MaterialPageRoute(builder: (context) => MyticketPage()),
                 ),
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -629,7 +613,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: AdvertiseColor.primaryColor,
                       ),
                       const SizedBox(width: 5),
-                      Text('Used Ticket', style: AppComponent.labelTextStyle),
+                      Text('My Ticket', style: AppComponent.labelTextStyle),
                       const Spacer(),
                       Icon(
                         Icons.arrow_forward_ios,

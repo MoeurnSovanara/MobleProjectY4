@@ -52,17 +52,19 @@ class TickettypeApi {
     final url = Uri.parse(
       '$baseUrl?ticketTypeId=$TickettypeApi&quantity=$quantity',
     );
-    late http.Response response;
     try {
-      response = await http.put(
+      final response = await http.put(
         url,
         headers: <String, String>{
           'content-type': 'application/json;charset=UTF-8',
         },
       );
-    } catch (e) {
       return response;
+    } catch (e) {
+      // Log the error or handle it appropriately
+      print('Error updating ticketType: $e');
+      // Rethrow the exception to let the caller handle it
+      rethrow;
     }
-    return response;
   }
 }

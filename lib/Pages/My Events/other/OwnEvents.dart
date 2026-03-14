@@ -72,7 +72,7 @@ class _OwneventsState extends State<Ownevents> {
               child: ListView.builder(
                 itemCount: event.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Editeventwidget(eventData: event[index]);
+                  return Editeventwidget(eventData: event[index],update: _loadUserEvent,);
                 },
               ),
             ),

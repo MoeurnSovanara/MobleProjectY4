@@ -3,22 +3,73 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/editEventPage.dart';
+import 'package:mobile_assignment/services/Helper/HelperClass.dart';
+import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
+import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class Editeventwidget extends StatefulWidget {
   final Eventdto eventData;
-  const Editeventwidget({super.key, required this.eventData});
+  final VoidCallback? update;
+  const Editeventwidget({super.key, required this.eventData, this.update});
 
   @override
   State<Editeventwidget> createState() => _EditeventwidgetState();
 }
 
 class _EditeventwidgetState extends State<Editeventwidget> {
+  InteractionHelper? _interactionHelper;
+  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
+  Helperclass helperclass = Helperclass();
+
   @override
   void initState() {
     super.initState();
+    interactionData();
   }
 
-  Future<void> initializeData() async {}
+  Future<void> interactionData() async {
+    var userId = await usersharedpreferences.getUserId();
+    if (userId != null) {
+      int totalLikes = 0;
+      int totalDislikes = 0;
+      int totalBookmarks = 0; // Add this if you need bookmark count
+      bool currentUserLiked = false;
+      bool currentUserDisliked = false;
+      bool currentUserBookMarked = false;
+
+      for (var item in widget.eventData.eventEngagement) {
+        if (item.isLiked == true) totalLikes++;
+        if (item.isDisliked == true) totalDislikes++;
+        if (item.isBookMarked == true) totalBookmarks++; // Add this if needed
+
+        if (item.userId == userId) {
+          currentUserLiked = item.isLiked == true;
+          currentUserDisliked = item.isDisliked == true;
+          currentUserBookMarked = item.isBookMarked == true;
+        }
+      }
+
+      // Create helper once after the loop
+      _interactionHelper = InteractionHelper(
+        isLiked: currentUserLiked,
+        isDisliked: currentUserDisliked,
+        isBookMarked: currentUserBookMarked,
+        likeCount: totalLikes,
+        dislikeCount: totalDislikes,
+        bookmarkedCount: totalBookmarks,
+        userId: userId,
+        eventId: widget.eventData.id,
+        onUpdate: (updatedEvent) {
+          // Handle update if needed
+          setState(() {
+            // Update counts or refresh data
+          });
+        },
+      );
+
+      setState(() {}); // Trigger rebuild with the new helper
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,29 +109,15 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                     color: AdvertiseColor.backgroundColor.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '12',
-                        style: TextStyle(
-                          fontFamily: 'KantumruyPro',
-                          color: AdvertiseColor.textColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 25,
-                        ),
-                      ),
-                      Text(
-                        'DEC',
-                        style: TextStyle(
-                          fontFamily: 'KantumruyPro',
-                          color: AdvertiseColor.primaryColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    Helperclass.formatFullDate(widget.eventData.eventStart),
+                    style: TextStyle(
+                      fontFamily: 'KantumruyPro',
+                      color: AdvertiseColor.textColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 25,
+                    ),
                   ),
                 ),
                 Spacer(),
@@ -117,31 +154,41 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                       color: AdvertiseColor.primaryColor,
                     ),
                     SizedBox(width: 5),
-                    Text('809 k'),
+                    Text(
+                      _interactionHelper?.likeCount.toString() ?? '0',
+                    ), // Safe null check
                     SizedBox(width: 5),
                     Icon(
                       Icons.thumb_down_outlined,
                       color: AdvertiseColor.textColor.withOpacity(0.5),
                     ),
                     SizedBox(width: 5),
-                    Text('0'),
+                    Text(
+                      _interactionHelper?.dislikeCount.toString() ?? '0',
+                    ), // Safe null check
                     SizedBox(width: 5),
                     Icon(
                       Icons.bookmark_outline,
                       color: AdvertiseColor.textColor.withOpacity(0.5),
                     ),
                     SizedBox(width: 5),
-                    Text('0'),
+                    Text(
+                      _interactionHelper?.bookmarkedCount.toString() ?? '0',
+                    ), // Safe null check
+                    Spacer(),
                     Spacer(),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        bool? result = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
                                 Editeventpage(eventData: widget.eventData),
                           ),
                         );
+                        if (result == true) {
+                          widget.update!();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AdvertiseColor.primaryColor,

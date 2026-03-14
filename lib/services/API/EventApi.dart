@@ -82,18 +82,21 @@ class Eventapi {
 
   Future<http.Response> updateEvent({required Createeventdto event}) async {
     final url = Uri.parse(baseUrl);
-    late http.Response response;
+
     try {
-      response = await http.put(
+      final response = await http.put(
         url,
         headers: <String, String>{
-          'content-type': 'application/json;charset=UTF-8;',
+          'Content-Type': 'Application/json;Charset=UTF-8',
         },
         body: json.encode(event.toJson()),
       );
-    } catch (e) {
       return response;
+    } catch (e) {
+      // Log the error or handle it appropriately
+      print('Error updating event: $e');
+      // Rethrow the exception to let the caller handle it
+      rethrow;
     }
-    return response;
   }
 }

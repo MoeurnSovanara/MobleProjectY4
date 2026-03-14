@@ -487,10 +487,10 @@ class _EditeventpageState extends State<Editeventpage> {
         capacityTicketd: _calculateTotalTickets(),
         eventStart: _combineDateTime(_startDate!, _startTime!),
         eventEnd: _combineDateTime(_endDate!, _endTime!),
-        startTime: _timeOfDayToDuration(_startTime)!,
-        endTime: _timeOfDayToDuration(_endTime)!,
         createdAt: widget.eventData?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
+        startTime: _timeOfDayToDuration(_startTime)!,
+        endTime: _timeOfDayToDuration(_endTime)!,
       ),
     );
 
