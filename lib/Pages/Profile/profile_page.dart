@@ -11,7 +11,6 @@ import 'package:mobile_assignment/Pages/Profile/other/password_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/usedTicket_page.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
 import 'package:mobile_assignment/services/API/UserApi.dart';
-import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -31,7 +30,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String userEmail = "N/A";
   String userPhone = "N/A";
   String userImage = "";
-  DateTime joinDate = DateTime(0);
 
   Userapi userapi = Userapi();
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
@@ -60,7 +58,6 @@ class _ProfilePageState extends State<ProfilePage> {
           userName = name ?? "N/A";
           userPhone = userData!.phoneNumber.toString();
           userImage = userData.profilePicture ?? "";
-          joinDate = userData.createdAt;
           _isLoading = false;
         });
       }
@@ -313,7 +310,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 width: double.infinity,
-                height: isOrganizer == true ? 260 : 130,
+                height: isOrganizer == true ? 200 : 130,
                 child: Column(
                   children: [
                     Row(
@@ -387,40 +384,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                   Text(
                                     userPhone,
-                                    style: AppComponent.sublabelStyle.copyWith(
-                                      color: AdvertiseColor.textColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    if (isOrganizer == true)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.calendar_month_outlined,
-                                size: 26,
-                              ),
-                              const SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Jointed",
-                                    style: AppComponent.sublabelStyle.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AdvertiseColor.textColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    Helperclass.formatFullDate(joinDate),
                                     style: AppComponent.sublabelStyle.copyWith(
                                       color: AdvertiseColor.textColor,
                                     ),
