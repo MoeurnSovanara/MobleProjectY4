@@ -45,7 +45,6 @@ class _CreateprofilePageState extends State<CreateprofilePage> {
         var getUser = await userapi.getUserByEmail(email: widget.email);
         await usersharedpreferences.saveUserEmail(getUser!.email);
         await usersharedpreferences.saveUserId(getUser.id);
-        await usersharedpreferences.saveUserImage(getUser.profilePicture!);
         await usersharedpreferences.saveUserOrganizer(getUser.organizer);
         await usersharedpreferences.saveUserName(getUser.fullname);
         Navigator.push(
