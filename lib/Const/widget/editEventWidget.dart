@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
+import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/editEventPage.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
+import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class Editeventwidget extends StatefulWidget {
@@ -20,6 +22,8 @@ class _EditeventwidgetState extends State<Editeventwidget> {
   InteractionHelper? _interactionHelper;
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
   Helperclass helperclass = Helperclass();
+  PreloadImageHelper? _preloadImageHelper;
+  bool _isDisposed = false; // Add this flag
 
   @override
   void initState() {
@@ -27,12 +31,22 @@ class _EditeventwidgetState extends State<Editeventwidget> {
     interactionData();
   }
 
+  @override
+  void dispose() {
+    _isDisposed = true; // Set flag when disposing
+    super.dispose();
+  }
+
   Future<void> interactionData() async {
     var userId = await usersharedpreferences.getUserId();
+
+    // Check if widget is still mounted before proceeding
+    if (!mounted || _isDisposed) return;
+
     if (userId != null) {
       int totalLikes = 0;
       int totalDislikes = 0;
-      int totalBookmarks = 0; // Add this if you need bookmark count
+      int totalBookmarks = 0;
       bool currentUserLiked = false;
       bool currentUserDisliked = false;
       bool currentUserBookMarked = false;
@@ -40,7 +54,7 @@ class _EditeventwidgetState extends State<Editeventwidget> {
       for (var item in widget.eventData.eventEngagement) {
         if (item.isLiked == true) totalLikes++;
         if (item.isDisliked == true) totalDislikes++;
-        if (item.isBookMarked == true) totalBookmarks++; // Add this if needed
+        if (item.isBookMarked == true) totalBookmarks++;
 
         if (item.userId == userId) {
           currentUserLiked = item.isLiked == true;
@@ -49,7 +63,23 @@ class _EditeventwidgetState extends State<Editeventwidget> {
         }
       }
 
-      // Create helper once after the loop
+      // Check mounted again before creating helper and calling setState
+      if (!mounted || _isDisposed) return;
+
+      _preloadImageHelper = PreloadImageHelper(
+        imageError: false,
+        imageName: widget.eventData.image,
+        onUpdate: () {
+          // Check mounted before calling setState in callback
+          if (mounted && !_isDisposed) {
+            setState(() {});
+          }
+        },
+        mounted: mounted,
+      );
+
+      _preloadImageHelper!.preloadImage(headUrl);
+
       _interactionHelper = InteractionHelper(
         isLiked: currentUserLiked,
         isDisliked: currentUserDisliked,
@@ -60,14 +90,28 @@ class _EditeventwidgetState extends State<Editeventwidget> {
         userId: userId,
         eventId: widget.eventData.id,
         onUpdate: (updatedEvent) {
-          // Handle update if needed
-          setState(() {
-            // Update counts or refresh data
-          });
+          // Check mounted before calling setState in callback
+          if (mounted && !_isDisposed) {
+            setState(() {
+              // Update counts or refresh data
+            });
+          }
         },
       );
 
-      setState(() {}); // Trigger rebuild with the new helper
+      // Final check before setState
+      if (mounted && !_isDisposed) {
+        setState(() {});
+      }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update mounted state in helper when dependencies change
+    if (_preloadImageHelper != null && mounted && !_isDisposed) {
+      _preloadImageHelper!.mounted = mounted;
     }
   }
 
@@ -76,7 +120,6 @@ class _EditeventwidgetState extends State<Editeventwidget> {
     return Container(
       width: 220,
       height: 320,
-
       padding: EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -94,7 +137,14 @@ class _EditeventwidgetState extends State<Editeventwidget> {
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/img/sample/upcoming2.png'),
+                image:
+                    _preloadImageHelper != null &&
+                        _preloadImageHelper!.hasValidImage
+                    ? NetworkImage(
+                        "${headUrl}lib/img/Event/${widget.eventData.image}",
+                      )
+                    : const AssetImage("assets/img/other/errorImage.png")
+                          as ImageProvider,
                 fit: BoxFit.fitWidth,
               ),
               borderRadius: BorderRadiusDirectional.circular(15),
@@ -154,27 +204,21 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                       color: AdvertiseColor.primaryColor,
                     ),
                     SizedBox(width: 5),
-                    Text(
-                      _interactionHelper?.likeCount.toString() ?? '0',
-                    ), // Safe null check
+                    Text(_interactionHelper?.likeCount.toString() ?? '0'),
                     SizedBox(width: 5),
                     Icon(
                       Icons.thumb_down_outlined,
                       color: AdvertiseColor.textColor.withOpacity(0.5),
                     ),
                     SizedBox(width: 5),
-                    Text(
-                      _interactionHelper?.dislikeCount.toString() ?? '0',
-                    ), // Safe null check
+                    Text(_interactionHelper?.dislikeCount.toString() ?? '0'),
                     SizedBox(width: 5),
                     Icon(
                       Icons.bookmark_outline,
                       color: AdvertiseColor.textColor.withOpacity(0.5),
                     ),
                     SizedBox(width: 5),
-                    Text(
-                      _interactionHelper?.bookmarkedCount.toString() ?? '0',
-                    ), // Safe null check
+                    Text(_interactionHelper?.bookmarkedCount.toString() ?? '0'),
                     Spacer(),
                     Spacer(),
                     ElevatedButton(
@@ -186,7 +230,8 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                                 Editeventpage(eventData: widget.eventData),
                           ),
                         );
-                        if (result == true) {
+                        // Check mounted before calling update
+                        if (result == true && mounted && !_isDisposed) {
                           widget.update!();
                         }
                       },

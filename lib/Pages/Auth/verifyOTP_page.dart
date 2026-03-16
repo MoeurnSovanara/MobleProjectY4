@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/Const/widget/carouselWidget.dart';
 import 'package:mobile_assignment/Pages/Auth/createprofile_page.dart';
+import 'package:mobile_assignment/Pages/Auth/login_page.dart';
 import 'package:mobile_assignment/Pages/Auth/newpass_page.dart';
+import 'package:mobile_assignment/Pages/Auth/signup_page.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
 import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/services/sentEmailServices.dart';
@@ -301,7 +304,25 @@ class _VerifyotpPageState extends State<VerifyotpPage> {
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AdvertiseColor.textColor),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            switch (widget.statusCase) {
+              case 'login':
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              case 'signup':
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignupPage()),
+                );
+              default:
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+            }
+          },
         ),
       ),
       backgroundColor: AdvertiseColor.backgroundColor,

@@ -81,7 +81,7 @@ class TicketInfo_widget extends StatelessWidget {
           Text(
             '\$ ${ticketTypeDto.price}',
             style: AppComponent.boldTextStyle.copyWith(
-              fontSize: screenWidth <= 375 ? 18 : 24,
+              fontSize: screenWidth <= 375 ? 12 : 18,
               color: AdvertiseColor.textColor.withOpacity(0.5),
             ),
           ),

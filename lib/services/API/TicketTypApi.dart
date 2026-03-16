@@ -50,7 +50,7 @@ class TickettypeApi {
     required int quantity,
   }) async {
     final url = Uri.parse(
-      '$baseUrl?ticketTypeId=$TickettypeApi&quantity=$quantity',
+      '$baseUrl/quantity?ticketTypeId=$TickettypeApi&quantity=$quantity',
     );
     try {
       final response = await http.put(

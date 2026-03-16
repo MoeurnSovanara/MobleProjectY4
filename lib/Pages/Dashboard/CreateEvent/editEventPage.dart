@@ -177,14 +177,27 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   void _pickDate({bool isStartDate = true}) async {
+    // Get the current date and the event date
+    final now = DateTime.now();
+    final eventDate = isStartDate ? _startDate : _endDate;
+
+    // Determine the initial date to show in the picker
+    DateTime initialDate;
+
+    if (eventDate != null) {
+      // If we have an event date, use it but ensure it's not before today
+      initialDate = eventDate.isBefore(now) ? now : eventDate;
+    } else {
+      initialDate = now;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: isStartDate
-          ? (_startDate ?? DateTime.now())
-          : (_endDate ?? DateTime.now()),
-      firstDate: DateTime.now(),
+      initialDate: initialDate,
+      firstDate: now, // Always use today as the first date
       lastDate: DateTime(2100),
     );
+
     if (picked != null) {
       setState(() {
         if (isStartDate) {
@@ -307,17 +320,21 @@ class _EditeventpageState extends State<Editeventpage> {
         return;
       }
 
-      String? uniqueImagename = _existingImageUrl;
+      String? uniqueImagename;
 
-      // Upload new image if selected
+      // Handle image upload/selection
       if (_pickedImage != null) {
+        // New image selected
         uniqueImagename = 'event_${uuid.v4()}.png';
         await eventapi.uploadEventImage(
           image: _pickedImage,
           imageName: uniqueImagename,
         );
+      } else if (_isEditMode && _existingImageUrl != null) {
+        // Edit mode with existing image (no new image selected)
+        uniqueImagename = _existingImageUrl;
       } else if (!_isEditMode && _pickedImage == null) {
-        // For create mode, image is required
+        // Create mode, image is required
         Navigator.pop(context);
         _showErrorDialog('Please select an event image');
         return;
@@ -325,7 +342,12 @@ class _EditeventpageState extends State<Editeventpage> {
 
       if (_isEditMode) {
         // UPDATE MODE
-        await _updateEvent(uId, uniqueImagename!);
+        if (uniqueImagename == null) {
+          Navigator.pop(context);
+          _showErrorDialog('Image is required');
+          return;
+        }
+        await _updateEvent(uId, uniqueImagename);
       } else {
         // CREATE MODE
         await _createEvent(uId, uniqueImagename!);
@@ -1093,7 +1115,7 @@ class _EditeventpageState extends State<Editeventpage> {
             dashPattern: [6, 3],
             child: Container(
               width: double.infinity,
-              height: 200,
+              height: 240,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
