@@ -7,6 +7,7 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/UserDto.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 import 'package:uuid/uuid.dart';
@@ -69,6 +70,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
   }
 
   void editUser() async {
+    final t = AppLocalizations.of(context)!;
     setState(() {
       isloading = true;
     });
@@ -106,7 +108,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
         _showDialog(
           icon: Icons.verified,
           iconColor: Colors.green,
-          message: 'Update Password Successfully!',
+          message: t.updatePasswordSuccess,
           isSuccess: true,
         );
       } else {
@@ -116,7 +118,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
         _showDialog(
           icon: Icons.close_rounded,
           iconColor: AdvertiseColor.dangerColor,
-          message: 'Failed to update!',
+          message: t.updateFailed,
         );
       }
     } else {
@@ -126,7 +128,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
       _showDialog(
         icon: Icons.close_rounded,
         iconColor: AdvertiseColor.dangerColor,
-        message: 'Failed to update!',
+        message: t.updateFailed,
       );
     }
   }
@@ -137,6 +139,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
     required String message,
     bool isSuccess = false,
   }) {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -159,12 +162,12 @@ class _EditprofilePageState extends State<EditprofilePage> {
                 Navigator.pop(context); // Close dialog
                 Navigator.pop(context); // Go back to previous page
               },
-              child: const Text('OK'),
+              child: Text(t.ok),
             )
           else
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+              child: Text(t.ok),
             ),
         ],
       ),
@@ -198,10 +201,11 @@ class _EditprofilePageState extends State<EditprofilePage> {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit Profile',
+          t.editProfile,
           style: AppComponent.appBarTitleTextStyle.copyWith(
             color: AdvertiseColor.textColor,
           ),
@@ -212,55 +216,52 @@ class _EditprofilePageState extends State<EditprofilePage> {
         future: _userFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error loading user data'));
+            return Center(child: Text(t.errorLoadingUserData));
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
-            return Center(child: Text('No user data found'));
+            return Center(child: Text(t.noUserDataFound));
           }
 
           return SingleChildScrollView(
             child: Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Center(
                     child: Stack(
                       alignment: Alignment.bottomRight,
                       children: [
                         _pickedImage != null
                             ? ClipRRect(
-                                borderRadius: BorderRadiusGeometry.circular(
-                                  100,
-                                ),
+                                borderRadius: BorderRadius.circular(100),
                                 child: Image.file(
                                   _pickedImage!,
-                                  fit: BoxFit.fitWidth,
+                                  fit: BoxFit.cover,
                                   height: 150,
                                   width: 150,
                                 ),
                               )
                             : ClipRRect(
-                                borderRadius: BorderRadiusGeometry.circular(
-                                  100,
-                                ),
+                                borderRadius: BorderRadius.circular(100),
                                 child: Image.network(
                                   '${headUrl}lib/img/user/${userData?.profilePicture}',
-                                  fit: BoxFit.fitWidth,
+                                  fit: BoxFit.cover,
                                   width: 150,
                                   height: 150,
                                   errorBuilder: (context, error, stackTrace) =>
                                       ClipRRect(
-                                        borderRadius:
-                                            BorderRadiusGeometry.circular(100),
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
                                         child: Image.asset(
                                           "assets/img/other/errorImage.png",
-                                          fit: BoxFit.fitWidth,
+                                          fit: BoxFit.cover,
                                           height: 150,
                                           width: 150,
                                         ),
@@ -293,9 +294,12 @@ class _EditprofilePageState extends State<EditprofilePage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 15,
+                    ),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -308,17 +312,20 @@ class _EditprofilePageState extends State<EditprofilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Fullname*', style: AppComponent.labelTextStyle),
+                          Text(
+                            t.fullnameLabel,
+                            style: AppComponent.labelTextStyle,
+                          ),
                           TextFormField(
                             controller: _fullnameController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please input your fullname';
+                                return t.validateFullname;
                               }
                               return null;
                             },
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           SizedBox(
                             height: 95,
                             child: Row(
@@ -329,7 +336,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Date of Brith',
+                                        t.dateOfBirthLabel,
                                         style: AppComponent.labelTextStyle,
                                       ),
                                       Container(
@@ -357,10 +364,13 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                               validator: (value) {
                                                 if (value == null ||
                                                     value.isEmpty) {
-                                                  return 'Please select start date';
+                                                  return t.validateDateOfBirth;
                                                 }
                                                 return null;
                                               },
+                                              decoration: const InputDecoration(
+                                                border: OutlineInputBorder(),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -368,33 +378,42 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Gender',
+                                        t.genderLabel,
                                         style: AppComponent.labelTextStyle,
                                       ),
                                       DropdownButtonFormField<String>(
                                         value: _getValidGenderValue(
                                           _selectedGender ?? userData?.gender,
                                         ),
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           contentPadding: EdgeInsets.all(0),
+                                          border: OutlineInputBorder(),
                                         ),
                                         hint: Text(
-                                          'Select Gender',
+                                          t.selectGenderHint,
                                           style: AppComponent.hintTextStyle,
                                         ),
-                                        items: gender.map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
+                                        items: [
+                                          DropdownMenuItem<String>(
+                                            value: 'Male',
+                                            child: Text(t.male),
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            value: 'Female',
+                                            child: Text(t.female),
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            value: 'Other',
+                                            child: Text(t.other),
+                                          ),
+                                        ],
                                         onChanged: (String? newValue) {
                                           setState(() {
                                             _selectedGender = newValue;
@@ -402,7 +421,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                         },
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
-                                            return 'Please select gender';
+                                            return t.validateGender;
                                           }
                                           return null;
                                         },
@@ -413,18 +432,21 @@ class _EditprofilePageState extends State<EditprofilePage> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Text('Phone', style: AppComponent.labelTextStyle),
+                          const SizedBox(height: 10),
+                          Text(
+                            t.phoneLabel,
+                            style: AppComponent.labelTextStyle,
+                          ),
                           TextFormField(
                             controller: _phoneNumberController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please input your phone number';
+                                return t.validatePhone;
                               }
                               return null;
                             },
                           ),
-                          SizedBox(height: 40),
+                          const SizedBox(height: 40),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -444,14 +466,14 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                   ),
                                 ),
                                 child: Text(
-                                  'CANCEL',
+                                  t.cancel,
                                   style: AppComponent.elevatedButtonTextStyle
                                       .copyWith(
                                         color: AdvertiseColor.textColor,
                                       ),
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                               ElevatedButton(
                                 onPressed: isloading
                                     ? null
@@ -471,7 +493,7 @@ class _EditprofilePageState extends State<EditprofilePage> {
                                         ),
                                       )
                                     : Text(
-                                        'SAVE',
+                                        t.save,
                                         style: AppComponent
                                             .elevatedButtonTextStyle,
                                       ),

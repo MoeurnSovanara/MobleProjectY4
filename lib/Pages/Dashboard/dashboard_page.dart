@@ -4,6 +4,7 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/createEventPage.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/CategoryApi.dart';
 import 'package:mobile_assignment/services/API/TicketApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
@@ -363,7 +364,7 @@ class _DashboardPageState extends State<DashboardPage> {
         body: const Center(child: CircularProgressIndicator()),
       );
     }
-
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
@@ -378,16 +379,13 @@ class _DashboardPageState extends State<DashboardPage> {
 
               if (isOrganizer == true) ...[
                 const SizedBox(height: 20),
-                Text(
-                  'History Post booking',
-                  style: AppComponent.labelTextStyle,
-                ),
+                Text(t.historyPostBooking, style: AppComponent.labelTextStyle),
                 const SizedBox(height: 10),
                 _buildCategoryBookingChart(),
               ],
 
               const SizedBox(height: 20),
-              Text('History booking', style: AppComponent.labelTextStyle),
+              Text(t.historyBooking, style: AppComponent.labelTextStyle),
               const SizedBox(height: 10),
               _buildCategoryBookingChart(),
 
@@ -481,6 +479,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildCompletedSection() {
+    final t = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -491,7 +490,7 @@ class _DashboardPageState extends State<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Completed',
+            t.complete,
             style: AppComponent.labelStyle.copyWith(
               color: AdvertiseColor.backgroundColor,
             ),
@@ -501,7 +500,7 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               Expanded(
                 child: Text(
-                  'Purchase now to gain membership badge and chance to win many rewards.',
+                  t.dComplete,
                   style: AppComponent.detailTextStyle.copyWith(
                     color: AdvertiseColor.backgroundColor,
                   ),
@@ -509,7 +508,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               const SizedBox(width: 5),
               Text(
-                '$purchasedTickets/$totalTickets tickets',
+                '$purchasedTickets/$totalTickets ${t.tickets}',
                 style: AppComponent.detailTextStyle.copyWith(
                   color: AdvertiseColor.backgroundColor,
                 ),

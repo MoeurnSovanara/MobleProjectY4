@@ -1,10 +1,14 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
+import 'package:mobile_assignment/providers/language_provider.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,10 +17,13 @@ void main() {
     DeviceOrientation.portraitDown,
   ]);
   SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
   );
   // runApp(DevicePreview(builder: (context) => MyApp()));
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -27,9 +34,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Usersharedpreferences usersharedpreferences = Usersharedpreferences();
-  String userEmail = "";
-  bool _isLoading = true; // Add loading state
+  final Usersharedpreferences _usersharedpreferences = Usersharedpreferences();
+  String _userEmail = "";
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -37,33 +44,114 @@ class _MyAppState extends State<MyApp> {
     _loadUserEmail();
   }
 
-  void _loadUserEmail() async {
-    String? email = await usersharedpreferences.getUserEmail();
-    bool? isOrganizer = await usersharedpreferences.getUserOrganizer();
-    setState(() {
-      userEmail = email ?? "";
-      _isLoading = false; // Set loading to false when done
-      isOrganizer = isOrganizer ?? false; // Default to false if not set
-    });
+  Future<void> _loadUserEmail() async {
+    try {
+      final String? email = await _usersharedpreferences.getUserEmail();
+      // Load organizer status if needed elsewhere
+      // final bool? isOrganizer = await _usersharedpreferences.getUserOrganizer();
+
+      if (mounted) {
+        setState(() {
+          _userEmail = email ?? "";
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Advertise App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AdvertiseColor.backgroundColor,
-        ),
+    return ChangeNotifierProvider(
+      create: (context) {
+        final provider = LanguageProvider();
+        // Load saved language preference
+        provider.loadSavedLanguage();
+        return provider;
+      },
+      child: Consumer<LanguageProvider>(
+        builder: (context, langProvider, child) {
+          return MaterialApp(
+            title: 'Advertise App',
+            debugShowCheckedModeBanner: false,
+
+            // Localization configuration
+            locale: langProvider.locale,
+            supportedLocales: const [
+              Locale('en'), // English
+              Locale('km'), // Khmer
+            ],
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+
+            // Improved locale resolution
+            localeResolutionCallback: (locale, supportedLocales) {
+              // If device locale is supported, use it
+              if (locale != null) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale.languageCode) {
+                    return supportedLocale;
+                  }
+                }
+              }
+              // Otherwise use the provider's locale (saved preference)
+              return langProvider.locale;
+            },
+
+            // Theme configuration
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: AdvertiseColor.backgroundColor,
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+              fontFamily: langProvider.locale.languageCode == 'km'
+                  ? 'KantumruyPro' // Add this if you have Khmer font
+                  : null,
+            ),
+
+            // Home screen with loading state
+            home: _isLoading
+                ? _buildLoadingScreen()
+                : _userEmail.isEmpty
+                ? const Landingpage()
+                : const Changepage(),
+          );
+        },
       ),
-      home: _isLoading
-          ? Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ) // Show loading indicator while checking
-          : userEmail.isEmpty
-          ? Landingpage() // Show landing page if not logged in
-          : Changepage(), // Show homepage if already logged in
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    return Consumer<LanguageProvider>(
+      builder: (context, langProvider, child) {
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(
+                  langProvider.locale.languageCode == 'km'
+                      ? 'កំពុងផ្ទុក...'
+                      : 'Loading...',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/widget/seeAlleventWidget.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 
 class SeeallPage extends StatefulWidget {
   final List<Eventdto> data;
@@ -13,13 +14,14 @@ class SeeallPage extends StatefulWidget {
 class _SeeallPageState extends State<SeeallPage> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context, true),
           icon: Icon(Icons.arrow_back),
         ),
-        title: Text('See all Event'),
+        title: Text(t.all),
         centerTitle: true,
       ),
       body: Column(

@@ -14,6 +14,7 @@ import 'package:mobile_assignment/Models/DTO/PaymentDto.dart';
 import 'package:mobile_assignment/Models/DTO/TicketTypeDto.dart';
 import 'package:mobile_assignment/Models/DTO/UserDto.dart';
 import 'package:mobile_assignment/Models/DTO/VenuesNameDto.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/CategoryApi.dart';
 import 'package:mobile_assignment/services/API/EventApi.dart';
 import 'package:mobile_assignment/services/API/PaymentApi.dart';
@@ -174,26 +175,28 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   Future<void> _submitForm() async {
+    final t = AppLocalizations.of(context)!;
+
     // Validate form first
     if (!_formKey.currentState!.validate()) {
-      _showErrorDialog('Please fill in all required fields');
+      _showErrorDialog(t.errorFillAllFields);
       return;
     }
 
     // Validate tickets
     if (_tickets.isEmpty) {
-      _showErrorDialog('Please add at least one ticket type');
+      _showErrorDialog(t.errorAddTicket);
       return;
     }
 
     // Validate dates
     if (_startDate == null || _endDate == null) {
-      _showErrorDialog('Please select event start and end dates');
+      _showErrorDialog(t.errorSelectDates);
       return;
     }
 
     if (_endDate!.isBefore(_startDate!)) {
-      _showErrorDialog('End date must be after start date');
+      _showErrorDialog(t.errorEndDateAfterStart);
       return;
     }
 
@@ -211,7 +214,7 @@ class _CreateeventpageState extends State<Createeventpage> {
       final uId = await usersharedpreferences.getUserId();
       if (uId == null) {
         Navigator.pop(context); // Close loading dialog
-        _showErrorDialog('User not logged in');
+        _showErrorDialog(t.errorUserNotLoggedIn);
         return;
       }
 
@@ -227,7 +230,7 @@ class _CreateeventpageState extends State<Createeventpage> {
 
       if (venue == null) {
         Navigator.pop(context); // Close loading dialog
-        _showErrorDialog('Failed to create venue');
+        _showErrorDialog(t.errorCreateVenue);
         return;
       }
 
@@ -241,7 +244,7 @@ class _CreateeventpageState extends State<Createeventpage> {
         );
       } else {
         Navigator.pop(context); // Close loading dialog
-        _showErrorDialog('Please select an event image');
+        _showErrorDialog(t.errorSelectImage);
         return;
       }
 
@@ -267,7 +270,7 @@ class _CreateeventpageState extends State<Createeventpage> {
 
       if (event == null) {
         Navigator.pop(context); // Close loading dialog
-        _showErrorDialog('Failed to create event');
+        _showErrorDialog(t.errorCreateEvent);
         return;
       }
 
@@ -292,7 +295,7 @@ class _CreateeventpageState extends State<Createeventpage> {
       if (createdTickets == null || createdTickets.isEmpty) {
         // Consider rolling back event creation or handling partial failure
         Navigator.pop(context); // Close loading dialog
-        _showErrorDialog('Event created but failed to create ticket types');
+        _showErrorDialog(t.errorCreateTickets);
         return;
       }
 
@@ -338,11 +341,11 @@ class _CreateeventpageState extends State<Createeventpage> {
       if (paymentResponse.statusCode < 300) {
         _showSuccessDialog();
       } else {
-        _showErrorDialog('Event created but payment setup failed');
+        _showErrorDialog(t.errorPaymentSetup);
       }
     } catch (e) {
       Navigator.pop(context); // Close loading dialog
-      _showErrorDialog('An error occurred: ${e.toString()}');
+      _showErrorDialog('${t.errorOccurred} ${e.toString()}');
     }
   }
 
@@ -356,6 +359,7 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   void _showErrorDialog(String message) {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -363,15 +367,18 @@ class _CreateeventpageState extends State<Createeventpage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          title: const Text(
-            'Error',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          title: Text(
+            t.error,
+            style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+              child: Text(t.ok),
             ),
           ],
         );
@@ -380,6 +387,7 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   void _showSuccessDialog() {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -397,19 +405,16 @@ class _CreateeventpageState extends State<Createeventpage> {
                 size: 60,
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Success',
-                style: TextStyle(
+              Text(
+                t.success,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'KantumruyPro',
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'You have created an event successfully',
-                textAlign: TextAlign.center,
-              ),
+              Text(t.eventCreatedSuccess, textAlign: TextAlign.center),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -420,7 +425,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                   Navigator.pop(context); // Close dialog
                   Navigator.pop(context); // Navigate back
                 },
-                child: const Text('OK'),
+                child: Text(t.ok),
               ),
             ],
           ),
@@ -448,10 +453,11 @@ class _CreateeventpageState extends State<Createeventpage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Event Information',
+          t.eventInformation,
           style: AppComponent.appBarTitleTextStyle.copyWith(
             color: AdvertiseColor.textColor,
           ),
@@ -460,11 +466,11 @@ class _CreateeventpageState extends State<Createeventpage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -476,12 +482,12 @@ class _CreateeventpageState extends State<Createeventpage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildProgressSteps(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _buildCurrentStep(),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -497,9 +503,9 @@ class _CreateeventpageState extends State<Createeventpage> {
                             Icons.arrow_back,
                             color: AdvertiseColor.backgroundColor,
                           ),
-                          SizedBox(width: 5),
+                          const SizedBox(width: 5),
                           Text(
-                            'Previous',
+                            t.previous,
                             style: AppComponent.elevatedButtonTextStyle,
                           ),
                         ],
@@ -511,10 +517,10 @@ class _CreateeventpageState extends State<Createeventpage> {
                     child: Row(
                       children: [
                         Text(
-                          _currentStep == 5 ? 'Submit' : 'Next',
+                          _currentStep == 5 ? t.submit : t.next,
                           style: AppComponent.elevatedButtonTextStyle,
                         ),
-                        SizedBox(width: 5),
+                        const SizedBox(width: 5),
                         Icon(
                           _currentStep == 5 ? Icons.check : Icons.arrow_forward,
                           color: AdvertiseColor.backgroundColor,
@@ -524,7 +530,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -533,99 +539,101 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   Widget _buildStep5() {
+    final t = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Remove the payment method toggle, just show PayPal directly
         Text(
-          'Payment Information',
+          t.paymentInformation,
           style: AppComponent.labelTextStyle.copyWith(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         _buildPaypalForm(),
       ],
     );
   }
 
   Widget _buildPaypalForm() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Paypal Account ID', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          Text(t.paypalAccountId, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _paypalAccountIdController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter PayPal Account ID';
+                return t.validatePaypalAccount;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter Paypal Account ID',
+              hintText: t.enterPaypalAccountHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Secret Key', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.secretKey, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _paypalSecretKeyController,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please Enter your Secret Key';
+                return t.validateSecretKey;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter Secret Key',
+              hintText: t.enterSecretKeyHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Currency Code', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.currencyCode, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _paypalCurrencyCodeController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter currency code';
+                return t.validateCurrencyCode;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter currency code',
+              hintText: t.enterCurrencyCodeHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Center(
             child: Image.asset(
               'assets/img/other/credit.png',
@@ -638,76 +646,77 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   Widget _buildStep4() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Location Name', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          Text(t.locationName, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _locationNameController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter location name';
+                return t.validateLocationName;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter location name',
+              hintText: t.enterLocationNameHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Location', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          const SizedBox(height: 10),
+          Text(t.location, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _locationInfoController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter location';
+                return t.validateLocation;
               }
               return null;
             },
             keyboardType: TextInputType.url,
             decoration: InputDecoration(
-              hintText: 'Enter location',
+              hintText: t.enterLocationHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Location Link', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          const SizedBox(height: 10),
+          Text(t.locationLink, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _locationLinkController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter location link';
+                return t.validateLocationLink;
               }
               return null;
             },
             keyboardType: TextInputType.url,
             decoration: InputDecoration(
-              hintText: 'Enter location link',
+              hintText: t.enterLocationLinkHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
@@ -719,71 +728,69 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   Widget _buildStep3() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ticket Type', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          Text(t.ticketType, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _ticketTypeController,
-
             decoration: InputDecoration(
-              hintText: 'Enter your ticket type',
+              hintText: t.enterTicketTypeHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Quantity', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.quantity, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _quantityController,
             keyboardType: TextInputType.number,
-
             decoration: InputDecoration(
-              hintText: 'Enter quantity',
+              hintText: t.enterQuantityHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Price', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.price, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _priceController,
             keyboardType: TextInputType.number,
-
             decoration: InputDecoration(
-              hintText: 'Enter price',
+              hintText: t.enterPriceHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           GestureDetector(
             onTap: _addTicket,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               width: 150,
               decoration: BoxDecoration(
                 border: Border.all(color: AdvertiseColor.primaryColor),
@@ -793,7 +800,7 @@ class _CreateeventpageState extends State<Createeventpage> {
               child: Row(
                 children: [
                   Text(
-                    'Add Ticket',
+                    t.addTicket,
                     style: TextStyle(
                       color: AdvertiseColor.backgroundColor,
                       fontFamily: 'KantumRuyPro',
@@ -805,7 +812,7 @@ class _CreateeventpageState extends State<Createeventpage> {
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           SizedBox(
             height: 3 * 90,
             child: ListView.builder(
@@ -832,27 +839,28 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   Widget _buildStep2() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Upload Image', style: AppComponent.labelTextStyle),
-          SizedBox(height: 20),
+          Text(t.uploadImage, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 20),
           DottedBorder(
             borderType: BorderType.RRect,
-            radius: Radius.circular(12),
-            padding: EdgeInsets.all(6),
+            radius: const Radius.circular(12),
+            padding: const EdgeInsets.all(6),
             color: Colors.blue,
             strokeWidth: 2,
-            dashPattern: [6, 3],
+            dashPattern: const [6, 3],
             child: Container(
               width: double.infinity,
               height: 200,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   if (_pickedImage != null)
                     Image.file(
                       _pickedImage!,
@@ -866,16 +874,16 @@ class _CreateeventpageState extends State<Createeventpage> {
                       color: AdvertiseColor.blueColor,
                       size: 40,
                     ),
-                  SizedBox(height: 5),
-                  Text('upload your event image here'),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 5),
+                  Text(t.uploadImageHint),
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: _pickImage,
                     style: ElevatedButton.styleFrom(
                       side: BorderSide(color: AdvertiseColor.primaryColor),
                     ),
                     child: Text(
-                      'Browse Image',
+                      t.browseImage,
                       style: AppComponent.elevatedButtonTextStyle.copyWith(
                         color: AdvertiseColor.primaryColor,
                       ),
@@ -885,25 +893,25 @@ class _CreateeventpageState extends State<Createeventpage> {
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Description', style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
+          Text(t.description, style: AppComponent.labelTextStyle),
           TextFormField(
             controller: _descriptionController,
             minLines: 3,
             maxLines: 5,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter description';
+                return t.validateDescription;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter your description',
+              hintText: t.enterDescriptionHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
@@ -915,42 +923,40 @@ class _CreateeventpageState extends State<Createeventpage> {
   }
 
   Widget _buildStep1() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Event Title', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          Text(t.eventTitle, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _eventTitleController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter event title';
+                return t.validateEventTitle;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter event title',
+              hintText: t.enterEventTitleHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Category', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          const SizedBox(height: 10),
+          Text(t.category, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           DropdownButtonFormField<int>(
             value: _selectedEventCategory,
-            hint: Text(
-              'Select Event Category',
-              style: AppComponent.hintTextStyle,
-            ),
+            hint: Text(t.selectCategoryHint, style: AppComponent.hintTextStyle),
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -973,12 +979,12 @@ class _CreateeventpageState extends State<Createeventpage> {
             validator: (value) {
               if (value == null) {
                 // Remove .isEmpty check
-                return 'Please select a category';
+                return t.validateCategory;
               }
               return null;
             },
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           SizedBox(
             height: 80,
             width: double.infinity,
@@ -988,7 +994,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Start date', style: AppComponent.labelTextStyle),
+                      Text(t.startDate, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1004,12 +1010,12 @@ class _CreateeventpageState extends State<Createeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select start date';
+                                  return t.validateStartDate;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1027,7 +1033,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick start date",
+                                hintText: t.pickStartDateHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1037,12 +1043,12 @@ class _CreateeventpageState extends State<Createeventpage> {
                     ],
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('End date', style: AppComponent.labelTextStyle),
+                      Text(t.endDate, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1058,12 +1064,12 @@ class _CreateeventpageState extends State<Createeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select end date';
+                                  return t.validateEndDate;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1081,7 +1087,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick end date",
+                                hintText: t.pickEndDateHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1094,7 +1100,7 @@ class _CreateeventpageState extends State<Createeventpage> {
               ],
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           SizedBox(
             height: 80,
             width: double.infinity,
@@ -1104,7 +1110,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Start time', style: AppComponent.labelTextStyle),
+                      Text(t.startTime, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1118,12 +1124,12 @@ class _CreateeventpageState extends State<Createeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select start time';
+                                  return t.validateStartTime;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1141,7 +1147,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick start time",
+                                hintText: t.pickStartTimeHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1151,12 +1157,12 @@ class _CreateeventpageState extends State<Createeventpage> {
                     ],
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('End time', style: AppComponent.labelTextStyle),
+                      Text(t.endTime, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1170,12 +1176,12 @@ class _CreateeventpageState extends State<Createeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select end time';
+                                  return t.validateEndTime;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1193,7 +1199,7 @@ class _CreateeventpageState extends State<Createeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick end time",
+                                hintText: t.pickEndTimeHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1243,7 +1249,7 @@ class _CreateeventpageState extends State<Createeventpage> {
 
   Widget _buildProgressSteps() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           _buildStepCircle('1', _currentStep >= 1),

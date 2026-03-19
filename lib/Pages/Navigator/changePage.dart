@@ -6,6 +6,7 @@ import 'package:mobile_assignment/Pages/Home/home_page.dart';
 import 'package:mobile_assignment/Pages/My%20Events/MyEvents.dart';
 import 'package:mobile_assignment/Pages/My%20Tickets/ticket_page.dart';
 import 'package:mobile_assignment/Pages/Profile/profile_page.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
 class Changepage extends StatefulWidget {
@@ -73,6 +74,7 @@ class _ChangepageState extends State<Changepage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     // Show loading indicator while initializing
     if (_isLoading) {
       return Scaffold(
@@ -92,31 +94,31 @@ class _ChangepageState extends State<Changepage> {
         unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
         type: BottomNavigationBarType.fixed,
         items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home_outlined),
+            label: t.homeLabel,
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.event_outlined),
-            label: 'Events',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.event_outlined),
+            label: t.eventLabel,
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Dashboard',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.dashboard_outlined),
+            label: t.dashBoardLabel,
           ),
           // Fix: Use proper condition check
           isOrganizer == false
-              ? const BottomNavigationBarItem(
-                  icon: Icon(Icons.confirmation_number_outlined),
-                  label: 'Tickets',
+              ? BottomNavigationBarItem(
+                  icon: const Icon(Icons.confirmation_number_outlined),
+                  label: t.tickets,
                 )
-              : const BottomNavigationBarItem(
-                  icon: Icon(Icons.wallet),
-                  label: 'My Events',
+              : BottomNavigationBarItem(
+                  icon: const Icon(Icons.wallet),
+                  label: t.eventLabel,
                 ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.person_outline),
+            label: t.profileLabel,
           ),
         ],
       ),

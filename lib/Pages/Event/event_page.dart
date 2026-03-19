@@ -8,6 +8,7 @@ import 'package:mobile_assignment/Models/DTO/EventDto.dart'; // Add this import
 import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
 import 'package:mobile_assignment/Pages/Home/other/notification_page.dart';
 import 'package:mobile_assignment/Pages/Other/seeall_page.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/CategoryApi.dart';
 
 class EventPage extends StatefulWidget {
@@ -123,6 +124,7 @@ class _EventPageState extends State<EventPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Stack(
       children: [
         // Main content - add your page content here
@@ -174,7 +176,7 @@ class _EventPageState extends State<EventPage> {
                                                 }
                                               },
                                               child: Text(
-                                                'See All >',
+                                                t.all,
                                                 style:
                                                     AppComponent.sublabelStyle,
                                               ),

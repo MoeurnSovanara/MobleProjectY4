@@ -8,8 +8,11 @@ import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Models/DTO/UserEventEngagementDto.dart';
 import 'package:mobile_assignment/Pages/Home/other/notification_page.dart';
 import 'package:mobile_assignment/Pages/Other/seeall_page.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
+import 'package:mobile_assignment/providers/language_provider.dart';
 import 'package:mobile_assignment/services/API/EventApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -116,6 +119,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Stack(
       children: [
         // Main content - add your page content here
@@ -143,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                                 ? Row(
                                     children: [
                                       Text(
-                                        "Upcoming Events",
+                                        t.upcoming,
                                         style: AppComponent.labelStyle,
                                       ),
                                       Spacer(),
@@ -165,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                                           }
                                         },
                                         child: Text(
-                                          'See All >',
+                                          t.all,
                                           style: AppComponent.sublabelStyle,
                                         ),
                                       ),
@@ -328,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            hintText: "Search ...",
+                            hintText: t.searchLabel,
                             hintStyle: AppComponent.hintSearchStyle,
                           ),
                         ),
@@ -352,7 +356,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             SizedBox(width: 5),
                             Text(
-                              'Filters',
+                              t.filters,
                               style: TextStyle(
                                 color: AdvertiseColor.backgroundColor,
                               ),

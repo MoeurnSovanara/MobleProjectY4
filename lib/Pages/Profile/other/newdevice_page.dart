@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 
 class NewdevicePage extends StatefulWidget {
   const NewdevicePage({super.key});
@@ -12,10 +13,11 @@ class NewdevicePage extends StatefulWidget {
 class _NewdevicePageState extends State<NewdevicePage> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Scan new device',
+          t.newDevice,
           style: AppComponent.appBarTitleTextStyle.copyWith(
             color: AdvertiseColor.textColor,
           ),

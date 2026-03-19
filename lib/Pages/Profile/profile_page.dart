@@ -10,8 +10,11 @@ import 'package:mobile_assignment/Pages/Profile/other/newdevice_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/password_page.dart';
 import 'package:mobile_assignment/Pages/Profile/other/usedTicket_page.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
+import 'package:mobile_assignment/providers/language_provider.dart';
 import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -23,7 +26,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _notificationsEnabled = true;
   Userdto? userdto;
-  // Initialize variables
   bool? isOrganizer = false;
   bool _isLoading = true;
   String userName = "N/A";
@@ -38,19 +40,15 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadUserData();
-    print("${headUrl}lib/img/user/$userImage");
   }
 
-  // Add this method to load user data
   void _loadUserData() async {
     try {
-      // Load organizer status
       var organizerResult = await usersharedpreferences.getUserOrganizer();
-
-      // Load user email and name
       String? email = await usersharedpreferences.getUserEmail();
       String? name = await usersharedpreferences.getUserName();
       var userData = await userapi.getUserByEmail(email: email!);
+
       if (mounted) {
         setState(() {
           isOrganizer = organizerResult ?? false;
@@ -71,65 +69,62 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLanguageBottomSheet(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
         return Container(
-          padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           width: double.infinity,
-          height: 350,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Languages', style: AppComponent.boldTextStyle),
-              SizedBox(height: 10),
+              Text(t.pLanguage, style: AppComponent.boldTextStyle),
+              const SizedBox(height: 10),
               Text(
-                'Please select a display language',
+                t.languageDetail,
                 style: AppComponent.labelTextStyle,
+                textAlign: TextAlign.center,
               ),
-              SizedBox(height: 10),
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AdvertiseColor.textColor.withOpacity(0.5),
+              const SizedBox(height: 20),
+
+              // Khmer option
+              _buildLanguageOption(
+                context,
+                flag: 'assets/img/other/khmer.png',
+                name: t.khmerLabel,
+                code: 'km',
+                isSelected: langProvider.locale.languageCode == 'km',
+              ),
+              const SizedBox(height: 10),
+
+              // English option
+              _buildLanguageOption(
+                context,
+                flag: 'assets/img/other/english.png',
+                name: t.englishLabel,
+                code: 'en',
+                isSelected: langProvider.locale.languageCode == 'en',
+              ),
+              const SizedBox(height: 30),
+
+              // Select button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: AppComponent.elevatedButtonStyle,
+                  child: Text(
+                    t.selectLabel,
+                    style: AppComponent.elevatedButtonTextStyle,
                   ),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset('assets/img/other/khmer.png'),
-                    SizedBox(width: 20),
-                    Text('Khmer', style: AppComponent.labelTextStyle),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AdvertiseColor.textColor.withOpacity(0.5),
-                  ),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset('assets/img/other/english.png', width: 20),
-                    SizedBox(width: 20),
-                    Text('English', style: AppComponent.labelTextStyle),
-                  ],
-                ),
-              ),
-              SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: AppComponent.elevatedButtonStyle,
-                child: Text(
-                  'Select',
-                  style: AppComponent.elevatedButtonTextStyle,
                 ),
               ),
             ],
@@ -139,31 +134,93 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _buildLanguageOption(
+    BuildContext context, {
+    required String flag,
+    required String name,
+    required String code,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: () async {
+        await Provider.of<LanguageProvider>(
+          context,
+          listen: false,
+        ).changeLanguage(code);
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected
+                ? AdvertiseColor.primaryColor
+                : AdvertiseColor.textColor.withOpacity(0.5),
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(10),
+          color: isSelected
+              ? AdvertiseColor.primaryColor.withOpacity(0.05)
+              : null,
+        ),
+        child: Row(
+          children: [
+            Image.asset(flag, width: 24, height: 24),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Text(
+                name,
+                style: AppComponent.labelTextStyle.copyWith(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                color: AdvertiseColor.primaryColor,
+                size: 24,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showAppearanceBottomSheet(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
         return Container(
-          padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           width: double.infinity,
-          height: 350,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Appearance', style: AppComponent.boldTextStyle),
-              SizedBox(height: 10),
+              Text(t.pAppearance, style: AppComponent.boldTextStyle),
+              const SizedBox(height: 10),
               Text(
-                'Choose your preferred theme',
+                t.appearanceDetail,
                 style: AppComponent.labelTextStyle,
+                textAlign: TextAlign.center,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 20),
+
+              // Light theme option
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: AdvertiseColor.textColor.withOpacity(0.5),
                   ),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
@@ -171,19 +228,23 @@ class _ProfilePageState extends State<ProfilePage> {
                       Icons.light_mode_outlined,
                       color: AdvertiseColor.primaryColor,
                     ),
-                    SizedBox(width: 20),
-                    Text('Light', style: AppComponent.labelTextStyle),
+                    const SizedBox(width: 15),
+                    Text(t.lightLable, style: AppComponent.labelTextStyle),
+                    const Spacer(),
+                    // TODO: Add theme selection logic
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
+
+              // Dark theme option
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: AdvertiseColor.textColor.withOpacity(0.5),
                   ),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
@@ -191,20 +252,25 @@ class _ProfilePageState extends State<ProfilePage> {
                       Icons.dark_mode_outlined,
                       color: AdvertiseColor.primaryColor,
                     ),
-                    SizedBox(width: 20),
-                    Text('Dark', style: AppComponent.labelTextStyle),
+                    const SizedBox(width: 15),
+                    Text(t.darkLabel, style: AppComponent.labelTextStyle),
+                    const Spacer(),
+                    // TODO: Add theme selection logic
                   ],
                 ),
               ),
-              SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: AppComponent.elevatedButtonStyle,
-                child: Text(
-                  'Select',
-                  style: AppComponent.elevatedButtonTextStyle,
+              const SizedBox(height: 30),
+
+              // Select button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: AppComponent.elevatedButtonStyle,
+                  child: Text(
+                    t.selectLabel,
+                    style: AppComponent.elevatedButtonTextStyle,
+                  ),
                 ),
               ),
             ],
@@ -226,13 +292,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Show loading indicator
+    final t = AppLocalizations.of(context)!;
+    final langProvider = Provider.of<LanguageProvider>(context);
+
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Text(
-            "Profile Page",
+            t.profilePage,
             style: AppComponent.labelStyle.copyWith(fontSize: 25),
           ),
           backgroundColor: AdvertiseColor.backgroundColor,
@@ -242,11 +310,12 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     var screenwidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          "Profile Page",
+          t.profilePage,
           style: AppComponent.labelStyle.copyWith(fontSize: 25),
         ),
         backgroundColor: AdvertiseColor.backgroundColor,
@@ -269,23 +338,23 @@ class _ProfilePageState extends State<ProfilePage> {
               }
             },
             itemBuilder: (BuildContext context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(Icons.edit, color: AdvertiseColor.primaryColor),
-                    SizedBox(width: 8),
-                    Text('Edit Profile'),
+                    const Icon(Icons.edit, color: AdvertiseColor.primaryColor),
+                    const SizedBox(width: 8),
+                    Text(t.editProfile),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'logout',
                 child: Row(
                   children: [
-                    Icon(Icons.logout, color: AdvertiseColor.dangerColor),
-                    SizedBox(width: 8),
-                    Text('Log out'),
+                    const Icon(Icons.logout, color: AdvertiseColor.dangerColor),
+                    const SizedBox(width: 8),
+                    Text(t.logout),
                   ],
                 ),
               ),
@@ -328,7 +397,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             borderRadius: BorderRadius.circular(40),
                             child: Image.network(
                               '${headUrl}lib/img/user/$userImage',
-
                               fit: BoxFit.cover,
                               height: 95,
                               width: 95,
@@ -410,14 +478,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 width: double.infinity,
-                height: 125,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         Text(
-                          'Devices',
+                          t.devices,
                           style: AppComponent.detailTextStyle.copyWith(
                             fontSize: screenwidth <= 402 ? 12 : 16,
                           ),
@@ -431,7 +498,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                           child: Text(
-                            'ADD NEW DEVICES',
+                            t.newDevice,
                             style: TextStyle(
                               fontFamily: 'KantumruyPro',
                               fontSize: screenwidth <= 402 ? 12 : 16,
@@ -554,78 +621,37 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              // Used Ticket
               const SizedBox(height: 10),
-              if (isOrganizer = false)
+
+              // Used Ticket (if applicable)
+              if (isOrganizer == false)
                 GestureDetector(
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => UsedticketPage()),
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                    ),
-                    height: 70,
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.file_copy_outlined,
-                          color: AdvertiseColor.primaryColor,
-                        ),
-                        const SizedBox(width: 5),
-                        Text('Used Ticket', style: AppComponent.labelTextStyle),
-                        const Spacer(),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: AdvertiseColor.textColor.withOpacity(0.5),
-                        ),
-                      ],
-                    ),
+                  child: _buildMenuItem(
+                    icon: Icons.file_copy_outlined,
+                    title: t.usedTicket, // TODO: Add to ARB if needed
                   ),
                 ),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyticketPage()),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AdvertiseColor.textColor.withOpacity(0.5),
-                    ),
+
+              // My Ticket
+              if (isOrganizer == true)
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyticketPage()),
                   ),
-                  height: 70,
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.file_copy_outlined,
-                        color: AdvertiseColor.primaryColor,
-                      ),
-                      const SizedBox(width: 5),
-                      Text('My Ticket', style: AppComponent.labelTextStyle),
-                      const Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                    ],
+                  child: _buildMenuItem(
+                    icon: Icons.file_copy_outlined,
+                    title: t.pMyTicket,
                   ),
                 ),
-              ),
+
+              const SizedBox(height: 10),
 
               // Notifications
-              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -643,8 +669,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       Icons.notifications_outlined,
                       color: AdvertiseColor.primaryColor,
                     ),
-                    const SizedBox(width: 5),
-                    Text('Notification', style: AppComponent.labelTextStyle),
+                    const SizedBox(width: 10),
+                    Text(t.pNotification, style: AppComponent.labelTextStyle),
                     const Spacer(),
                     Switch(
                       value: _notificationsEnabled,
@@ -666,111 +692,53 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              // Languages
               const SizedBox(height: 10),
+
+              // Language
               GestureDetector(
-                onTap: () {
-                  _showLanguageBottomSheet(context);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AdvertiseColor.textColor.withOpacity(0.5),
-                    ),
-                  ),
-                  height: 70,
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Icon(Icons.language, color: AdvertiseColor.primaryColor),
-                      const SizedBox(width: 5),
-                      Text('Language', style: AppComponent.labelTextStyle),
-                      const Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                    ],
-                  ),
+                onTap: () => _showLanguageBottomSheet(context),
+                child: _buildMenuItem(
+                  icon: Icons.language,
+                  title: t.pLanguage,
+                  showValue: true,
+                  value: langProvider.locale.languageCode == 'km'
+                      ? t.khmerLabel
+                      : t.englishLabel,
                 ),
               ),
 
-              // Password
               const SizedBox(height: 10),
+
+              // Password
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PasswordPage()),
                 ),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AdvertiseColor.textColor.withOpacity(0.5),
-                    ),
-                  ),
-                  height: 70,
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.lock_outline,
-                        color: AdvertiseColor.primaryColor,
-                      ),
-                      const SizedBox(width: 5),
-                      Text('Password', style: AppComponent.labelTextStyle),
-                      const Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                    ],
-                  ),
+                child: _buildMenuItem(
+                  icon: Icons.lock_outline,
+                  title: t.pPassword,
                 ),
               ),
+
+              const SizedBox(height: 10),
 
               // Appearance
-              const SizedBox(height: 10),
               GestureDetector(
-                onTap: () {
-                  _showAppearanceBottomSheet(context);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AdvertiseColor.textColor.withOpacity(0.5),
-                    ),
-                  ),
-                  height: 70,
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.dark_mode_outlined,
-                        color: AdvertiseColor.primaryColor,
-                      ),
-                      const SizedBox(width: 5),
-                      Text('Appearance', style: AppComponent.labelTextStyle),
-                      const Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                    ],
-                  ),
+                onTap: () => _showAppearanceBottomSheet(context),
+                child: _buildMenuItem(
+                  icon: Icons.dark_mode_outlined,
+                  title: t.pAppearance,
+                  showValue: true,
+                  value: langProvider.locale.languageCode == 'km'
+                      ? t.lightLable
+                      : t.lightLable, // TODO: Add theme selection logic
                 ),
               ),
 
-              // Bookmark (Only for non-organizers)
               const SizedBox(height: 10),
+
+              // Bookmark (Only for non-organizers)
               if (isOrganizer == false)
                 GestureDetector(
                   onTap: () {
@@ -779,38 +747,57 @@ class _ProfilePageState extends State<ProfilePage> {
                       MaterialPageRoute(builder: (context) => BookmarkPage()),
                     );
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: AdvertiseColor.textColor.withOpacity(0.5),
-                      ),
-                    ),
-                    height: 70,
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.bookmark_outline,
-                          color: AdvertiseColor.primaryColor,
-                        ),
-                        const SizedBox(width: 5),
-                        Text('Bookmark', style: AppComponent.labelTextStyle),
-                        const Spacer(),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: AdvertiseColor.textColor.withOpacity(0.5),
-                        ),
-                      ],
-                    ),
+                  child: _buildMenuItem(
+                    icon: Icons.bookmark_outline,
+                    title: t.pBookmark,
                   ),
                 ),
+
               const SizedBox(height: 20),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Helper method for consistent menu items
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    bool showValue = false,
+    String? value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.5)),
+      ),
+      height: 70,
+      width: double.infinity,
+      child: Row(
+        children: [
+          Icon(icon, color: AdvertiseColor.primaryColor),
+          const SizedBox(width: 10),
+          Expanded(child: Text(title, style: AppComponent.labelTextStyle)),
+          if (showValue && value != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text(
+                value,
+                style: AppComponent.sublabelStyle.copyWith(
+                  color: AdvertiseColor.textColor.withOpacity(0.7),
+                ),
+              ),
+            ),
+          Icon(
+            Icons.arrow_forward_ios,
+            color: AdvertiseColor.textColor.withOpacity(0.5),
+            size: 16,
+          ),
+        ],
       ),
     );
   }

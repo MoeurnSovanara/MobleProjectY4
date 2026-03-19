@@ -4,6 +4,7 @@ import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/bookticket_page.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
 import 'package:mobile_assignment/services/Helper/TimeHelperClass.dart';
@@ -83,6 +84,7 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     if (_isLoading) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -198,7 +200,7 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Start Date',
+                                    t.startDate,
                                     style: AppComponent.labelStyle,
                                   ),
                                   Text(
@@ -222,7 +224,7 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'End Date',
+                                    t.endDate,
                                     style: AppComponent.labelStyle,
                                   ),
                                   Text(
@@ -250,7 +252,7 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Time', style: AppComponent.labelStyle),
+                                  Text(t.time, style: AppComponent.labelStyle),
                                   Text(
                                     timeHelperClass.formatTimeRange(
                                       widget.eventdto.startTime,
@@ -272,7 +274,7 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                         SizedBox(width: 5),
                         Expanded(
                           child: Text(
-                            'Location: ${widget.eventdto.venues.venueInfo}',
+                            '${t.location} ${widget.eventdto.venues.venueInfo}',
                             style: AppComponent.hintTextStyle.copyWith(
                               color: AdvertiseColor.textColor,
                             ),
@@ -433,7 +435,7 @@ class _EventdetailedPageState extends State<EventdetailedPage> {
                       ),
                       style: AppComponent.elevatedButtonStyle,
                       child: Text(
-                        'Booking Ticket',
+                        t.bookTicketButton,
                         style: AppComponent.elevatedButtonTextStyle,
                       ),
                     ),

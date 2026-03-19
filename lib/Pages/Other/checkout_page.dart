@@ -5,6 +5,7 @@ import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/CreateTicketDto.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/PaymentApi.dart';
 import 'package:mobile_assignment/services/API/TicketApi.dart';
 import 'package:mobile_assignment/services/API/TicketTypApi.dart';
@@ -140,7 +141,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   void _processPayment() async {
     var userId = await usersharedpreferences.getUserId();
     String uniqueKey = "ticket_${uuid.v4()}";
-
+    final t = AppLocalizations.of(context)!;
     if (userId == null) {
       showDialog(
         context: context,
@@ -175,7 +176,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (_selectedTicketType == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Please select a ticket type')));
+      ).showSnackBar(SnackBar(content: Text(t.select_ticket_type)));
       return;
     }
 
@@ -330,9 +331,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Checkout', style: AppComponent.labelStyle),
+        title: Text(t.checkout, style: AppComponent.labelStyle),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -367,19 +369,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 children: [
                   _buildDateInfo(
                     Icons.calendar_month_outlined,
-                    'Start Date',
+                    t.startDate,
                     Helperclass.formatFullDate(widget.eventdto.eventStart),
                   ),
                   Spacer(),
                   _buildDateInfo(
                     Icons.calendar_month_outlined,
-                    'End Date',
+                    t.endDate,
                     Helperclass.formatFullDate(widget.eventdto.eventEnd),
                   ),
                   Spacer(),
                   _buildDateInfo(
                     Icons.timer_outlined,
-                    'Time',
+                    t.time,
                     '${timeHelper.formatTimeAMPM(widget.eventdto.startTime)} - ${timeHelper.formatTime(widget.eventdto.endTime)}',
                   ),
                 ],
@@ -395,13 +397,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Total Payment',
+                        t.total,
                         style: AppComponent.boldTextStyle.copyWith(
                           fontSize: 18,
                         ),
                       ),
                       Text(
-                        'Please check the price before going!!',
+                        t.paymentText,
                         style: TextStyle(
                           color: AdvertiseColor.textColor.withOpacity(0.6),
                         ),
@@ -452,7 +454,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           SizedBox(width: 4),
                           Text(
-                            'Back',
+                            t.backLabel,
                             style: TextStyle(
                               color: AdvertiseColor.primaryColor,
                             ),
@@ -467,7 +469,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     child: Row(
                       children: [
                         Text(
-                          _currentStep == 3 ? 'Finish' : 'Next',
+                          _currentStep == 3 ? t.finishLabel : t.nextLabel,
                           style: AppComponent.elevatedButtonTextStyle,
                         ),
                         if (_currentStep < 3)
@@ -517,11 +519,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildProgressSteps() {
+    final t = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          _buildStepCircle('1', _currentStep >= 1, 'Tickets'),
+          _buildStepCircle('1', _currentStep >= 1, t.lTickets),
           Expanded(
             child: Divider(
               thickness: 2,
@@ -530,7 +533,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   : Colors.grey.shade300,
             ),
           ),
-          _buildStepCircle('2', _currentStep >= 2, 'Payment'),
+          _buildStepCircle('2', _currentStep >= 2, t.lPayment),
           Expanded(
             child: Divider(
               thickness: 2,
@@ -539,7 +542,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   : Colors.grey.shade300,
             ),
           ),
-          _buildStepCircle('3', _currentStep >= 3, 'Success'),
+          _buildStepCircle('3', _currentStep >= 3, t.lSuccess),
         ],
       ),
     );
@@ -587,13 +590,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildStep1() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Ticket Quantity
-          Text('Ticket Quantity', style: AppComponent.labelTextStyle),
+          Text(t.ticketQuantity, style: AppComponent.labelTextStyle),
           SizedBox(height: 8),
           Container(
             width: double.infinity,
@@ -604,7 +608,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     controller: _quantityController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      hintText: 'Ticket quantity',
+                      hintText: t.ticketQuantity,
                       hintStyle: AppComponent.hintTextStyle,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -623,13 +627,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter ticket quantity';
+                        return t.enter_ticket_quantity;
                       }
                       if (int.tryParse(value) == null) {
-                        return 'Please enter a valid number';
+                        return t.enter_valid_number;
                       }
                       if (int.parse(value) < 1) {
-                        return 'Quantity must be at least 1';
+                        return t.quantity_min_one;
                       }
                       return null;
                     },
@@ -672,11 +676,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
           SizedBox(height: 16),
 
           // Ticket Type
-          Text('Ticket Type', style: AppComponent.labelTextStyle),
+          Text(t.ticketType, style: AppComponent.labelTextStyle),
           SizedBox(height: 8),
           DropdownButtonFormField<String>(
             value: _selectedTicketType,
-            hint: Text('Select Ticket Type', style: AppComponent.hintTextStyle),
+            hint: Text(
+              t.select_ticket_type_label,
+              style: AppComponent.hintTextStyle,
+            ),
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -702,7 +709,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please select a ticket type';
+                return t.select_ticket_type;
               }
               return null;
             },
@@ -713,6 +720,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildStep2() {
+    final t = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -726,14 +734,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: Column(
             children: [
               Text(
-                'Order Summary',
+                t.orderSummary,
                 style: AppComponent.boldTextStyle.copyWith(fontSize: 18),
               ),
               SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Event:', style: TextStyle(color: Colors.grey.shade600)),
+                  Text(t.oEvent, style: TextStyle(color: Colors.grey.shade600)),
                   Flexible(
                     child: Text(
                       widget.eventdto.title,
@@ -748,7 +756,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Ticket Type:',
+                    t.oTicketType,
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
                   Text(
@@ -762,7 +770,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Quantity:',
+                    t.oQuantity,
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
                   Text(
@@ -776,7 +784,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Price per ticket:',
+                    t.oPricePerTicket,
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
                   Text(
@@ -791,7 +799,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total:',
+                    t.oTotal,
                     style: AppComponent.boldTextStyle.copyWith(fontSize: 16),
                   ),
                   Text(
@@ -811,6 +819,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildStep3() {
+    final t = AppLocalizations.of(context)!;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -818,12 +827,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
         Icon(Icons.check_circle, color: Colors.green, size: 100),
         SizedBox(height: 24),
         Text(
-          'Payment Successful!',
+          t.payment_successful,
           style: AppComponent.boldTextStyle.copyWith(fontSize: 24),
         ),
         SizedBox(height: 16),
         Text(
-          'Your tickets have been booked successfully.',
+          t.stext1,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
@@ -832,7 +841,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
         SizedBox(height: 8),
         Text(
-          'Booking ID: #${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+          '${t.sBookId} #${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
           style: TextStyle(fontSize: 14, color: Colors.grey),
         ),
         SizedBox(height: 32),
@@ -844,13 +853,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           child: Column(
             children: [
-              Text(
-                'Download your tickets from the "My Tickets" section.',
-                textAlign: TextAlign.center,
-              ),
+              Text(t.stext2, textAlign: TextAlign.center),
               SizedBox(height: 8),
               Text(
-                'You will also receive an email confirmation.',
+                t.stext3,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),

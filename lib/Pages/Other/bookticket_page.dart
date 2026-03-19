@@ -4,6 +4,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/TicketInforWidget.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Other/checkout_page.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 
 class BookticketPage extends StatefulWidget {
   final Eventdto eventdto;
@@ -48,10 +49,11 @@ class _BookticketPageState extends State<BookticketPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Ticket Information',
+          t.ticketInfo,
           style: AppComponent.boldTextStyle.copyWith(
             color: AdvertiseColor.primaryColor,
           ),
@@ -80,7 +82,7 @@ class _BookticketPageState extends State<BookticketPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Capacity tickets',
+                                  t.capacityTicket,
                                   style: AppComponent.detailTextStyle,
                                 ),
                                 Row(
@@ -94,7 +96,7 @@ class _BookticketPageState extends State<BookticketPage> {
                                           ),
                                     ),
                                     Text(
-                                      ' ticket',
+                                      t.tickets,
                                       style: AppComponent.detailTextStyle,
                                     ),
                                   ],
@@ -112,7 +114,7 @@ class _BookticketPageState extends State<BookticketPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Remaining tickets',
+                                  t.remainingTicket,
                                   style: AppComponent.detailTextStyle,
                                 ),
                                 Row(
@@ -126,7 +128,7 @@ class _BookticketPageState extends State<BookticketPage> {
                                           ),
                                     ),
                                     Text(
-                                      ' tickets',
+                                      t.tickets,
                                       style: AppComponent.detailTextStyle,
                                     ),
                                   ],
@@ -162,7 +164,7 @@ class _BookticketPageState extends State<BookticketPage> {
                       ),
                       style: AppComponent.elevatedButtonStyle,
                       child: Text(
-                        'Buy Now',
+                        t.buyNow,
                         style: AppComponent.elevatedButtonTextStyle,
                       ),
                     ),

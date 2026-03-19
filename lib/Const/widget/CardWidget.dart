@@ -4,6 +4,7 @@ import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/TicketDto.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -90,6 +91,7 @@ class _CardWidgetState extends State<CardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final event = widget.tickets.ticketType.events;
     final venue = event.venues;
@@ -310,7 +312,7 @@ class _CardWidgetState extends State<CardWidget> {
   void _showQRCodeDialog(BuildContext context) {
     final event = widget.tickets.ticketType.events;
     final qrData = _getQRData();
-
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -404,7 +406,7 @@ class _CardWidgetState extends State<CardWidget> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Ticket #${widget.tickets.id}',
+                  '${t.tickets} #${widget.tickets.id}',
                   style: AppComponent.detailTextStyle.copyWith(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -415,7 +417,7 @@ class _CardWidgetState extends State<CardWidget> {
               const SizedBox(height: 20),
 
               Text(
-                'Scan this QR code at the entrance',
+                t.scanQrAtEntrance,
                 style: AppComponent.detailTextStyle,
                 textAlign: TextAlign.center,
               ),
@@ -433,7 +435,7 @@ class _CardWidgetState extends State<CardWidget> {
                   ),
                 ),
                 child: Text(
-                  'Close',
+                  t.close,
                   style: AppComponent.elevatedButtonTextStyle,
                 ),
               ),
