@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/TicketInforWidget.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/Models/DTO/CategoryDto.dart';
 import 'package:mobile_assignment/Models/DTO/CreateEventDto.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
@@ -91,7 +92,6 @@ class _EditeventpageState extends State<Editeventpage> {
 
   // Tickets list
   final List<TicketTypeDto> _tickets = [];
-
   Future<void> firstTask() async {
     var categoryData = await categoryapi.getAllCategoryName();
     if (categoryData != null) {
@@ -168,7 +168,7 @@ class _EditeventpageState extends State<Editeventpage> {
       }
     } catch (e) {
       print('Error initializing data: $e');
-      _showErrorDialog('Failed to load data');
+      _showErrorDialog(AppLocalizations.of(context)!.errorLoadData);
     } finally {
       setState(() {
         _isLoading = false;
@@ -279,26 +279,28 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   Future<void> _submitForm() async {
+    final t = AppLocalizations.of(context)!;
+
     // Validate form first
     if (!_formKey.currentState!.validate()) {
-      _showErrorDialog('Please fill in all required fields');
+      _showErrorDialog(t.errorFillAllFields);
       return;
     }
 
     // Validate tickets
     if (_tickets.isEmpty) {
-      _showErrorDialog('Please add at least one ticket type');
+      _showErrorDialog(t.errorAddTicket);
       return;
     }
 
     // Validate dates
     if (_startDate == null || _endDate == null) {
-      _showErrorDialog('Please select event start and end dates');
+      _showErrorDialog(t.errorSelectDates);
       return;
     }
 
     if (_endDate!.isBefore(_startDate!)) {
-      _showErrorDialog('End date must be after start date');
+      _showErrorDialog(t.errorEndDateAfterStart);
       return;
     }
 
@@ -316,7 +318,7 @@ class _EditeventpageState extends State<Editeventpage> {
       final uId = await usersharedpreferences.getUserId();
       if (uId == null) {
         Navigator.pop(context);
-        _showErrorDialog('User not logged in');
+        _showErrorDialog(t.errorUserNotLoggedIn);
         return;
       }
 
@@ -336,7 +338,7 @@ class _EditeventpageState extends State<Editeventpage> {
       } else if (!_isEditMode && _pickedImage == null) {
         // Create mode, image is required
         Navigator.pop(context);
-        _showErrorDialog('Please select an event image');
+        _showErrorDialog(t.errorSelectImage);
         return;
       }
 
@@ -344,7 +346,7 @@ class _EditeventpageState extends State<Editeventpage> {
         // UPDATE MODE
         if (uniqueImagename == null) {
           Navigator.pop(context);
-          _showErrorDialog('Image is required');
+          _showErrorDialog(t.imageRequired);
           return;
         }
         await _updateEvent(uId, uniqueImagename);
@@ -388,11 +390,13 @@ class _EditeventpageState extends State<Editeventpage> {
       _showSuccessDialog();
     } catch (e) {
       Navigator.pop(context); // Close loading dialog
-      _showErrorDialog('An error occurred: ${e.toString()}');
+      _showErrorDialog('${t.errorOccurred} ${e.toString()}');
     }
   }
 
   Future<void> _createEvent(int uId, String imageName) async {
+    final t = AppLocalizations.of(context)!;
+
     // Create venue
     final venue = await venuesapi.CreateVenues(
       venue: Venuesnamedto(
@@ -404,7 +408,7 @@ class _EditeventpageState extends State<Editeventpage> {
     );
 
     if (venue == null) {
-      _showErrorDialog('Failed to create venue');
+      _showErrorDialog(t.errorCreateVenue);
       return;
     }
 
@@ -429,7 +433,7 @@ class _EditeventpageState extends State<Editeventpage> {
     );
 
     if (event == null) {
-      _showErrorDialog('Failed to create event');
+      _showErrorDialog(t.errorCreateEvent);
       return;
     }
 
@@ -452,7 +456,7 @@ class _EditeventpageState extends State<Editeventpage> {
     );
 
     if (createdTickets == null || createdTickets.isEmpty) {
-      _showErrorDialog('Event created but failed to create ticket types');
+      _showErrorDialog(t.errorCreateTickets);
       return;
     }
 
@@ -481,6 +485,8 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   Future<void> _updateEvent(int uId, String imageName) async {
+    final t = AppLocalizations.of(context)!;
+
     // Update venue
     final venueUpdateResponse = await venuesapi.updateVeneus(
       venue: Venuesnamedto(
@@ -492,7 +498,7 @@ class _EditeventpageState extends State<Editeventpage> {
     );
 
     if (venueUpdateResponse.statusCode > 299) {
-      _showErrorDialog('Failed to update venue');
+      _showErrorDialog(t.errorUpdateVenue);
       return;
     }
 
@@ -517,7 +523,7 @@ class _EditeventpageState extends State<Editeventpage> {
     );
 
     if (eventUpdateResponse.statusCode > 299) {
-      _showErrorDialog('Failed to update event');
+      _showErrorDialog(t.errorUpdateEvent);
       return;
     }
 
@@ -570,6 +576,7 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   void _showErrorDialog(String message) {
+    final t = AppLocalizations.of(context)!;
     if (mounted) {
       showDialog(
         context: context,
@@ -578,15 +585,18 @@ class _EditeventpageState extends State<Editeventpage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            title: const Text(
-              'Error',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            title: Text(
+              t.error,
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             content: Text(message),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+                child: Text(t.ok),
               ),
             ],
           );
@@ -596,6 +606,7 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   void _showSuccessDialog() {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -613,9 +624,9 @@ class _EditeventpageState extends State<Editeventpage> {
                 size: 60,
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Success',
-                style: TextStyle(
+              Text(
+                t.success,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'KantumruyPro',
@@ -623,9 +634,7 @@ class _EditeventpageState extends State<Editeventpage> {
               ),
               const SizedBox(height: 10),
               Text(
-                _isEditMode
-                    ? 'Event updated successfully'
-                    : 'Event created successfully',
+                _isEditMode ? t.eventUpdatedSuccess : t.eventCreatedSuccess,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -638,7 +647,7 @@ class _EditeventpageState extends State<Editeventpage> {
                   Navigator.pop(context); // Close dialog
                   Navigator.pop(context, true); // Navigate back with result
                 },
-                child: const Text('OK'),
+                child: Text(t.ok),
               ),
             ],
           ),
@@ -666,11 +675,13 @@ class _EditeventpageState extends State<Editeventpage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            _isEditMode ? 'Edit Event' : 'Create Event',
+            _isEditMode ? t.editEvent : t.createEvent,
             style: AppComponent.appBarTitleTextStyle.copyWith(
               color: AdvertiseColor.textColor,
             ),
@@ -684,7 +695,7 @@ class _EditeventpageState extends State<Editeventpage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _isEditMode ? 'Edit Event' : 'Create Event',
+          _isEditMode ? t.editEvent : t.createEvent,
           style: AppComponent.appBarTitleTextStyle.copyWith(
             color: AdvertiseColor.textColor,
           ),
@@ -693,11 +704,11 @@ class _EditeventpageState extends State<Editeventpage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -709,12 +720,12 @@ class _EditeventpageState extends State<Editeventpage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildProgressSteps(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _buildCurrentStep(),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -730,9 +741,9 @@ class _EditeventpageState extends State<Editeventpage> {
                             Icons.arrow_back,
                             color: AdvertiseColor.backgroundColor,
                           ),
-                          SizedBox(width: 5),
+                          const SizedBox(width: 5),
                           Text(
-                            'Previous',
+                            t.previous,
                             style: AppComponent.elevatedButtonTextStyle,
                           ),
                         ],
@@ -745,11 +756,11 @@ class _EditeventpageState extends State<Editeventpage> {
                       children: [
                         Text(
                           _currentStep == 5
-                              ? (_isEditMode ? 'Update' : 'Submit')
-                              : 'Next',
+                              ? (_isEditMode ? t.update : t.submit)
+                              : t.next,
                           style: AppComponent.elevatedButtonTextStyle,
                         ),
-                        SizedBox(width: 5),
+                        const SizedBox(width: 5),
                         Icon(
                           _currentStep == 5 ? Icons.check : Icons.arrow_forward,
                           color: AdvertiseColor.backgroundColor,
@@ -759,7 +770,7 @@ class _EditeventpageState extends State<Editeventpage> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -768,98 +779,100 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   Widget _buildStep5() {
+    final t = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payment Information',
+          t.paymentInformation,
           style: AppComponent.labelTextStyle.copyWith(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         _buildPaypalForm(),
       ],
     );
   }
 
   Widget _buildPaypalForm() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Paypal Account ID', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          Text(t.paypalAccountId, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _paypalAccountIdController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter PayPal Account ID';
+                return t.validatePaypalAccount;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter Paypal Account ID',
+              hintText: t.enterPaypalAccountHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Secret Key', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.secretKey, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _paypalSecretKeyController,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please Enter your Secret Key';
+                return t.validateSecretKey;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter Secret Key',
+              hintText: t.enterSecretKeyHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Currency Code', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.currencyCode, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _paypalCurrencyCodeController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter currency code';
+                return t.validateCurrencyCode;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter currency code',
+              hintText: t.enterCurrencyCodeHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Center(
             child: Image.asset(
               'assets/img/other/credit.png',
@@ -872,76 +885,77 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   Widget _buildStep4() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Location Name', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          Text(t.locationName, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _locationNameController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter location name';
+                return t.validateLocationName;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter location name',
+              hintText: t.enterLocationNameHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Location', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          const SizedBox(height: 10),
+          Text(t.location, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _locationInfoController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter location';
+                return t.validateLocation;
               }
               return null;
             },
             keyboardType: TextInputType.url,
             decoration: InputDecoration(
-              hintText: 'Enter location',
+              hintText: t.enterLocationHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Location Link', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          const SizedBox(height: 10),
+          Text(t.locationLink, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _locationLinkController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter location link';
+                return t.validateLocationLink;
               }
               return null;
             },
             keyboardType: TextInputType.url,
             decoration: InputDecoration(
-              hintText: 'Enter location link',
+              hintText: t.enterLocationLinkHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
@@ -953,68 +967,69 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   Widget _buildStep3() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ticket Type', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          Text(t.ticketType, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _ticketTypeController,
             decoration: InputDecoration(
-              hintText: 'Enter your ticket type',
+              hintText: t.enterTicketTypeHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Quantity', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.quantity, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _quantityController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: 'Enter quantity',
+              hintText: t.enterQuantityHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Price', style: AppComponent.labelTextStyle),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          Text(t.price, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _priceController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: 'Enter price',
+              hintText: t.enterPriceHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           GestureDetector(
             onTap: _addTicket,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               width: 150,
               decoration: BoxDecoration(
                 border: Border.all(color: AdvertiseColor.primaryColor),
@@ -1024,7 +1039,7 @@ class _EditeventpageState extends State<Editeventpage> {
               child: Row(
                 children: [
                   Text(
-                    'Add Ticket',
+                    t.addTicket,
                     style: TextStyle(
                       color: AdvertiseColor.backgroundColor,
                       fontFamily: 'KantumRuyPro',
@@ -1036,13 +1051,13 @@ class _EditeventpageState extends State<Editeventpage> {
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _tickets.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Text(
-                      'No tickets added yet',
+                      t.noTicketsAdded,
                       style: TextStyle(
                         color: AdvertiseColor.textColor.withOpacity(0.5),
                       ),
@@ -1075,12 +1090,12 @@ class _EditeventpageState extends State<Editeventpage> {
                             child: GestureDetector(
                               onTap: () => _removeTicket(index),
                               child: Container(
-                                padding: EdgeInsets.all(4),
+                                padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
                                   color: Colors.red,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.close,
                                   size: 16,
                                   color: Colors.white,
@@ -1099,27 +1114,28 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   Widget _buildStep2() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Upload Image', style: AppComponent.labelTextStyle),
-          SizedBox(height: 20),
+          Text(t.uploadImage, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 20),
           DottedBorder(
             borderType: BorderType.RRect,
-            radius: Radius.circular(12),
-            padding: EdgeInsets.all(6),
+            radius: const Radius.circular(12),
+            padding: const EdgeInsets.all(6),
             color: Colors.blue,
             strokeWidth: 2,
-            dashPattern: [6, 3],
+            dashPattern: const [6, 3],
             child: Container(
               width: double.infinity,
               height: 240,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   if (_pickedImage != null)
                     Image.file(
                       _pickedImage!,
@@ -1139,22 +1155,22 @@ class _EditeventpageState extends State<Editeventpage> {
                       color: AdvertiseColor.blueColor,
                       size: 40,
                     ),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Text(
                     _pickedImage != null
-                        ? 'New image selected'
+                        ? t.newImageSelected
                         : (_existingImageUrl != null && _isEditMode
-                              ? 'Current image'
-                              : 'Upload your event image here'),
+                              ? t.currentImage
+                              : t.uploadImageHint),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: _pickImage,
                     style: ElevatedButton.styleFrom(
                       side: BorderSide(color: AdvertiseColor.primaryColor),
                     ),
                     child: Text(
-                      _pickedImage != null ? 'Change Image' : 'Browse Image',
+                      _pickedImage != null ? t.changeImage : t.browseImage,
                       style: AppComponent.elevatedButtonTextStyle.copyWith(
                         color: AdvertiseColor.primaryColor,
                       ),
@@ -1169,31 +1185,31 @@ class _EditeventpageState extends State<Editeventpage> {
                           _pickedImage = null;
                         });
                       },
-                      child: Text('Use existing image'),
+                      child: Text(t.useExistingImage),
                     ),
                 ],
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Description', style: AppComponent.labelTextStyle),
+          const SizedBox(height: 10),
+          Text(t.description, style: AppComponent.labelTextStyle),
           TextFormField(
             controller: _descriptionController,
             minLines: 3,
             maxLines: 5,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter description';
+                return t.validateDescription;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter your description',
+              hintText: t.enterDescriptionHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
@@ -1205,42 +1221,40 @@ class _EditeventpageState extends State<Editeventpage> {
   }
 
   Widget _buildStep1() {
+    final t = AppLocalizations.of(context)!;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Event Title', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          Text(t.eventTitle, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           TextFormField(
             controller: _eventTitleController,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter event title';
+                return t.validateEventTitle;
               }
               return null;
             },
             decoration: InputDecoration(
-              hintText: 'Enter event title',
+              hintText: t.enterEventTitleHint,
               hintStyle: AppComponent.hintTextStyle,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Text('Category', style: AppComponent.labelTextStyle),
-          SizedBox(height: 5),
+          const SizedBox(height: 10),
+          Text(t.category, style: AppComponent.labelTextStyle),
+          const SizedBox(height: 5),
           DropdownButtonFormField<int>(
             value: _selectedEventCategory,
-            hint: Text(
-              'Select Event Category',
-              style: AppComponent.hintTextStyle,
-            ),
+            hint: Text(t.selectCategoryHint, style: AppComponent.hintTextStyle),
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -1261,12 +1275,12 @@ class _EditeventpageState extends State<Editeventpage> {
             },
             validator: (value) {
               if (value == null) {
-                return 'Please select a category';
+                return t.validateCategory;
               }
               return null;
             },
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           SizedBox(
             height: 80,
             width: double.infinity,
@@ -1276,7 +1290,7 @@ class _EditeventpageState extends State<Editeventpage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Start date', style: AppComponent.labelTextStyle),
+                      Text(t.startDate, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1292,12 +1306,12 @@ class _EditeventpageState extends State<Editeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select start date';
+                                  return t.validateStartDate;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1315,7 +1329,7 @@ class _EditeventpageState extends State<Editeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick start date",
+                                hintText: t.pickStartDateHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1325,12 +1339,12 @@ class _EditeventpageState extends State<Editeventpage> {
                     ],
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('End date', style: AppComponent.labelTextStyle),
+                      Text(t.endDate, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1346,12 +1360,12 @@ class _EditeventpageState extends State<Editeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select end date';
+                                  return t.validateEndDate;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1369,7 +1383,7 @@ class _EditeventpageState extends State<Editeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick end date",
+                                hintText: t.pickEndDateHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1382,7 +1396,7 @@ class _EditeventpageState extends State<Editeventpage> {
               ],
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           SizedBox(
             height: 80,
             width: double.infinity,
@@ -1392,7 +1406,7 @@ class _EditeventpageState extends State<Editeventpage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Start time', style: AppComponent.labelTextStyle),
+                      Text(t.startTime, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1406,12 +1420,12 @@ class _EditeventpageState extends State<Editeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select start time';
+                                  return t.validateStartTime;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1429,7 +1443,7 @@ class _EditeventpageState extends State<Editeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick start time",
+                                hintText: t.pickStartTimeHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1439,12 +1453,12 @@ class _EditeventpageState extends State<Editeventpage> {
                     ],
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('End time', style: AppComponent.labelTextStyle),
+                      Text(t.endTime, style: AppComponent.labelTextStyle),
                       Container(
                         height: 50,
                         child: GestureDetector(
@@ -1458,12 +1472,12 @@ class _EditeventpageState extends State<Editeventpage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select end time';
+                                  return t.validateEndTime;
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
                                 filled: true,
@@ -1481,7 +1495,7 @@ class _EditeventpageState extends State<Editeventpage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                hintText: "Pick end time",
+                                hintText: t.pickEndTimeHint,
                                 hintStyle: AppComponent.hintTextStyle,
                               ),
                             ),
@@ -1531,7 +1545,7 @@ class _EditeventpageState extends State<Editeventpage> {
 
   Widget _buildProgressSteps() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           _buildStepCircle('1', _currentStep >= 1),

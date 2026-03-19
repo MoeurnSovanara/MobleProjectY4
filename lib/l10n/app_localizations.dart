@@ -1093,6 +1093,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No user data found'**
   String get noUserDataFound;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// No description provided for @oldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Old Password'**
+  String get oldPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// No description provided for @confirmNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get confirmNewPassword;
+
+  /// No description provided for @validateOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please input your old password'**
+  String get validateOldPassword;
+
+  /// No description provided for @validateNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please input your new password'**
+  String get validateNewPassword;
+
+  /// No description provided for @validateConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your new password'**
+  String get validateConfirmPassword;
+
+  /// No description provided for @passwordLengthError.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordLengthError;
+
+  /// No description provided for @passwordMatchError.
+  ///
+  /// In en, this message translates to:
+  /// **'New password and confirm password do not match!'**
+  String get passwordMatchError;
+
+  /// No description provided for @userEmailNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'User email not found!'**
+  String get userEmailNotFound;
+
+  /// No description provided for @incorrectOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect Old Password!'**
+  String get incorrectOldPassword;
+
+  /// No description provided for @warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @editEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Event'**
+  String get editEvent;
+
+  /// No description provided for @createEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Event'**
+  String get createEvent;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// No description provided for @changeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Image'**
+  String get changeImage;
+
+  /// No description provided for @useExistingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Use existing image'**
+  String get useExistingImage;
+
+  /// No description provided for @newImageSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'New image selected'**
+  String get newImageSelected;
+
+  /// No description provided for @currentImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Current image'**
+  String get currentImage;
+
+  /// No description provided for @noTicketsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No tickets added yet'**
+  String get noTicketsAdded;
+
+  /// No description provided for @errorUpdateVenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update venue'**
+  String get errorUpdateVenue;
+
+  /// No description provided for @errorUpdateEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update event'**
+  String get errorUpdateEvent;
+
+  /// No description provided for @errorLoadData.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load data'**
+  String get errorLoadData;
+
+  /// No description provided for @imageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Image is required'**
+  String get imageRequired;
+
+  /// No description provided for @eventUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Event updated successfully'**
+  String get eventUpdatedSuccess;
 }
 
 class _AppLocalizationsDelegate

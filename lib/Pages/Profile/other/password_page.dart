@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/UserDto.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
@@ -23,12 +24,14 @@ class _PasswordPageState extends State<PasswordPage> {
   bool isLoading = false;
 
   Future<void> _updatePassword() async {
+    final t = AppLocalizations.of(context)!;
+
     // Validate if new password and confirm password match
     if (_newPasswordController.text != _confirmPasswordController.text) {
       _showDialog(
         icon: Icons.warning,
         iconColor: Colors.yellow,
-        message: 'New password and confirm password do not match!',
+        message: t.passwordMatchError,
       );
       return;
     }
@@ -43,7 +46,7 @@ class _PasswordPageState extends State<PasswordPage> {
         _showDialog(
           icon: Icons.error,
           iconColor: AdvertiseColor.dangerColor,
-          message: 'User email not found!',
+          message: t.userEmailNotFound,
         );
         setState(() {
           isLoading = false;
@@ -81,14 +84,14 @@ class _PasswordPageState extends State<PasswordPage> {
           _showDialog(
             icon: Icons.verified,
             iconColor: Colors.green,
-            message: 'Update Password Successfully!',
+            message: t.updatePasswordSuccess,
             isSuccess: true,
           );
         } else {
           _showDialog(
             icon: Icons.close_rounded,
             iconColor: AdvertiseColor.dangerColor,
-            message: 'Failed to update!',
+            message: t.updateFailed,
           );
         }
       } else {
@@ -98,7 +101,7 @@ class _PasswordPageState extends State<PasswordPage> {
         _showDialog(
           icon: Icons.warning,
           iconColor: Colors.yellow,
-          message: 'Incorrect Old Password!',
+          message: t.incorrectOldPassword,
         );
       }
     } catch (e) {
@@ -108,7 +111,7 @@ class _PasswordPageState extends State<PasswordPage> {
       _showDialog(
         icon: Icons.error,
         iconColor: AdvertiseColor.dangerColor,
-        message: 'An error occurred. Please try again.',
+        message: t.errorOccurred,
       );
     }
   }
@@ -119,6 +122,7 @@ class _PasswordPageState extends State<PasswordPage> {
     required String message,
     bool isSuccess = false,
   }) {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -141,12 +145,12 @@ class _PasswordPageState extends State<PasswordPage> {
                 Navigator.pop(context); // Close dialog
                 Navigator.pop(context); // Go back to previous page
               },
-              child: const Text('OK'),
+              child: Text(t.ok),
             )
           else
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+              child: Text(t.ok),
             ),
         ],
       ),
@@ -155,10 +159,11 @@ class _PasswordPageState extends State<PasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Change Password',
+          t.changePassword,
           style: AppComponent.appBarTitleTextStyle.copyWith(
             color: AdvertiseColor.textColor,
           ),
@@ -186,35 +191,41 @@ class _PasswordPageState extends State<PasswordPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Old Password', style: AppComponent.labelTextStyle),
+                    Text(t.oldPassword, style: AppComponent.labelTextStyle),
                     TextFormField(
                       controller: _oldPasswordController,
                       obscureText: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please input your old password';
+                          return t.validateOldPassword;
                         }
                         return null;
                       },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                     const SizedBox(height: 20),
-                    Text('New Password', style: AppComponent.labelTextStyle),
+                    Text(t.newPassword, style: AppComponent.labelTextStyle),
                     TextFormField(
                       controller: _newPasswordController,
                       obscureText: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please input your new password';
+                          return t.validateNewPassword;
                         }
                         if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
+                          return t.passwordLengthError;
                         }
                         return null;
                       },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Confirm New Password',
+                      t.confirmNewPassword,
                       style: AppComponent.labelTextStyle,
                     ),
                     TextFormField(
@@ -222,10 +233,13 @@ class _PasswordPageState extends State<PasswordPage> {
                       obscureText: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please confirm your new password';
+                          return t.validateConfirmPassword;
                         }
                         return null;
                       },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                     const SizedBox(height: 30),
                     Row(
@@ -244,7 +258,7 @@ class _PasswordPageState extends State<PasswordPage> {
                             ),
                           ),
                           child: Text(
-                            'CANCEL',
+                            t.cancel,
                             style: AppComponent.elevatedButtonTextStyle
                                 .copyWith(color: AdvertiseColor.primaryColor),
                           ),
@@ -279,7 +293,7 @@ class _PasswordPageState extends State<PasswordPage> {
                                   ),
                                 )
                               : Text(
-                                  'SAVE',
+                                  t.save,
                                   style: AppComponent.elevatedButtonTextStyle,
                                 ),
                         ),

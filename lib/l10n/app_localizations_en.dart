@@ -507,4 +507,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noUserDataFound => 'No user data found';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get oldPassword => 'Old Password';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get confirmNewPassword => 'Confirm New Password';
+
+  @override
+  String get validateOldPassword => 'Please input your old password';
+
+  @override
+  String get validateNewPassword => 'Please input your new password';
+
+  @override
+  String get validateConfirmPassword => 'Please confirm your new password';
+
+  @override
+  String get passwordLengthError => 'Password must be at least 6 characters';
+
+  @override
+  String get passwordMatchError =>
+      'New password and confirm password do not match!';
+
+  @override
+  String get userEmailNotFound => 'User email not found!';
+
+  @override
+  String get incorrectOldPassword => 'Incorrect Old Password!';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get editEvent => 'Edit Event';
+
+  @override
+  String get createEvent => 'Create Event';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get changeImage => 'Change Image';
+
+  @override
+  String get useExistingImage => 'Use existing image';
+
+  @override
+  String get newImageSelected => 'New image selected';
+
+  @override
+  String get currentImage => 'Current image';
+
+  @override
+  String get noTicketsAdded => 'No tickets added yet';
+
+  @override
+  String get errorUpdateVenue => 'Failed to update venue';
+
+  @override
+  String get errorUpdateEvent => 'Failed to update event';
+
+  @override
+  String get errorLoadData => 'Failed to load data';
+
+  @override
+  String get imageRequired => 'Image is required';
+
+  @override
+  String get eventUpdatedSuccess => 'Event updated successfully';
 }

@@ -3,6 +3,7 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Pages/My%20Events/other/OwnEvents.dart';
 import 'package:mobile_assignment/Pages/Profile/other/bookmark_page.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 
 class Myevents extends StatefulWidget {
   const Myevents({super.key});
@@ -14,6 +15,7 @@ class Myevents extends StatefulWidget {
 class _MyeventsState extends State<Myevents> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: null,
@@ -53,7 +55,7 @@ class _MyeventsState extends State<Myevents> {
                   children: [
                     Icon(Icons.wallet, color: AdvertiseColor.primaryColor),
                     SizedBox(width: 5),
-                    Text('My Events', style: AppComponent.labelTextStyle),
+                    Text(t.eventLabel, style: AppComponent.labelTextStyle),
                     Spacer(),
                     Icon(
                       Icons.arrow_forward_ios,
@@ -84,7 +86,7 @@ class _MyeventsState extends State<Myevents> {
                   children: [
                     Icon(Icons.bookmark, color: AdvertiseColor.primaryColor),
                     SizedBox(width: 5),
-                    Text('My Bookmark', style: AppComponent.labelTextStyle),
+                    Text(t.pBookmark, style: AppComponent.labelTextStyle),
                     Spacer(),
                     Icon(
                       Icons.arrow_forward_ios,

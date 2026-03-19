@@ -512,4 +512,85 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get noUserDataFound => 'រកមិនឃើញទិន្នន័យអ្នកប្រើប្រាស់';
+
+  @override
+  String get changePassword => 'ប្តូរពាក្យសម្ងាត់';
+
+  @override
+  String get oldPassword => 'ពាក្យសម្ងាត់ចាស់';
+
+  @override
+  String get newPassword => 'ពាក្យសម្ងាត់ថ្មី';
+
+  @override
+  String get confirmNewPassword => 'បញ្ជាក់ពាក្យសម្ងាត់ថ្មី';
+
+  @override
+  String get validateOldPassword => 'សូមបញ្ចូលពាក្យសម្ងាត់ចាស់របស់អ្នក';
+
+  @override
+  String get validateNewPassword => 'សូមបញ្ចូលពាក្យសម្ងាត់ថ្មីរបស់អ្នក';
+
+  @override
+  String get validateConfirmPassword => 'សូមបញ្ជាក់ពាក្យសម្ងាត់ថ្មីរបស់អ្នក';
+
+  @override
+  String get passwordLengthError =>
+      'ពាក្យសម្ងាត់ត្រូវតែមានយ៉ាងហោចណាស់ ៦ តួអក្សរ';
+
+  @override
+  String get passwordMatchError =>
+      'ពាក្យសម្ងាត់ថ្មី និងបញ្ជាក់ពាក្យសម្ងាត់មិនត្រូវគ្នាទេ!';
+
+  @override
+  String get userEmailNotFound => 'រកមិនឃើញអ៊ីមែលអ្នកប្រើប្រាស់!';
+
+  @override
+  String get incorrectOldPassword => 'ពាក្យសម្ងាត់ចាស់មិនត្រឹមត្រូវទេ!';
+
+  @override
+  String get warning => 'ការព្រមាន';
+
+  @override
+  String get edit => 'កែសម្រួល';
+
+  @override
+  String get editEvent => 'កែសម្រួលព្រឹត្តិការណ៍';
+
+  @override
+  String get createEvent => 'បង្កើតព្រឹត្តិការណ៍';
+
+  @override
+  String get update => 'ធ្វើបច្ចុប្បន្នភាព';
+
+  @override
+  String get changeImage => 'ប្តូររូបភាព';
+
+  @override
+  String get useExistingImage => 'ប្រើរូបភាពដើម';
+
+  @override
+  String get newImageSelected => 'បានជ្រើសរើសរូបភាពថ្មី';
+
+  @override
+  String get currentImage => 'រូបភាពបច្ចុប្បន្ន';
+
+  @override
+  String get noTicketsAdded => 'មិនទាន់មានការបន្ថែមសំបុត្រនៅឡើយទេ';
+
+  @override
+  String get errorUpdateVenue => 'បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពទីតាំង';
+
+  @override
+  String get errorUpdateEvent =>
+      'បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពព្រឹត្តិការណ៍';
+
+  @override
+  String get errorLoadData => 'បរាជ័យក្នុងការផ្ទុកទិន្នន័យ';
+
+  @override
+  String get imageRequired => 'ត្រូវការរូបភាព';
+
+  @override
+  String get eventUpdatedSuccess => 'ធ្វើបច្ចុប្បន្នភាពព្រឹត្តិការណ៍ដោយជោគជ័យ';
 }

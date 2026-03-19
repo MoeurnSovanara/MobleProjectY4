@@ -3,6 +3,7 @@ import 'package:mobile_assignment/Const/Component.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/BookmarkCardWidget.dart';
 import 'package:mobile_assignment/Models/DTO/NotGetUserEventEngagementDto.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/userevent_engagement_api.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
@@ -72,10 +73,11 @@ class _BookmarkPageState extends State<BookmarkPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bookmark',
+          t.pBookmark,
           style: AppComponent.appBarTitleTextStyle.copyWith(
             color: AdvertiseColor.textColor,
           ),

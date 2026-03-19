@@ -4,6 +4,7 @@ import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Const/widget/editEventWidget.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/createEventPage.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/API/EventApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 
@@ -42,11 +43,12 @@ class _OwneventsState extends State<Ownevents> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         actionsPadding: EdgeInsets.all(10),
         title: Text(
-          'My Events',
+          t.eventLabel,
           style: AppComponent.appBarTitleTextStyle.copyWith(
             color: AdvertiseColor.textColor,
           ),
@@ -72,7 +74,10 @@ class _OwneventsState extends State<Ownevents> {
               child: ListView.builder(
                 itemCount: event.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Editeventwidget(eventData: event[index],update: _loadUserEvent,);
+                  return Editeventwidget(
+                    eventData: event[index],
+                    update: _loadUserEvent,
+                  );
                 },
               ),
             ),

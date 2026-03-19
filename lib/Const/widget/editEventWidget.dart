@@ -4,6 +4,7 @@ import 'package:mobile_assignment/Const/Global/global.dart';
 import 'package:mobile_assignment/Const/themeColor.dart';
 import 'package:mobile_assignment/Models/DTO/EventDto.dart';
 import 'package:mobile_assignment/Pages/Dashboard/CreateEvent/editEventPage.dart';
+import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/services/Helper/HelperClass.dart';
 import 'package:mobile_assignment/services/Helper/InteractionHelper.dart';
 import 'package:mobile_assignment/services/Helper/PreloadImageHelper.dart';
@@ -117,24 +118,25 @@ class _EditeventwidgetState extends State<Editeventwidget> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Container(
       width: 220,
       height: 320,
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
-      margin: EdgeInsets.only(bottom: 5),
+      margin: const EdgeInsets.only(bottom: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             height: 150,
-            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             decoration: BoxDecoration(
               image: DecorationImage(
                 image:
@@ -145,9 +147,9 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                       )
                     : const AssetImage("assets/img/other/errorImage.png")
                           as ImageProvider,
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.cover,
               ),
-              borderRadius: BorderRadiusDirectional.circular(15),
+              borderRadius: const BorderRadius.all(Radius.circular(15)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,15 +164,14 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                   child: Text(
                     textAlign: TextAlign.center,
                     Helperclass.formatFullDate(widget.eventData.eventStart),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'KantumruyPro',
-                      color: AdvertiseColor.textColor,
                       fontWeight: FontWeight.w500,
                       fontSize: 25,
                     ),
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 Container(
                   width: 30,
                   height: 35,
@@ -178,49 +179,61 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                     color: AdvertiseColor.backgroundColor.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.bookmark_outline),
+                  child: const Icon(Icons.bookmark_outline),
                 ),
               ],
             ),
           ),
           Container(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               children: [
                 Text(
                   widget.eventData.title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'KantumruyPro',
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: AdvertiseColor.textColor,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Row(
                   children: [
                     Icon(
                       Icons.thumb_up_outlined,
                       color: AdvertiseColor.primaryColor,
+                      size: 18,
                     ),
-                    SizedBox(width: 5),
-                    Text(_interactionHelper?.likeCount.toString() ?? '0'),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
+                    Text(
+                      _interactionHelper?.likeCount.toString() ?? '0',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    const SizedBox(width: 5),
                     Icon(
                       Icons.thumb_down_outlined,
                       color: AdvertiseColor.textColor.withOpacity(0.5),
+                      size: 18,
                     ),
-                    SizedBox(width: 5),
-                    Text(_interactionHelper?.dislikeCount.toString() ?? '0'),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
+                    Text(
+                      _interactionHelper?.dislikeCount.toString() ?? '0',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    const SizedBox(width: 5),
                     Icon(
                       Icons.bookmark_outline,
                       color: AdvertiseColor.textColor.withOpacity(0.5),
+                      size: 18,
                     ),
-                    SizedBox(width: 5),
-                    Text(_interactionHelper?.bookmarkedCount.toString() ?? '0'),
-                    Spacer(),
-                    Spacer(),
+                    const SizedBox(width: 5),
+                    Text(
+                      _interactionHelper?.bookmarkedCount.toString() ?? '0',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    const Spacer(),
                     ElevatedButton(
                       onPressed: () async {
                         bool? result = await Navigator.push(
@@ -240,26 +253,30 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 15,
                           vertical: 5,
                         ),
+                        minimumSize: const Size(60, 30),
                       ),
                       child: Text(
-                        'Edit',
-                        style: AppComponent.elevatedButtonTextStyle,
+                        t.edit,
+                        style: AppComponent.elevatedButtonTextStyle.copyWith(
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Icon(
                       Icons.location_on,
                       color: AdvertiseColor.textColor.withOpacity(0.5),
+                      size: 16,
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Flexible(
                       child: Text(
                         widget.eventData.venues.venueInfo,
@@ -267,6 +284,7 @@ class _EditeventwidgetState extends State<Editeventwidget> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: AdvertiseColor.textColor.withOpacity(0.5),
+                          fontSize: 11,
                         ),
                       ),
                     ),
