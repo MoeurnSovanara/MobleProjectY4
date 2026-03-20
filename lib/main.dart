@@ -7,6 +7,7 @@ import 'package:mobile_assignment/Pages/Navigator/changePage.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
 import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/providers/language_provider.dart';
+import 'package:mobile_assignment/providers/theme_provider.dart'; // Add this import
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 import 'package:provider/provider.dart';
 
@@ -47,8 +48,6 @@ class _MyAppState extends State<MyApp> {
   Future<void> _loadUserEmail() async {
     try {
       final String? email = await _usersharedpreferences.getUserEmail();
-      // Load organizer status if needed elsewhere
-      // final bool? isOrganizer = await _usersharedpreferences.getUserOrganizer();
 
       if (mounted) {
         setState(() {
@@ -67,25 +66,26 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) {
-        final provider = LanguageProvider();
-        // Load saved language preference
-        provider.loadSavedLanguage();
-        return provider;
-      },
-      child: Consumer<LanguageProvider>(
-        builder: (context, langProvider, child) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) {
+            final provider = LanguageProvider();
+            provider.loadSavedLanguage();
+            return provider;
+          },
+        ),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+      ],
+      child: Consumer2<LanguageProvider, ThemeProvider>(
+        builder: (context, langProvider, themeProvider, child) {
           return MaterialApp(
             title: 'Advertise App',
             debugShowCheckedModeBanner: false,
 
             // Localization configuration
             locale: langProvider.locale,
-            supportedLocales: const [
-              Locale('en'), // English
-              Locale('km'), // Khmer
-            ],
+            supportedLocales: const [Locale('en'), Locale('km')],
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -93,9 +93,7 @@ class _MyAppState extends State<MyApp> {
               GlobalCupertinoLocalizations.delegate,
             ],
 
-            // Improved locale resolution
             localeResolutionCallback: (locale, supportedLocales) {
-              // If device locale is supported, use it
               if (locale != null) {
                 for (var supportedLocale in supportedLocales) {
                   if (supportedLocale.languageCode == locale.languageCode) {
@@ -103,21 +101,69 @@ class _MyAppState extends State<MyApp> {
                   }
                 }
               }
-              // Otherwise use the provider's locale (saved preference)
               return langProvider.locale;
             },
 
-            // Theme configuration
+            // Theme configuration - Using the colors from AdvertiseColor
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: AdvertiseColor.backgroundColor,
-                brightness: Brightness.light,
+              brightness: Brightness.light,
+              primaryColor: AdvertiseColor.lightPrimaryColor,
+              scaffoldBackgroundColor: AdvertiseColor.lightBackgroundColor,
+              colorScheme: const ColorScheme.light(
+                primary: AdvertiseColor.lightPrimaryColor,
+                secondary: AdvertiseColor.lightBlueColor,
+                error: AdvertiseColor.lightDangerColor,
+                background: AdvertiseColor.lightBackgroundColor,
               ),
               useMaterial3: true,
               fontFamily: langProvider.locale.languageCode == 'km'
-                  ? 'KantumruyPro' // Add this if you have Khmer font
+                  ? 'KantumruyPro'
                   : null,
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: AdvertiseColor.lightInputFieldColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              textTheme: const TextTheme(
+                bodyLarge: TextStyle(color: AdvertiseColor.lightTextColor),
+                bodyMedium: TextStyle(color: AdvertiseColor.lightTextColor),
+              ),
             ),
+
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              primaryColor: AdvertiseColor.darkPrimaryColor,
+              scaffoldBackgroundColor: AdvertiseColor.darkBackgroundColor,
+              colorScheme: const ColorScheme.dark(
+                primary: AdvertiseColor.darkPrimaryColor,
+                secondary: AdvertiseColor.darkBlueColor,
+                error: AdvertiseColor.darkDangerColor,
+                background: AdvertiseColor.darkBackgroundColor,
+              ),
+              useMaterial3: true,
+              fontFamily: langProvider.locale.languageCode == 'km'
+                  ? 'KantumruyPro'
+                  : null,
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: AdvertiseColor.darkInputFieldColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              textTheme: const TextTheme(
+                bodyLarge: TextStyle(color: AdvertiseColor.darkTextColor),
+                bodyMedium: TextStyle(color: AdvertiseColor.darkTextColor),
+              ),
+            ),
+
+            themeMode: themeProvider.isDarkMode
+                ? ThemeMode.dark
+                : ThemeMode.light,
 
             // Home screen with loading state
             home: _isLoading

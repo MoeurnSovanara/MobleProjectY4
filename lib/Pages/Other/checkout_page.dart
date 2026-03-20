@@ -728,8 +728,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
         Container(
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: AdvertiseColor.inputFieldColor,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AdvertiseColor.textColor.withOpacity(0.5),
+            ),
           ),
           child: Column(
             children: [

@@ -315,7 +315,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             prefixIcon: Icon(
                               Icons.search,
-                              color: AdvertiseColor.backgroundColor,
+                              color: AdvertiseColor.darkTextColor,
                             ), // Use prefixIcon instead of icon
                             filled: true,
                             fillColor: Colors.white.withOpacity(
@@ -333,7 +333,9 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                             hintText: t.searchLabel,
-                            hintStyle: AppComponent.hintSearchStyle,
+                            hintStyle: AppComponent.hintSearchStyle.copyWith(
+                              color: AdvertiseColor.darkTextColor,
+                            ),
                           ),
                         ),
                       ),
@@ -352,13 +354,13 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Icon(
                               Icons.playlist_add_circle_outlined,
-                              color: AdvertiseColor.backgroundColor,
+                              color: AdvertiseColor.darkTextColor,
                             ),
                             SizedBox(width: 5),
                             Text(
                               t.filters,
                               style: TextStyle(
-                                color: AdvertiseColor.backgroundColor,
+                                color: AdvertiseColor.darkTextColor,
                               ),
                             ),
                           ],

@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                           fontFamily: 'KantumruyPro',
                           fontSize: 16,
-                          color: AdvertiseColor.backgroundColor,
+                          color: AdvertiseColor.textColor,
                         ),
                       ),
                       Text(
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                           fontFamily: 'KantumruyPro',
                           fontSize: 40,
                           fontWeight: FontWeight.w700,
-                          color: AdvertiseColor.backgroundColor,
+                          color: AdvertiseColor.textColor,
                         ),
                       ),
                     ],

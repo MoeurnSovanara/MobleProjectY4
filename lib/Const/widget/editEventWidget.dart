@@ -124,7 +124,8 @@ class _EditeventwidgetState extends State<Editeventwidget> {
       height: 320,
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdvertiseColor.backgroundColor,
+        border: Border.all(color: AdvertiseColor.inputFieldColor),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),

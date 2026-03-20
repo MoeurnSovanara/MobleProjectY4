@@ -43,7 +43,7 @@ class _MyeventsState extends State<Myevents> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AdvertiseColor.backgroundColor,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: AdvertiseColor.textColor.withOpacity(0.5),
@@ -74,7 +74,7 @@ class _MyeventsState extends State<Myevents> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AdvertiseColor.backgroundColor,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: AdvertiseColor.textColor.withOpacity(0.5),

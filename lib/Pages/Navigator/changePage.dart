@@ -7,7 +7,9 @@ import 'package:mobile_assignment/Pages/My%20Events/MyEvents.dart';
 import 'package:mobile_assignment/Pages/My%20Tickets/ticket_page.dart';
 import 'package:mobile_assignment/Pages/Profile/profile_page.dart';
 import 'package:mobile_assignment/l10n/app_localizations.dart';
+import 'package:mobile_assignment/providers/theme_provider.dart'; // Add this import
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
+import 'package:provider/provider.dart'; // Add this import
 
 class Changepage extends StatefulWidget {
   const Changepage({super.key});
@@ -19,7 +21,7 @@ class Changepage extends StatefulWidget {
 class _ChangepageState extends State<Changepage> {
   late List<Widget> pages;
   bool? isOrganizer = false;
-  bool _isLoading = true; // Add loading state
+  bool _isLoading = true;
   Usersharedpreferences usersharedpreferences = Usersharedpreferences();
   int currentTabIndex = 0;
 
@@ -34,10 +36,9 @@ class _ChangepageState extends State<Changepage> {
   @override
   void initState() {
     super.initState();
-    _initializePages(); // Call async method properly
+    _initializePages();
   }
 
-  // Fix: Move async operation to separate method
   void _initializePages() async {
     // Initialize all pages first
     homePage = const HomePage();
@@ -75,53 +76,69 @@ class _ChangepageState extends State<Changepage> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    // Show loading indicator while initializing
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: AdvertiseColor.backgroundColor,
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
 
-    return Scaffold(
-      backgroundColor: AdvertiseColor.backgroundColor,
-      body: pages[currentTabIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AdvertiseColor.backgroundColor,
-        currentIndex: currentTabIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: AdvertiseColor.primaryColor,
-        unselectedItemColor: AdvertiseColor.textColor.withOpacity(0.4),
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            label: t.homeLabel,
+    // Listen to theme changes using Consumer
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        // Show loading indicator while initializing
+        if (_isLoading) {
+          return Scaffold(
+            backgroundColor:
+                AdvertiseColor.backgroundColor, // This will update with theme
+            body: Center(
+              child: CircularProgressIndicator(
+                color:
+                    AdvertiseColor.primaryColor, // This will update with theme
+              ),
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: AdvertiseColor
+              .backgroundColor, // This will update when theme changes
+          body: pages[currentTabIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: AdvertiseColor
+                .backgroundColor, // This will update when theme changes
+            currentIndex: currentTabIndex,
+            onTap: _onItemTapped,
+            selectedItemColor: AdvertiseColor
+                .primaryColor, // This will update when theme changes
+            unselectedItemColor: AdvertiseColor.textColor.withOpacity(
+              0.4,
+            ), // This will update when theme changes
+            type: BottomNavigationBarType.fixed,
+            items: [
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.home_outlined),
+                label: t.homeLabel,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.event_outlined),
+                label: t.eventLabel,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.dashboard_outlined),
+                label: t.dashBoardLabel,
+              ),
+              isOrganizer == false
+                  ? BottomNavigationBarItem(
+                      icon: const Icon(Icons.confirmation_number_outlined),
+                      label: t.tickets,
+                    )
+                  : BottomNavigationBarItem(
+                      icon: const Icon(Icons.wallet),
+                      label: t.eventLabel,
+                    ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.person_outline),
+                label: t.profileLabel,
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.event_outlined),
-            label: t.eventLabel,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.dashboard_outlined),
-            label: t.dashBoardLabel,
-          ),
-          // Fix: Use proper condition check
-          isOrganizer == false
-              ? BottomNavigationBarItem(
-                  icon: const Icon(Icons.confirmation_number_outlined),
-                  label: t.tickets,
-                )
-              : BottomNavigationBarItem(
-                  icon: const Icon(Icons.wallet),
-                  label: t.eventLabel,
-                ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person_outline),
-            label: t.profileLabel,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

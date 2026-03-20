@@ -79,7 +79,7 @@ class _UsedcardwidgetState extends State<Usedcardwidget> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AdvertiseColor.inputFieldColor,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
@@ -96,7 +96,7 @@ class _UsedcardwidgetState extends State<Usedcardwidget> {
                   data: qrData,
                   version: QrVersions.auto,
                   size: 200,
-                  backgroundColor: Colors.white,
+                  backgroundColor: AdvertiseColor.textColor,
                   errorCorrectionLevel: QrErrorCorrectLevel.H,
                   eyeStyle: QrEyeStyle(
                     eyeShape: QrEyeShape.square,
@@ -198,7 +198,9 @@ class _UsedcardwidgetState extends State<Usedcardwidget> {
                 ),
                 child: Text(
                   'Close',
-                  style: AppComponent.elevatedButtonTextStyle,
+                  style: AppComponent.elevatedButtonTextStyle.copyWith(
+                    color: AdvertiseColor.textColor,
+                  ),
                 ),
               ),
             ],
@@ -226,7 +228,12 @@ class _UsedcardwidgetState extends State<Usedcardwidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: AdvertiseColor.textColor.withOpacity(0.2),
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -334,7 +341,7 @@ class _UsedcardwidgetState extends State<Usedcardwidget> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          event.venues.venueInfo,
+                          event.venues.venueName,
                           style: AppComponent.detailTextStyle.copyWith(
                             fontSize: screenWidth <= 402 ? 10 : 12,
                           ),

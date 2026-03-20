@@ -12,6 +12,7 @@ import 'package:mobile_assignment/Pages/Profile/other/usedTicket_page.dart';
 import 'package:mobile_assignment/Pages/landingpage.dart';
 import 'package:mobile_assignment/l10n/app_localizations.dart';
 import 'package:mobile_assignment/providers/language_provider.dart';
+import 'package:mobile_assignment/providers/theme_provider.dart';
 import 'package:mobile_assignment/services/API/UserApi.dart';
 import 'package:mobile_assignment/sharedpreferences/UserSharedPreferences.dart';
 import 'package:provider/provider.dart';
@@ -75,6 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AdvertiseColor
+          .inputFieldColor, // Using inputFieldColor for background
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -86,11 +89,18 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(t.pLanguage, style: AppComponent.boldTextStyle),
+              Text(
+                t.pLanguage,
+                style: AppComponent.boldTextStyle.copyWith(
+                  color: AdvertiseColor.textColor,
+                ),
+              ),
               const SizedBox(height: 10),
               Text(
                 t.languageDetail,
-                style: AppComponent.labelTextStyle,
+                style: AppComponent.labelTextStyle.copyWith(
+                  color: AdvertiseColor.textColor.withOpacity(0.7),
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -120,10 +130,20 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  style: AppComponent.elevatedButtonStyle,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AdvertiseColor.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                   child: Text(
                     t.selectLabel,
-                    style: AppComponent.elevatedButtonTextStyle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -155,13 +175,13 @@ class _ProfilePageState extends State<ProfilePage> {
           border: Border.all(
             color: isSelected
                 ? AdvertiseColor.primaryColor
-                : AdvertiseColor.textColor.withOpacity(0.5),
+                : AdvertiseColor.textColor.withOpacity(0.3),
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(10),
           color: isSelected
-              ? AdvertiseColor.primaryColor.withOpacity(0.05)
-              : null,
+              ? AdvertiseColor.primaryColor.withOpacity(0.1)
+              : AdvertiseColor.inputFieldColor,
         ),
         child: Row(
           children: [
@@ -170,7 +190,8 @@ class _ProfilePageState extends State<ProfilePage> {
             Expanded(
               child: Text(
                 name,
-                style: AppComponent.labelTextStyle.copyWith(
+                style: TextStyle(
+                  color: AdvertiseColor.textColor,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -193,88 +214,164 @@ class _ProfilePageState extends State<ProfilePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AdvertiseColor.inputFieldColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-          width: double.infinity,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(t.pAppearance, style: AppComponent.boldTextStyle),
-              const SizedBox(height: 10),
-              Text(
-                t.appearanceDetail,
-                style: AppComponent.labelTextStyle,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-
-              // Light theme option
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AdvertiseColor.textColor.withOpacity(0.5),
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.light_mode_outlined,
-                      color: AdvertiseColor.primaryColor,
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, child) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+              width: double.infinity,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    t.pAppearance,
+                    style: AppComponent.boldTextStyle.copyWith(
+                      color: AdvertiseColor.textColor,
                     ),
-                    const SizedBox(width: 15),
-                    Text(t.lightLable, style: AppComponent.labelTextStyle),
-                    const Spacer(),
-                    // TODO: Add theme selection logic
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Dark theme option
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AdvertiseColor.textColor.withOpacity(0.5),
                   ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.dark_mode_outlined,
-                      color: AdvertiseColor.primaryColor,
+                  const SizedBox(height: 10),
+                  Text(
+                    t.appearanceDetail,
+                    style: AppComponent.labelTextStyle.copyWith(
+                      color: AdvertiseColor.textColor.withOpacity(0.7),
                     ),
-                    const SizedBox(width: 15),
-                    Text(t.darkLabel, style: AppComponent.labelTextStyle),
-                    const Spacer(),
-                    // TODO: Add theme selection logic
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // Select button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: AppComponent.elevatedButtonStyle,
-                  child: Text(
-                    t.selectLabel,
-                    style: AppComponent.elevatedButtonTextStyle,
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  const SizedBox(height: 20),
+
+                  // Light theme option
+                  GestureDetector(
+                    onTap: () {
+                      themeProvider.toggleTheme();
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: !themeProvider.isDarkMode
+                              ? AdvertiseColor.primaryColor
+                              : AdvertiseColor.textColor.withOpacity(0.3),
+                          width: !themeProvider.isDarkMode ? 2 : 1,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        color: !themeProvider.isDarkMode
+                            ? AdvertiseColor.primaryColor.withOpacity(0.1)
+                            : AdvertiseColor.inputFieldColor,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.light_mode_outlined,
+                            color: !themeProvider.isDarkMode
+                                ? AdvertiseColor.primaryColor
+                                : AdvertiseColor.textColor.withOpacity(0.5),
+                          ),
+                          const SizedBox(width: 15),
+                          Text(
+                            t.lightLable,
+                            style: TextStyle(
+                              color: AdvertiseColor.textColor,
+                              fontWeight: !themeProvider.isDarkMode
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (!themeProvider.isDarkMode)
+                            Icon(
+                              Icons.check_circle,
+                              color: AdvertiseColor.primaryColor,
+                              size: 24,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Dark theme option
+                  GestureDetector(
+                    onTap: () {
+                      themeProvider.toggleTheme();
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: themeProvider.isDarkMode
+                              ? AdvertiseColor.primaryColor
+                              : AdvertiseColor.textColor.withOpacity(0.3),
+                          width: themeProvider.isDarkMode ? 2 : 1,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        color: themeProvider.isDarkMode
+                            ? AdvertiseColor.primaryColor.withOpacity(0.1)
+                            : AdvertiseColor.inputFieldColor,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.dark_mode_outlined,
+                            color: themeProvider.isDarkMode
+                                ? AdvertiseColor.primaryColor
+                                : AdvertiseColor.textColor.withOpacity(0.5),
+                          ),
+                          const SizedBox(width: 15),
+                          Text(
+                            t.darkLabel,
+                            style: TextStyle(
+                              color: AdvertiseColor.textColor,
+                              fontWeight: themeProvider.isDarkMode
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (themeProvider.isDarkMode)
+                            Icon(
+                              Icons.check_circle,
+                              color: AdvertiseColor.primaryColor,
+                              size: 24,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Close button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AdvertiseColor.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        t.close,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -294,6 +391,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     final langProvider = Provider.of<LanguageProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     if (_isLoading) {
       return Scaffold(
@@ -301,24 +399,35 @@ class _ProfilePageState extends State<ProfilePage> {
           automaticallyImplyLeading: false,
           title: Text(
             t.profilePage,
-            style: AppComponent.labelStyle.copyWith(fontSize: 25),
+            style: AppComponent.labelStyle.copyWith(
+              fontSize: 25,
+              color: AdvertiseColor.textColor,
+            ),
           ),
           backgroundColor: AdvertiseColor.backgroundColor,
+          elevation: 0,
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(color: AdvertiseColor.primaryColor),
+        ),
       );
     }
 
     var screenwidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: AdvertiseColor.backgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
           t.profilePage,
-          style: AppComponent.labelStyle.copyWith(fontSize: 25),
+          style: AppComponent.labelStyle.copyWith(
+            fontSize: 25,
+            color: AdvertiseColor.textColor,
+          ),
         ),
         backgroundColor: AdvertiseColor.backgroundColor,
+        elevation: 0,
         actions: [
           PopupMenuButton<String>(
             icon: Icon(
@@ -342,9 +451,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 value: 'edit',
                 child: Row(
                   children: [
-                    const Icon(Icons.edit, color: AdvertiseColor.primaryColor),
+                    Icon(Icons.edit, color: AdvertiseColor.primaryColor),
                     const SizedBox(width: 8),
-                    Text(t.editProfile),
+                    Text(
+                      t.editProfile,
+                      style: TextStyle(color: AdvertiseColor.textColor),
+                    ),
                   ],
                 ),
               ),
@@ -352,9 +464,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 value: 'logout',
                 child: Row(
                   children: [
-                    const Icon(Icons.logout, color: AdvertiseColor.dangerColor),
+                    Icon(Icons.logout, color: AdvertiseColor.dangerColor),
                     const SizedBox(width: 8),
-                    Text(t.logout),
+                    Text(
+                      t.logout,
+                      style: TextStyle(color: AdvertiseColor.textColor),
+                    ),
                   ],
                 ),
               ),
@@ -365,6 +480,7 @@ class _ProfilePageState extends State<ProfilePage> {
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(10),
+          color: AdvertiseColor.backgroundColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -372,10 +488,11 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AdvertiseColor
+                      .inputFieldColor, // Using inputFieldColor for card background
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AdvertiseColor.textColor.withOpacity(0.5),
+                    color: AdvertiseColor.textColor.withOpacity(0.2),
                   ),
                 ),
                 width: double.infinity,
@@ -388,7 +505,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: AdvertiseColor.textColor,
+                              color: AdvertiseColor.primaryColor,
                               width: 2,
                             ),
                             borderRadius: BorderRadius.circular(50),
@@ -416,12 +533,19 @@ class _ProfilePageState extends State<ProfilePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(userName, style: AppComponent.labelStyle),
+                              Text(
+                                userName,
+                                style: AppComponent.labelStyle.copyWith(
+                                  color: AdvertiseColor.textColor,
+                                ),
+                              ),
                               const SizedBox(height: 10),
                               Text(
                                 userEmail,
                                 style: AppComponent.sublabelStyle.copyWith(
-                                  color: AdvertiseColor.textColor,
+                                  color: AdvertiseColor.textColor.withOpacity(
+                                    0.7,
+                                  ),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -438,7 +562,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Icon(Icons.phone_outlined, size: 26),
+                              Icon(
+                                Icons.phone_outlined,
+                                size: 26,
+                                color: AdvertiseColor.textColor,
+                              ),
                               const SizedBox(width: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,7 +581,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Text(
                                     userPhone,
                                     style: AppComponent.sublabelStyle.copyWith(
-                                      color: AdvertiseColor.textColor,
+                                      color: AdvertiseColor.textColor
+                                          .withOpacity(0.7),
                                     ),
                                   ),
                                 ],
@@ -471,10 +600,10 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AdvertiseColor.inputFieldColor,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AdvertiseColor.textColor.withOpacity(0.5),
+                    color: AdvertiseColor.textColor.withOpacity(0.2),
                   ),
                 ),
                 width: double.infinity,
@@ -487,6 +616,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           t.devices,
                           style: AppComponent.detailTextStyle.copyWith(
                             fontSize: screenwidth <= 402 ? 12 : 16,
+                            color: AdvertiseColor.textColor,
                           ),
                         ),
                         const Spacer(),
@@ -514,11 +644,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Image.asset(
-                          'assets/img/sample/qr.png',
-                          fit: BoxFit.fitHeight,
-                          height: 70,
-                          width: 70,
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color:
+                                Colors.white, // Keep QR code background white
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Image.asset(
+                            'assets/img/sample/qr.png',
+                            fit: BoxFit.fitHeight,
+                            height: 70,
+                            width: 70,
+                          ),
                         ),
                         const SizedBox(width: 5),
                         Expanded(
@@ -531,6 +669,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'Added on 13/June/2025',
                                 style: AppComponent.labelStyle.copyWith(
                                   fontSize: 12,
+                                  color: AdvertiseColor.textColor,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
@@ -539,6 +678,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'RUPP',
                                 style: AppComponent.detailTextStyle.copyWith(
                                   fontSize: 10,
+                                  color: AdvertiseColor.textColor.withOpacity(
+                                    0.7,
+                                  ),
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
@@ -547,6 +689,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'C5E9',
                                 style: AppComponent.detailTextStyle.copyWith(
                                   fontSize: 10,
+                                  color: AdvertiseColor.textColor.withOpacity(
+                                    0.7,
+                                  ),
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
@@ -569,7 +714,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                       color: AdvertiseColor.textColor
-                                          .withOpacity(0.5),
+                                          .withOpacity(0.3),
                                       width: 1.5,
                                     ),
                                     borderRadius: BorderRadius.circular(15),
@@ -632,7 +777,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: _buildMenuItem(
                     icon: Icons.file_copy_outlined,
-                    title: t.usedTicket, // TODO: Add to ARB if needed
+                    title: t.usedTicket, // Add to ARB if needed
                   ),
                 ),
 
@@ -655,10 +800,10 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AdvertiseColor.inputFieldColor,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AdvertiseColor.textColor.withOpacity(0.5),
+                    color: AdvertiseColor.textColor.withOpacity(0.2),
                   ),
                 ),
                 height: 70,
@@ -670,7 +815,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: AdvertiseColor.primaryColor,
                     ),
                     const SizedBox(width: 10),
-                    Text(t.pNotification, style: AppComponent.labelTextStyle),
+                    Text(
+                      t.pNotification,
+                      style: TextStyle(
+                        color: AdvertiseColor.textColor,
+                        fontSize: 16,
+                      ),
+                    ),
                     const Spacer(),
                     Switch(
                       value: _notificationsEnabled,
@@ -727,12 +878,12 @@ class _ProfilePageState extends State<ProfilePage> {
               GestureDetector(
                 onTap: () => _showAppearanceBottomSheet(context),
                 child: _buildMenuItem(
-                  icon: Icons.dark_mode_outlined,
+                  icon: themeProvider.isDarkMode
+                      ? Icons.dark_mode_outlined
+                      : Icons.light_mode_outlined,
                   title: t.pAppearance,
                   showValue: true,
-                  value: langProvider.locale.languageCode == 'km'
-                      ? t.lightLable
-                      : t.lightLable, // TODO: Add theme selection logic
+                  value: themeProvider.isDarkMode ? t.darkLabel : t.lightLable,
                 ),
               ),
 
@@ -771,9 +922,9 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdvertiseColor.inputFieldColor,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.5)),
+        border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.2)),
       ),
       height: 70,
       width: double.infinity,
@@ -781,14 +932,20 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           Icon(icon, color: AdvertiseColor.primaryColor),
           const SizedBox(width: 10),
-          Expanded(child: Text(title, style: AppComponent.labelTextStyle)),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(color: AdvertiseColor.textColor, fontSize: 16),
+            ),
+          ),
           if (showValue && value != null)
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Text(
                 value,
-                style: AppComponent.sublabelStyle.copyWith(
+                style: TextStyle(
                   color: AdvertiseColor.textColor.withOpacity(0.7),
+                  fontSize: 14,
                 ),
               ),
             ),

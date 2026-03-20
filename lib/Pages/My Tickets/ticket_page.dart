@@ -156,9 +156,11 @@ class _TicketPageState extends State<TicketPage> {
                       horizontal: 20,
                     ),
                     hintText: "Search Tickets",
-                    hintStyle: AppComponent.hintSearchStyle,
+                    hintStyle: AppComponent.hintSearchStyle.copyWith(
+                      color: AdvertiseColor.textColor,
+                    ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AdvertiseColor.inputFieldColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
@@ -171,7 +173,7 @@ class _TicketPageState extends State<TicketPage> {
                     ),
                     prefixIcon: Icon(
                       Icons.search,
-                      color: AdvertiseColor.inputFieldColor,
+                      color: AdvertiseColor.textColor,
                     ),
                   ),
                 ),

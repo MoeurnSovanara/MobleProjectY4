@@ -254,8 +254,9 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
         height: 300,
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AdvertiseColor.inputFieldColor,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.5)),
           boxShadow: const [
             BoxShadow(
               color: Colors.black12,
@@ -302,7 +303,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                       children: [
                         Text(
                           '${widget.eventData.eventStart.day}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.textColor,
                             fontWeight: FontWeight.w500,
@@ -313,7 +314,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                           helper.getMonthAbbreviation(
                             widget.eventData.eventStart.month,
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'KantumruyPro',
                             color: AdvertiseColor.primaryColor,
                             fontSize: 16,
@@ -340,7 +341,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                             : Icons.bookmark_outline,
                         color: interactiveHelper.isBookMarked
                             ? AdvertiseColor.primaryColor
-                            : Colors.black,
+                            : AdvertiseColor.textColor,
                         size: 20,
                       ),
                     ),
@@ -358,7 +359,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                   // Event title
                   Text(
                     widget.eventData.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'KantumruyPro',
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -393,7 +394,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                                 fontFamily: 'KantumruyPro',
                                 color: interactiveHelper.isLiked
                                     ? AdvertiseColor.primaryColor
-                                    : Colors.black,
+                                    : AdvertiseColor.textColor,
                                 fontWeight: interactiveHelper.isLiked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -428,7 +429,7 @@ class _SeealleventwidgetState extends State<Seealleventwidget> {
                                 fontFamily: 'KantumruyPro',
                                 color: interactiveHelper.isDisliked
                                     ? AdvertiseColor.textColor
-                                    : Colors.black,
+                                    : AdvertiseColor.textColor,
                                 fontWeight: interactiveHelper.isDisliked
                                     ? FontWeight.bold
                                     : FontWeight.normal,

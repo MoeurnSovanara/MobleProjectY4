@@ -299,13 +299,13 @@ class _EventWidgetState extends State<EventWidget> {
         height: 500,
         margin: const EdgeInsets.only(left: 15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AdvertiseColor.backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black12,
+              color: AdvertiseColor.textColor.withOpacity(0.5),
               blurRadius: 4,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -329,8 +329,9 @@ class _EventWidgetState extends State<EventWidget> {
         height: 500,
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AdvertiseColor.inputFieldColor,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AdvertiseColor.textColor.withOpacity(0.5)),
           boxShadow: const [
             BoxShadow(
               color: Colors.black12,
@@ -417,7 +418,7 @@ class _EventWidgetState extends State<EventWidget> {
                             : Icons.bookmark_outline,
                         color: _interactionHelper!.isBookMarked
                             ? AdvertiseColor.primaryColor
-                            : Colors.black,
+                            : AdvertiseColor.textColor,
                         size: 20,
                       ),
                     ),
@@ -471,7 +472,7 @@ class _EventWidgetState extends State<EventWidget> {
                                 fontFamily: 'KantumruyPro',
                                 color: _interactionHelper!.isLiked
                                     ? AdvertiseColor.primaryColor
-                                    : Colors.black,
+                                    : AdvertiseColor.textColor,
                                 fontWeight: _interactionHelper!.isLiked
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -510,7 +511,7 @@ class _EventWidgetState extends State<EventWidget> {
                                 fontFamily: 'KantumruyPro',
                                 color: _interactionHelper!.isDisliked
                                     ? AdvertiseColor.textColor
-                                    : Colors.black,
+                                    : AdvertiseColor.textColor.withOpacity(0.5),
                                 fontWeight: _interactionHelper!.isDisliked
                                     ? FontWeight.bold
                                     : FontWeight.normal,

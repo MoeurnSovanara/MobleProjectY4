@@ -321,7 +321,7 @@ class _CardWidgetState extends State<CardWidget> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AdvertiseColor.inputFieldColor,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
@@ -338,7 +338,7 @@ class _CardWidgetState extends State<CardWidget> {
                   data: qrData,
                   version: QrVersions.auto,
                   size: 200,
-                  backgroundColor: Colors.white,
+                  backgroundColor: AdvertiseColor.textColor,
                   errorCorrectionLevel: QrErrorCorrectLevel.H,
                   eyeStyle: QrEyeStyle(
                     eyeShape: QrEyeShape.square,
