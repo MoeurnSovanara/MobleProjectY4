@@ -116,7 +116,7 @@ class _SignupPageState extends State<SignupPage> {
                         style: TextStyle(
                           fontFamily: 'KantumruyPro',
                           fontSize: 16,
-                          color: AdvertiseColor.textColor,
+                          color: AdvertiseColor.backgroundColor,
                         ),
                       ),
                       Text(
@@ -125,7 +125,7 @@ class _SignupPageState extends State<SignupPage> {
                           fontFamily: 'KantumruyPro',
                           fontSize: 40,
                           fontWeight: FontWeight.w700,
-                          color: AdvertiseColor.textColor,
+                          color: AdvertiseColor.backgroundColor,
                         ),
                       ),
                     ],
